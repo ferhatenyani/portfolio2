@@ -1212,23 +1212,31 @@
                 const heroLayer = document.getElementById('hero-layer');
                 const navLayer = document.getElementById('nav-layer');
 
-                // Wait for dust animation to complete
+                // Wait for dust animation to nearly complete before showing navigation
                 const checkDust = setInterval(() => {
-                    if (ParticleSystem.getActiveParticleCount() === 0) {
+                    if (ParticleSystem.getActiveParticleCount() < ParticleSystem.textParticles.length * 0.1) { // When 90% of particles have scattered
                         clearInterval(checkDust);
 
-                        heroLayer.style.display = 'none';
                         navLayer.classList.add('visible');
-
                         ParticleSystem.initNavigationState();
 
+                        // Fade in navigation layer more smoothly with a bit of delay
                         gsap.to(navLayer, {
                             opacity: 1,
-                            duration: 0.5,
+                            duration: 0.8,
+                            delay: 0.2,
+                            ease: 'power2.out',
                             onComplete: () => {
+                                // Gradually show zone labels with stagger
                                 gsap.fromTo('.zone-label',
-                                    { opacity: 0 },
-                                    { opacity: 0, duration: 0 }
+                                    { opacity: 0, y: 10 },
+                                    {
+                                        opacity: 0.7,
+                                        y: 0,
+                                        duration: 0.6,
+                                        stagger: 0.15,
+                                        ease: 'power2.out'
+                                    }
                                 );
                                 onComplete();
                             }
@@ -1355,9 +1363,19 @@
                         navLayer.style.opacity = 0;
                         heroLayer.style.display = 'flex';
 
-                        ctaBtn.classList.remove('opacity-0', 'pointer-events-none');
-                        ctaBtn.style.opacity = 1;
+                        // Reset CTA button to its initial state with proper class handling
+                        ctaBtn.style.opacity = '0';
+                        ctaBtn.style.transform = 'scale(1)';
                         ctaBtn.style.pointerEvents = 'auto';
+                        ctaBtn.classList.add('animate-in'); // Re-add the initial animation class
+
+                        // Reset the animation by removing and re-adding the class to restart it
+                        setTimeout(() => {
+                            ctaBtn.classList.remove('animate-in');
+                            setTimeout(() => {
+                                ctaBtn.classList.add('animate-in');
+                            }, 10);
+                        }, 10);
 
                         ParticleSystem.initHeroState();
 
@@ -1488,10 +1506,17 @@
                 const ctaBtn = document.getElementById('cta-btn');
 
                 ctaBtn.addEventListener('click', () => {
+                    // Remove the animate-in class to prevent interference with fade-out
+                    ctaBtn.classList.remove('animate-in');
+
+                    // Add a slower, more subtle fade out animation to the CTA button
                     gsap.to(ctaBtn, {
                         opacity: 0,
+                        scale: 0.95,
                         pointerEvents: 'none',
-                        duration: 0.3
+                        duration: 1.0,
+                        ease: 'power2.out',
+                        overwrite: 'auto'
                     });
 
                     ParticleSystem.startDusting();
