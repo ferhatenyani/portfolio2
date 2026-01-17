@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferhaten Yani | Portfolio</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #fafafa;
+            color: #18181b;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ================================
+           CANVAS LAYERS
+        ================================ */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        #aperture-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 80;
+        }
+
+        /* ================================
+           HERO LAYER
+        ================================ */
+        #hero-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        #hero-layer > * {
+            pointer-events: auto;
+        }
+
+        .scanned-text {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* ================================
+           NAVIGATION LAYER
+        ================================ */
+        #nav-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: none;
+            opacity: 0;
+        }
+
+        #nav-layer.visible {
+            display: block;
+        }
+
+        /* Zone Areas (invisible hit areas) */
+        .zone {
+            position: fixed;
+            z-index: 61;
+            cursor: pointer;
+        }
+
+        .zone.top-left {
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 50%;
+        }
+
+        .zone.top-right {
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 50%;
+        }
+
+        .zone.bottom-left {
+            bottom: 0;
+            left: 0;
+            width: 50%;
+            height: 50%;
+        }
+
+        .zone.bottom-right {
+            bottom: 0;
+            right: 0;
+            width: 50%;
+            height: 50%;
+        }
+
+        /* Zone Labels */
+        .zone-label {
+            position: absolute;
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #a1a1aa;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .zone:hover .zone-label,
+        .zone.active .zone-label {
+            opacity: 1;
+        }
+
+        .zone.top-left .zone-label {
+            top: 40px;
+            left: 40px;
+        }
+
+        .zone.top-right .zone-label {
+            top: 40px;
+            right: 40px;
+        }
+
+        .zone.bottom-left .zone-label {
+            bottom: 40px;
+            left: 40px;
+        }
+
+        .zone.bottom-right .zone-label {
+            bottom: 40px;
+            right: 40px;
+        }
+
+        /* Center instruction */
+        .center-hint {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #d4d4d8;
+            z-index: 55;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .center-hint.hidden {
+            opacity: 0;
+        }
+
+        /* Back to Hero button */
+        #back-hero-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #a1a1aa;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 62;
+            transition: color 0.3s ease;
+            padding: 10px 20px;
+        }
+
+        #back-hero-btn:hover {
+            color: #18181b;
+        }
+
+        /* ================================
+           SECTION CONTAINERS
+        ================================ */
+        .section-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .section-container.preview {
+            opacity: 0.4;
+            filter: brightness(0.7);
+        }
+
+        .section-container.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .section-content {
+            max-width: 700px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .section-content h2 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-content p {
+            font-size: 1rem;
+            color: #71717a;
+            line-height: 1.8;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ================================
+           CONTACT SECTION SPECIAL STYLES
+           (Invocation-style large typography input)
+        ================================ */
+        #section-contact .section-content {
+            max-width: 900px;
+            position: relative;
+        }
+
+        #section-contact .section-content h2,
+        #section-contact .section-content > p {
+            position: relative;
+            z-index: 10;
+        }
+
+        .contact-input-wrapper {
+            margin-top: 3rem;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        /* Large Typography Input - like nav-invocation */
+        .contact-input {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 600;
+            letter-spacing: -0.04em;
+            color: #18181b;
+            background: transparent;
+            border: none;
+            outline: none;
+            text-align: center;
+            width: 100%;
+            caret-color: #18181b;
+        }
+
+        .contact-input::placeholder {
+            color: #d4d4d8;
+        }
+
+        .contact-input:focus::placeholder {
+            color: transparent;
+        }
+
+        /* Background preview text (fades in as you type) */
+        .contact-preview {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(4rem, 15vw, 10rem);
+            font-weight: 600;
+            letter-spacing: -0.05em;
+            color: #18181b;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            white-space: nowrap;
+            transition: opacity 0.3s ease;
+        }
+
+        .contact-preview.visible {
+            opacity: 0.08;
+        }
+
+        .contact-hint {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: #a1a1aa;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: opacity 0.3s ease;
+        }
+
+        #contact-confirmation {
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: #18181b;
+            opacity: 0;
+        }
+
+        /* Mobile adjustments for contact */
+        @media (max-width: 768px) {
+            .contact-input {
+                font-size: clamp(1.8rem, 6vw, 3rem);
+            }
+
+            .contact-preview {
+                font-size: clamp(3rem, 12vw, 6rem);
+            }
+        }
+
+        /* ================================
+           CLOSE BUTTON
+        ================================ */
+        .close-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #18181b;
+            border: none;
+            cursor: pointer;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #3f3f46;
+            transform: scale(1.05);
+        }
+
+        .close-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .close-btn::before,
+        .close-btn::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: #fafafa;
+        }
+
+        .close-btn::before {
+            transform: rotate(45deg);
+        }
+
+        .close-btn::after {
+            transform: rotate(-45deg);
+        }
+
+        /* ================================
+           MOBILE ADJUSTMENTS
+        ================================ */
+        @media (max-width: 768px) {
+            .zone-label {
+                font-size: 0.6rem;
+            }
+
+            .zone.top-left .zone-label,
+            .zone.top-right .zone-label {
+                top: 25px;
+            }
+
+            .zone.bottom-left .zone-label,
+            .zone.bottom-right .zone-label {
+                bottom: 60px;
+            }
+
+            .zone.top-left .zone-label,
+            .zone.bottom-left .zone-label {
+                left: 25px;
+            }
+
+            .zone.top-right .zone-label,
+            .zone.bottom-right .zone-label {
+                right: 25px;
+            }
+
+            .close-btn {
+                top: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
+            }
+
+            #back-hero-btn {
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas Layers -->
+    <canvas id="particle-canvas"></canvas>
+    <canvas id="aperture-canvas"></canvas>
+
+    <!-- ================================
+         HERO LAYER
+    ================================ -->
+    <div id="hero-layer">
+        <!-- Header Icon -->
+        <div class="mb-10 p-3 rounded-2xl bg-white shadow-sm border border-zinc-200/60 animate-in" style="animation-delay: 100ms;">
+            <i data-lucide="cpu" class="w-6 h-6 text-zinc-900" stroke-width="1.5"></i>
+        </div>
+
+        <!-- Target Text for Particle System -->
+        <div class="relative w-full flex flex-col items-center justify-center mb-12">
+            <h1 id="text-name" class="scanned-text text-5xl md:text-7xl font-semibold tracking-tighter text-zinc-900 mb-6 leading-tight">
+                Ferhaten Yani
+            </h1>
+            <h2 id="text-role" class="scanned-text text-sm md:text-base font-normal text-zinc-400 tracking-tight uppercase">
+                Frontend & UI Engineering
+            </h2>
+        </div>
+
+        <!-- Trigger Button -->
+        <button id="cta-btn" class="group relative px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs md:text-sm font-medium tracking-wide rounded-full transition-all duration-300 ease-out flex items-center gap-2 shadow-lg shadow-zinc-200/50 animate-in" style="animation-delay: 500ms;">
+            <span class="relative z-10">Initialize Portfolio</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5 relative z-10 transition-transform duration-300 group-hover:translate-x-0.5" stroke-width="1.5"></i>
+        </button>
+    </div>
+
+    <!-- ================================
+         NAVIGATION LAYER
+    ================================ -->
+    <div id="nav-layer">
+        <!-- Center Hint -->
+        <div class="center-hint" id="center-hint">Hover to preview · Click to enter</div>
+
+        <!-- Zone Hit Areas -->
+        <div class="zone top-left" data-section="projects">
+            <span class="zone-label">Projects</span>
+        </div>
+        <div class="zone top-right" data-section="contact">
+            <span class="zone-label">Contact</span>
+        </div>
+        <div class="zone bottom-left" data-section="about">
+            <span class="zone-label">About</span>
+        </div>
+        <div class="zone bottom-right" data-section="skills">
+            <span class="zone-label">Skills</span>
+        </div>
+
+        <!-- Back to Hero Button -->
+        <button id="back-hero-btn">Back to Start</button>
+    </div>
+
+    <!-- Close Button (shared) -->
+    <button class="close-btn" id="close-btn" aria-label="Close section"></button>
+
+    <!-- ================================
+         SECTION CONTAINERS
+    ================================ -->
+    <div class="section-container" id="section-projects">
+        <div class="section-content">
+            <h2>Projects</h2>
+            <p>A curated selection of work spanning interface design, creative development, and interactive experiences.</p>
+        </div>
+    </div>
+
+    <div class="section-container" id="section-about">
+        <div class="section-content">
+            <h2>About</h2>
+            <p>Designer and developer focused on crafting interfaces that feel inevitable. Based in the intersection of form and function.</p>
+        </div>
+    </div>
+
+    <div class="section-container" id="section-skills">
+        <div class="section-content">
+            <h2>Skills</h2>
+            <p>Frontend architecture, motion design, creative coding, and the delicate art of making complex things feel simple.</p>
+        </div>
+    </div>
+
+    <!-- Contact Section (Special - Invocation style with large typography input) -->
+    <div class="section-container" id="section-contact">
+        <div class="section-content">
+            <!-- Background preview text that fades in as user types -->
+            <div class="contact-preview" id="contact-preview"></div>
+
+            <h2>Contact</h2>
+            <p>Open to collaboration on ambitious projects. Let's create something meaningful together.</p>
+
+            <div class="contact-input-wrapper">
+                <input
+                    type="text"
+                    id="contact-input"
+                    class="contact-input"
+                    placeholder="Type..."
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                >
+                <div class="contact-hint" id="contact-hint">Press Enter to send your message into the void</div>
+            </div>
+
+            <div id="contact-confirmation">Message sent — particles carry your words</div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const CONFIG = {
+            // Hero text sampling
+            textSampleGap: 1,
+            particleSize: 0.8,
+            mouseRadius: 60,
+
+            // Hero state
+            driftRadius: 1.2,
+            driftSpeed: 0.015,
+            dustSpeed: 2.5,
+            dustFade: 0.012,
+
+            // Navigation state
+            navParticleCount: 600,
+            zoneConcentration: 0.6,
+            apertureParticleCount: 300,
+            apertureDuration: 0.7,
+
+            // Colors
+            colors: {
+                primary: '39, 39, 42',
+                name: '39, 39, 42',
+                role: '161, 161, 170'
+            }
+        };
+
+        // Zone positions (normalized 0-1)
+        const ZONE_POSITIONS = {
+            'projects': { x: 0.25, y: 0.25 },
+            'contact': { x: 0.75, y: 0.25 },
+            'about': { x: 0.25, y: 0.75 },
+            'skills': { x: 0.75, y: 0.75 }
+        };
+
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        const AppState = {
+            HERO: 'hero',
+            NAVIGATION: 'navigation',
+            SECTION_OPEN: 'section_open'
+        };
+
+        const StateManager = {
+            current: AppState.HERO,
+            previous: null,
+            activeSection: null,
+            isTransitioning: false,
+
+            transition(newState, data = {}) {
+                if (this.isTransitioning && !data.force) return;
+                if (this.current === newState && !data.force) return;
+
+                this.isTransitioning = true;
+                this.previous = this.current;
+                this.current = newState;
+
+                TransitionController.execute(this.previous, newState, data, () => {
+                    this.isTransitioning = false;
+                });
+            },
+
+            setActiveSection(sectionName) {
+                this.activeSection = sectionName;
+            },
+
+            clearActiveSection() {
+                this.activeSection = null;
+            }
+        };
+
+        // ============================================
+        // CANVAS SETUP
+        // ============================================
+        const particleCanvas = document.getElementById('particle-canvas');
+        const particleCtx = particleCanvas.getContext('2d', { willReadFrequently: false });
+
+        const apertureCanvas = document.getElementById('aperture-canvas');
+        const apertureCtx = apertureCanvas.getContext('2d');
+
+        let width, height;
+        let mouse = { x: -9999, y: -9999 };
+        let resizeTimer;
+
+        // ============================================
+        // UNIFIED PARTICLE CLASS
+        // ============================================
+        class UnifiedParticle {
+            constructor() {
+                this.x = 0;
+                this.y = 0;
+                this.targetX = 0;
+                this.targetY = 0;
+                this.originX = 0;
+                this.originY = 0;
+                this.vx = 0;
+                this.vy = 0;
+                this.size = 1;
+                this.alpha = 1;
+                this.baseAlpha = 0.3;
+                this.color = CONFIG.colors.primary;
+                this.mode = 'wander';
+                this.zone = null;
+                this.isTextParticle = false;
+                this.formed = false;
+                this.ease = 0.05;
+                this.wanderAngle = Math.random() * Math.PI * 2;
+                this.wanderSpeed = 0.1;
+                this.driftPhase = Math.random() * Math.PI * 2;
+                this.driftAngle = Math.random() * Math.PI * 2;
+                this.driftAmount = 1;
+                this.dustVx = 0;
+                this.dustVy = 0;
+                this.dustAcceleration = 0;
+                this.activeVelocity = 0;
+            }
+
+            initWander() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.mode = 'wander';
+                this.alpha = Math.random() * 0.3 + 0.1;
+                this.baseAlpha = this.alpha;
+                this.wanderAngle = Math.random() * Math.PI * 2;
+                this.wanderSpeed = 0.08 + Math.random() * 0.12;
+                this.size = Math.random() * CONFIG.particleSize + 0.3;
+                this.isTextParticle = false;
+            }
+
+            initTextFormation(targetX, targetY, colorRGB) {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.originX = targetX;
+                this.originY = targetY;
+                this.color = colorRGB;
+                this.mode = 'wander';
+                this.alpha = 1;
+                this.size = Math.random() * 0.2 + CONFIG.particleSize;
+                this.ease = Math.random() * 0.06 + 0.03;
+                this.driftPhase = Math.random() * Math.PI * 2;
+                this.driftAngle = Math.random() * Math.PI * 2;
+                this.driftAmount = Math.random() * CONFIG.driftRadius;
+                this.isTextParticle = true;
+                this.formed = false;
+                this.wanderAngle = Math.random() * Math.PI * 2;
+                this.wanderSpeed = 0.3 + Math.random() * 0.5;
+
+                const angle = Math.PI + (Math.random() - 0.5) * 0.8;
+                const speed = Math.random() * CONFIG.dustSpeed + 0.5;
+                this.dustVx = Math.cos(angle) * speed;
+                this.dustVy = Math.sin(angle) * speed;
+                this.dustAcceleration = 0.02 + Math.random() * 0.03;
+            }
+
+            initZoneParticle(zoneName) {
+                this.zone = zoneName;
+                const pos = ZONE_POSITIONS[zoneName];
+
+                if (Math.random() < CONFIG.zoneConcentration) {
+                    const spread = 0.15;
+                    this.x = (pos.x + (Math.random() - 0.5) * spread) * width;
+                    this.y = (pos.y + (Math.random() - 0.5) * spread) * height;
+                } else {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                }
+
+                this.originX = this.x;
+                this.originY = this.y;
+                this.mode = 'concentrate';
+                this.alpha = Math.random() * 0.5 + 0.2;
+                this.baseAlpha = this.alpha;
+                this.size = Math.random() * 1.2 + 0.5;
+                this.isTextParticle = false;
+                this.wanderAngle = Math.random() * Math.PI * 2;
+                this.wanderSpeed = 0.1 + Math.random() * 0.15;
+            }
+
+            update(hoveredZone) {
+                switch (this.mode) {
+                    case 'wander':
+                        this.updateWander();
+                        break;
+                    case 'form':
+                        this.updateFormation();
+                        break;
+                    case 'dust':
+                        this.updateDust();
+                        break;
+                    case 'concentrate':
+                        this.updateConcentrate(hoveredZone);
+                        break;
+                }
+            }
+
+            updateWander() {
+                this.wanderAngle += (Math.random() - 0.5) * 0.1;
+                this.x += Math.cos(this.wanderAngle) * this.wanderSpeed;
+                this.y += Math.sin(this.wanderAngle) * this.wanderSpeed;
+
+                if (this.x < 0) this.wanderAngle = 0;
+                if (this.x > width) this.wanderAngle = Math.PI;
+                if (this.y < 0) this.wanderAngle = Math.PI / 2;
+                if (this.y > height) this.wanderAngle = -Math.PI / 2;
+            }
+
+            updateFormation() {
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const distance = Math.hypot(dx, dy);
+
+                let forceX = 0;
+                let forceY = 0;
+
+                if (distance < CONFIG.mouseRadius) {
+                    const forceDirectionX = dx / distance;
+                    const forceDirectionY = dy / distance;
+                    const force = (CONFIG.mouseRadius - distance) / CONFIG.mouseRadius;
+                    const strength = 4;
+                    forceX = -forceDirectionX * force * strength;
+                    forceY = -forceDirectionY * force * strength;
+                }
+
+                this.driftPhase += CONFIG.driftSpeed;
+                const driftX = Math.cos(this.driftPhase + this.driftAngle) * this.driftAmount;
+                const driftY = Math.sin(this.driftPhase + this.driftAngle) * this.driftAmount;
+
+                const targetX = this.originX + forceX + driftX;
+                const targetY = this.originY + forceY + driftY;
+
+                this.x += (targetX - this.x) * this.ease;
+                this.y += (targetY - this.y) * this.ease;
+
+                const distToOrigin = Math.hypot(this.x - this.originX, this.y - this.originY);
+                if (distToOrigin < 5) {
+                    this.formed = true;
+                }
+            }
+
+            updateDust() {
+                if (this.activeVelocity < 1.5) {
+                    this.activeVelocity += this.dustAcceleration;
+                }
+
+                this.x += this.dustVx * this.activeVelocity;
+                this.y += this.dustVy * this.activeVelocity;
+                this.y += (Math.random() - 0.5) * 0.4 * this.activeVelocity;
+                this.x -= Math.random() * 0.2;
+
+                this.alpha -= CONFIG.dustFade;
+            }
+
+            updateConcentrate(hoveredZone) {
+                this.wanderAngle += (Math.random() - 0.5) * 0.08;
+                this.x += Math.cos(this.wanderAngle) * this.wanderSpeed;
+                this.y += Math.sin(this.wanderAngle) * this.wanderSpeed;
+
+                // Mouse repulsion
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const dist = Math.hypot(dx, dy);
+
+                if (dist < CONFIG.mouseRadius) {
+                    const force = (CONFIG.mouseRadius - dist) / CONFIG.mouseRadius;
+                    this.x -= (dx / dist) * force * 2;
+                    this.y -= (dy / dist) * force * 2;
+                }
+
+                // Hover attraction to zone
+                if (hoveredZone && this.zone === hoveredZone) {
+                    const pos = ZONE_POSITIONS[hoveredZone];
+                    const targetX = pos.x * width;
+                    const targetY = pos.y * height;
+                    this.x += (targetX - this.x) * 0.01;
+                    this.y += (targetY - this.y) * 0.01;
+                    this.alpha = Math.min(this.baseAlpha * 1.5, 1);
+                } else {
+                    this.alpha = this.baseAlpha;
+                }
+
+                // Soft wrap
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+            }
+
+            draw(ctx) {
+                if (this.alpha <= 0) return;
+                ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        // ============================================
+        // APERTURE PARTICLE CLASS
+        // ============================================
+        class ApertureParticle {
+            constructor(angle) {
+                this.baseAngle = angle;
+                this.angle = angle;
+                this.size = Math.random() * 2 + 1;
+                this.alpha = Math.random() * 0.8 + 0.2;
+                this.wobble = Math.random() * Math.PI * 2;
+                this.wobbleSpeed = 0.02 + Math.random() * 0.03;
+                this.wobbleAmount = 5 + Math.random() * 10;
+                this.x = 0;
+                this.y = 0;
+            }
+
+            update(centerX, centerY, currentRadius) {
+                this.wobble += this.wobbleSpeed;
+                const wobbleOffset = Math.sin(this.wobble) * this.wobbleAmount;
+                const radius = currentRadius + wobbleOffset;
+                this.angle = this.baseAngle + Math.sin(this.wobble * 0.5) * 0.05;
+                this.x = centerX + Math.cos(this.angle) * radius;
+                this.y = centerY + Math.sin(this.angle) * radius;
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = `rgba(${CONFIG.colors.primary}, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // ============================================
+        // PARTICLE SYSTEM
+        // ============================================
+        const ParticleSystem = {
+            particles: [],
+            textParticles: [],
+            zoneParticles: [],
+            apertureParticles: [],
+            explosionParticles: [],
+            isForming: false,
+            isDusting: false,
+
+            init() {
+                this.particles = [];
+                this.textParticles = [];
+                this.zoneParticles = [];
+                this.explosionParticles = [];
+                this.isForming = false;
+                this.isDusting = false;
+            },
+
+            initHeroState() {
+                this.init();
+
+                const textSamplingCtx = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+                textSamplingCtx.canvas.width = width;
+                textSamplingCtx.canvas.height = height;
+
+                const sampleElement = (id, colorRGB) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+
+                    const rect = el.getBoundingClientRect();
+                    const style = window.getComputedStyle(el);
+
+                    textSamplingCtx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+                    textSamplingCtx.fillStyle = 'white';
+                    textSamplingCtx.textBaseline = 'top';
+                    textSamplingCtx.textAlign = 'center';
+
+                    const centerX = rect.left + rect.width / 2;
+                    textSamplingCtx.fillText(el.innerText, centerX, rect.top);
+
+                    const buffer = 5;
+                    const scanLeft = Math.floor(Math.max(0, rect.left - buffer));
+                    const scanTop = Math.floor(Math.max(0, rect.top - buffer));
+                    const scanW = Math.ceil(rect.width + buffer * 2);
+                    const scanH = Math.ceil(rect.height + buffer * 2);
+
+                    const imgData = textSamplingCtx.getImageData(scanLeft, scanTop, scanW, scanH);
+                    const data = imgData.data;
+                    const gap = CONFIG.textSampleGap;
+
+                    for (let y = 0; y < scanH; y += gap) {
+                        for (let x = 0; x < scanW; x += gap) {
+                            const index = (y * scanW + x) * 4 + 3;
+                            if (data[index] > 128) {
+                                const pX = scanLeft + x;
+                                const pY = scanTop + y;
+                                const particle = new UnifiedParticle();
+                                particle.initTextFormation(pX, pY, colorRGB);
+                                this.textParticles.push(particle);
+                            }
+                        }
+                    }
+                    textSamplingCtx.clearRect(0, 0, width, height);
+                };
+
+                sampleElement('text-name', CONFIG.colors.name);
+                sampleElement('text-role', CONFIG.colors.role);
+
+                this.particles = [...this.textParticles];
+            },
+
+            initNavigationState() {
+                this.init();
+
+                const zones = Object.keys(ZONE_POSITIONS);
+                for (let i = 0; i < CONFIG.navParticleCount; i++) {
+                    const particle = new UnifiedParticle();
+                    const zone = zones[i % zones.length];
+                    particle.initZoneParticle(zone);
+                    this.zoneParticles.push(particle);
+                }
+
+                // Initialize aperture particles
+                this.apertureParticles = [];
+                for (let i = 0; i < CONFIG.apertureParticleCount; i++) {
+                    const angle = (i / CONFIG.apertureParticleCount) * Math.PI * 2;
+                    this.apertureParticles.push(new ApertureParticle(angle));
+                }
+
+                this.particles = [...this.zoneParticles];
+            },
+
+            startTextFormation() {
+                this.isForming = true;
+                this.textParticles.forEach(p => {
+                    p.mode = 'form';
+                });
+            },
+
+            startDusting() {
+                this.isDusting = true;
+                this.textParticles.forEach(p => {
+                    p.mode = 'dust';
+                    p.activeVelocity = 0;
+                });
+            },
+
+            createTextExplosion(text, x, y, fontSize) {
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+
+                tempCtx.font = `500 ${fontSize}px Inter`;
+                tempCtx.fillStyle = 'white';
+                tempCtx.textAlign = 'center';
+                tempCtx.textBaseline = 'middle';
+                tempCtx.fillText(text, x, y);
+
+                const imageData = tempCtx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                const gap = 4;
+
+                for (let py = 0; py < height; py += gap) {
+                    for (let px = 0; px < width; px += gap) {
+                        const index = (py * width + px) * 4 + 3;
+                        if (data[index] > 128) {
+                            const particle = {
+                                x: px,
+                                y: py,
+                                vx: (Math.random() - 0.5) * 12,
+                                vy: (Math.random() - 0.5) * 12 - 2,
+                                size: Math.random() * 2 + 1,
+                                alpha: 1,
+                                decay: 0.02 + Math.random() * 0.015,
+                                color: CONFIG.colors.primary,
+
+                                update() {
+                                    this.x += this.vx;
+                                    this.y += this.vy;
+                                    this.vx *= 0.96;
+                                    this.vy *= 0.96;
+                                    this.vy += 0.08;
+                                    this.alpha -= this.decay;
+                                },
+
+                                draw(ctx) {
+                                    if (this.alpha <= 0) return;
+                                    ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
+                                    ctx.fillRect(this.x, this.y, this.size, this.size);
+                                }
+                            };
+
+                            this.explosionParticles.push(particle);
+                        }
+                    }
+                }
+            },
+
+            update(hoveredZone) {
+                this.particles.forEach(p => {
+                    p.update(hoveredZone);
+                });
+
+                this.explosionParticles = this.explosionParticles.filter(p => p.alpha > 0);
+                this.explosionParticles.forEach(p => p.update());
+            },
+
+            draw(ctx) {
+                this.particles.forEach(p => p.draw(ctx));
+                this.explosionParticles.forEach(p => p.draw(ctx));
+            },
+
+            getActiveParticleCount() {
+                return this.particles.filter(p => p.alpha > 0).length;
+            }
+        };
+
+        // ============================================
+        // APERTURE SYSTEM
+        // ============================================
+        const ApertureSystem = {
+            state: 0,
+            center: { x: 0, y: 0 },
+            isAnimating: false,
+
+            setCenter(x, y) {
+                this.center.x = x;
+                this.center.y = y;
+            },
+
+            animateOpen(duration, onComplete) {
+                this.isAnimating = true;
+                gsap.to(this, {
+                    state: 1,
+                    duration: duration,
+                    ease: 'power2.inOut',
+                    onComplete: () => {
+                        this.isAnimating = false;
+                        if (onComplete) onComplete();
+                    }
+                });
+            },
+
+            animateClose(duration, onComplete) {
+                this.isAnimating = true;
+                gsap.to(this, {
+                    state: 0,
+                    duration: duration,
+                    delay: 0.2,
+                    ease: 'power2.inOut',
+                    onComplete: () => {
+                        this.isAnimating = false;
+                        if (onComplete) onComplete();
+                    }
+                });
+            },
+
+            animatePeek() {
+                if (this.isAnimating) return;
+                gsap.to(this, {
+                    state: 0.15,
+                    duration: 0.4,
+                    ease: 'power2.out'
+                });
+            },
+
+            animateUnpeek() {
+                if (this.isAnimating) return;
+                gsap.to(this, {
+                    state: 0,
+                    duration: 0.3,
+                    ease: 'power2.in'
+                });
+            },
+
+            draw(ctx) {
+                if (this.state <= 0) return;
+                if (this.state >= 1) return;
+
+                const maxRadius = Math.max(width, height) * 1.5;
+                const currentRadius = maxRadius * this.state;
+
+                ctx.save();
+                ctx.fillStyle = '#fafafa';
+                ctx.beginPath();
+                ctx.rect(0, 0, width, height);
+                ctx.arc(this.center.x, this.center.y, currentRadius, 0, Math.PI * 2, true);
+                ctx.fill();
+
+                ParticleSystem.apertureParticles.forEach(p => {
+                    p.update(this.center.x, this.center.y, currentRadius);
+                    p.draw(ctx);
+                });
+
+                ctx.restore();
+            }
+        };
+
+        // ============================================
+        // TRANSITION CONTROLLER
+        // ============================================
+        const TransitionController = {
+            execute(fromState, toState, data, onComplete) {
+                const transitionKey = `${fromState}_to_${toState}`;
+
+                const transitions = {
+                    'hero_to_navigation': this.heroToNavigation.bind(this),
+                    'navigation_to_section_open': this.navigationToSection.bind(this),
+                    'section_open_to_navigation': this.sectionToNavigation.bind(this),
+                    'navigation_to_hero': this.navigationToHero.bind(this),
+                    'section_open_to_hero': this.sectionToHero.bind(this)
+                };
+
+                const transitionFn = transitions[transitionKey];
+                if (transitionFn) {
+                    transitionFn(data, onComplete);
+                } else {
+                    onComplete();
+                }
+            },
+
+            heroToNavigation(data, onComplete) {
+                const heroLayer = document.getElementById('hero-layer');
+                const navLayer = document.getElementById('nav-layer');
+
+                // Wait for dust animation to complete
+                const checkDust = setInterval(() => {
+                    if (ParticleSystem.getActiveParticleCount() === 0) {
+                        clearInterval(checkDust);
+
+                        heroLayer.style.display = 'none';
+                        navLayer.classList.add('visible');
+
+                        ParticleSystem.initNavigationState();
+
+                        gsap.to(navLayer, {
+                            opacity: 1,
+                            duration: 0.5,
+                            onComplete: () => {
+                                gsap.fromTo('.zone-label',
+                                    { opacity: 0 },
+                                    { opacity: 0, duration: 0 }
+                                );
+                                onComplete();
+                            }
+                        });
+                    }
+                }, 50);
+            },
+
+            navigationToSection(data, onComplete) {
+                const { sectionName } = data;
+                const section = document.getElementById(`section-${sectionName}`);
+                const closeBtn = document.getElementById('close-btn');
+                const centerHint = document.getElementById('center-hint');
+                const zones = document.querySelectorAll('.zone');
+                const backBtn = document.getElementById('back-hero-btn');
+                const pos = ZONE_POSITIONS[sectionName];
+
+                section.classList.remove('preview');
+                section.classList.add('active');
+
+                zones.forEach(z => z.style.pointerEvents = 'none');
+                centerHint.classList.add('hidden');
+                backBtn.style.display = 'none';
+
+                ApertureSystem.setCenter(pos.x * width, pos.y * height);
+                ApertureSystem.animateOpen(CONFIG.apertureDuration, () => {
+                    StateManager.setActiveSection(sectionName);
+                    onComplete();
+                });
+
+                gsap.to(closeBtn, {
+                    opacity: 1,
+                    duration: 0.3,
+                    delay: CONFIG.apertureDuration * 0.5,
+                    onStart: () => closeBtn.classList.add('visible')
+                });
+
+                const content = section.querySelector('.section-content');
+                const h2 = content.querySelector('h2');
+                const p = content.querySelector('p');
+
+                gsap.fromTo([h2, p],
+                    { opacity: 0, y: 30 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.6,
+                        stagger: 0.15,
+                        delay: CONFIG.apertureDuration * 0.6,
+                        ease: 'power3.out'
+                    }
+                );
+
+                // If contact section, animate the form and focus input
+                if (sectionName === 'contact') {
+                    const inputWrapper = section.querySelector('.contact-input-wrapper');
+                    gsap.fromTo(inputWrapper,
+                        { opacity: 0, y: 20 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.5,
+                            delay: CONFIG.apertureDuration * 0.8,
+                            ease: 'power2.out',
+                            onComplete: () => {
+                                ContactController.focusInput();
+                            }
+                        }
+                    );
+                }
+            },
+
+            sectionToNavigation(data, onComplete) {
+                const sectionName = StateManager.activeSection;
+                const section = document.getElementById(`section-${sectionName}`);
+                const closeBtn = document.getElementById('close-btn');
+                const centerHint = document.getElementById('center-hint');
+                const zones = document.querySelectorAll('.zone');
+                const backBtn = document.getElementById('back-hero-btn');
+
+                const content = section.querySelector('.section-content');
+                const h2 = content.querySelector('h2');
+                const p = content.querySelector('p');
+
+                gsap.to([p, h2], {
+                    opacity: 0,
+                    y: -20,
+                    duration: 0.3,
+                    stagger: 0.1,
+                    ease: 'power2.in'
+                });
+
+                gsap.to(closeBtn, {
+                    opacity: 0,
+                    duration: 0.2,
+                    onComplete: () => closeBtn.classList.remove('visible')
+                });
+
+                // Reset contact controller if leaving contact section
+                if (sectionName === 'contact') {
+                    ContactController.reset();
+                }
+
+                ApertureSystem.animateClose(CONFIG.apertureDuration, () => {
+                    section.classList.remove('active');
+                    zones.forEach(z => z.style.pointerEvents = 'auto');
+                    centerHint.classList.remove('hidden');
+                    backBtn.style.display = 'block';
+                    StateManager.clearActiveSection();
+                    onComplete();
+                });
+            },
+
+            navigationToHero(data, onComplete) {
+                const heroLayer = document.getElementById('hero-layer');
+                const navLayer = document.getElementById('nav-layer');
+                const ctaBtn = document.getElementById('cta-btn');
+
+                gsap.to(navLayer, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        navLayer.classList.remove('visible');
+                        navLayer.style.opacity = 0;
+                        heroLayer.style.display = 'flex';
+
+                        ctaBtn.classList.remove('opacity-0', 'pointer-events-none');
+                        ctaBtn.style.opacity = 1;
+                        ctaBtn.style.pointerEvents = 'auto';
+
+                        ParticleSystem.initHeroState();
+
+                        gsap.fromTo(heroLayer,
+                            { opacity: 0 },
+                            { opacity: 1, duration: 0.5 }
+                        );
+
+                        setTimeout(() => {
+                            ParticleSystem.startTextFormation();
+                        }, 800);
+
+                        onComplete();
+                    }
+                });
+            },
+
+            sectionToHero(data, onComplete) {
+                const section = document.getElementById(`section-${StateManager.activeSection}`);
+                const closeBtn = document.getElementById('close-btn');
+
+                gsap.to(closeBtn, {
+                    opacity: 0,
+                    duration: 0.2,
+                    onComplete: () => closeBtn.classList.remove('visible')
+                });
+
+                ApertureSystem.animateClose(CONFIG.apertureDuration * 0.5, () => {
+                    section.classList.remove('active');
+                    StateManager.clearActiveSection();
+                    this.navigationToHero(data, onComplete);
+                });
+            }
+        };
+
+        // ============================================
+        // NAVIGATION CONTROLLER
+        // ============================================
+        const NavigationController = {
+            hoveredZone: null,
+
+            init() {
+                const zones = document.querySelectorAll('.zone');
+                const closeBtn = document.getElementById('close-btn');
+                const backHeroBtn = document.getElementById('back-hero-btn');
+
+                zones.forEach(zone => {
+                    const sectionName = zone.dataset.section;
+
+                    zone.addEventListener('mouseenter', () => this.onZoneEnter(sectionName));
+                    zone.addEventListener('mouseleave', () => this.onZoneLeave(sectionName));
+                    zone.addEventListener('click', () => this.onZoneClick(sectionName));
+
+                    zone.addEventListener('touchstart', () => this.onZoneEnter(sectionName), { passive: true });
+                    zone.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        this.onZoneClick(sectionName);
+                    });
+                });
+
+                closeBtn.addEventListener('click', () => this.closeSection());
+                closeBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.closeSection();
+                });
+
+                backHeroBtn.addEventListener('click', () => this.backToHero());
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        if (StateManager.activeSection) {
+                            this.closeSection();
+                        }
+                    }
+                });
+            },
+
+            onZoneEnter(sectionName) {
+                if (StateManager.current !== AppState.NAVIGATION) return;
+                if (StateManager.isTransitioning) return;
+
+                this.hoveredZone = sectionName;
+
+                const section = document.getElementById(`section-${sectionName}`);
+                section.classList.add('preview');
+
+                const pos = ZONE_POSITIONS[sectionName];
+                ApertureSystem.setCenter(pos.x * width, pos.y * height);
+                ApertureSystem.animatePeek();
+            },
+
+            onZoneLeave(sectionName) {
+                if (StateManager.current !== AppState.NAVIGATION) return;
+                if (StateManager.isTransitioning) return;
+
+                this.hoveredZone = null;
+
+                const section = document.getElementById(`section-${sectionName}`);
+                section.classList.remove('preview');
+
+                ApertureSystem.animateUnpeek();
+            },
+
+            onZoneClick(sectionName) {
+                if (StateManager.isTransitioning) return;
+                StateManager.transition(AppState.SECTION_OPEN, { sectionName });
+            },
+
+            closeSection() {
+                if (!StateManager.activeSection) return;
+                StateManager.transition(AppState.NAVIGATION);
+            },
+
+            backToHero() {
+                if (StateManager.activeSection) {
+                    StateManager.transition(AppState.HERO, { fromSection: true });
+                } else {
+                    StateManager.transition(AppState.HERO);
+                }
+            }
+        };
+
+        // ============================================
+        // HERO CONTROLLER
+        // ============================================
+        const HeroController = {
+            init() {
+                const ctaBtn = document.getElementById('cta-btn');
+
+                ctaBtn.addEventListener('click', () => {
+                    gsap.to(ctaBtn, {
+                        opacity: 0,
+                        pointerEvents: 'none',
+                        duration: 0.3
+                    });
+
+                    ParticleSystem.startDusting();
+                    StateManager.transition(AppState.NAVIGATION);
+                });
+            }
+        };
+
+        // ============================================
+        // CONTACT CONTROLLER (Invocation-style)
+        // ============================================
+        const ContactController = {
+            input: null,
+            preview: null,
+            hint: null,
+            confirmation: null,
+
+            init() {
+                this.input = document.getElementById('contact-input');
+                this.preview = document.getElementById('contact-preview');
+                this.hint = document.getElementById('contact-hint');
+                this.confirmation = document.getElementById('contact-confirmation');
+
+                // Real-time preview as user types
+                this.input.addEventListener('input', (e) => {
+                    this.updatePreview(e.target.value);
+                });
+
+                this.input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.submitMessage();
+                    }
+                    if (e.key === 'Escape') {
+                        if (this.input.value) {
+                            this.input.value = '';
+                            this.updatePreview('');
+                        } else {
+                            NavigationController.closeSection();
+                        }
+                    }
+                });
+
+                // Focus input when contact section opens
+                this.input.addEventListener('focus', () => {
+                    this.hint.style.opacity = '0.6';
+                });
+
+                this.input.addEventListener('blur', () => {
+                    this.hint.style.opacity = '1';
+                });
+            },
+
+            updatePreview(text) {
+                if (text.length > 0) {
+                    this.preview.textContent = text;
+                    this.preview.classList.add('visible');
+                    // Increase opacity based on text length (more text = more visible)
+                    const opacity = Math.min(text.length * 0.015, 0.12);
+                    this.preview.style.opacity = opacity;
+                } else {
+                    this.preview.classList.remove('visible');
+                    this.preview.style.opacity = 0;
+                }
+            },
+
+            submitMessage() {
+                const message = this.input.value.trim();
+                if (!message) return;
+
+                // Get input position for particle explosion
+                const rect = this.input.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const fontSize = parseInt(window.getComputedStyle(this.input).fontSize);
+
+                // Explode the typed text into particles
+                ParticleSystem.createTextExplosion(message, centerX, centerY, fontSize);
+
+                // Clear input and preview
+                this.input.value = '';
+                this.updatePreview('');
+
+                // Show confirmation
+                gsap.fromTo(this.confirmation,
+                    { opacity: 0, y: 10 },
+                    { opacity: 1, y: 0, duration: 0.4 }
+                );
+
+                setTimeout(() => {
+                    gsap.to(this.confirmation, { opacity: 0, duration: 0.3 });
+                }, 2500);
+            },
+
+            // Focus input when section opens
+            focusInput() {
+                setTimeout(() => {
+                    if (this.input) this.input.focus();
+                }, 500);
+            },
+
+            // Clear state when section closes
+            reset() {
+                if (this.input) {
+                    this.input.value = '';
+                    this.updatePreview('');
+                }
+            }
+        };
+
+        // ============================================
+        // MAIN ANIMATION LOOP
+        // ============================================
+        function animate() {
+            requestAnimationFrame(animate);
+
+            particleCtx.clearRect(0, 0, width, height);
+            apertureCtx.clearRect(0, 0, width, height);
+
+            const hoveredZone = NavigationController.hoveredZone;
+
+            if (ApertureSystem.state < 1) {
+                ParticleSystem.update(hoveredZone);
+                ParticleSystem.draw(particleCtx);
+            }
+
+            // Draw explosion particles even when aperture is open
+            if (ApertureSystem.state >= 1) {
+                ParticleSystem.explosionParticles = ParticleSystem.explosionParticles.filter(p => p.alpha > 0);
+                ParticleSystem.explosionParticles.forEach(p => {
+                    p.update();
+                    p.draw(particleCtx);
+                });
+            }
+
+            ApertureSystem.draw(apertureCtx);
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function init() {
+            width = particleCanvas.width = apertureCanvas.width = window.innerWidth;
+            height = particleCanvas.height = apertureCanvas.height = window.innerHeight;
+
+            HeroController.init();
+            NavigationController.init();
+            ContactController.init();
+
+            ParticleSystem.initHeroState();
+            animate();
+
+            document.fonts.ready.then(() => {
+                ParticleSystem.initHeroState();
+                setTimeout(() => {
+                    ParticleSystem.startTextFormation();
+                }, 800);
+            });
+        }
+
+        // Event Listeners
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                width = particleCanvas.width = apertureCanvas.width = window.innerWidth;
+                height = particleCanvas.height = apertureCanvas.height = window.innerHeight;
+
+                if (StateManager.current === AppState.HERO && !ParticleSystem.isDusting) {
+                    ParticleSystem.initHeroState();
+                    setTimeout(() => ParticleSystem.startTextFormation(), 100);
+                } else if (StateManager.current === AppState.NAVIGATION || StateManager.current === AppState.SECTION_OPEN) {
+                    ParticleSystem.initNavigationState();
+                }
+            }, 250);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX;
+                mouse.y = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
+        // Start
+        init();
+    </script>
+</body>
+</html>

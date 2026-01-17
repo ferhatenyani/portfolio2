@@ -1,0 +1,378 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferhaten Yani | Fine Dust Interface</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Text State Management */
+        .scanned-text {
+            transition: opacity 0.5s ease;
+            opacity: 0; /* Hidden by default - particles will form the text */
+            pointer-events: none;
+        }
+        .scanned-text.virtualized {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Post-Animation Content Transition */
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1.2s ease, transform 1.2s ease;
+        }
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* UI Intro Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900 overflow-hidden h-screen flex flex-col items-center justify-center relative select-none">
+
+    <!-- Simulation Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Interactive UI Layer -->
+    <div id="ui-layer" class="relative z-10 flex flex-col items-center text-center p-6 max-w-3xl w-full">
+        
+        <!-- Header Icon -->
+        <div class="mb-10 p-3 rounded-2xl bg-white shadow-sm border border-zinc-200/60 animate-in opacity-0" style="animation-delay: 100ms; animation-fill-mode: forwards;">
+            <i data-lucide="cpu" class="w-6 h-6 text-zinc-900" stroke-width="1.5"></i>
+        </div>
+
+        <!-- Target Text for Particle System -->
+        <div class="relative w-full flex flex-col items-center justify-center mb-12">
+            <h1 id="text-name" class="scanned-text text-5xl md:text-7xl font-semibold tracking-tighter text-zinc-900 mb-6 leading-tight">
+                Ferhaten Yani
+            </h1>
+            <h2 id="text-role" class="scanned-text text-sm md:text-base font-normal text-zinc-400 tracking-tight uppercase letter-spacing-wide">
+                Frontend &amp; UI Engineering
+            </h2>
+        </div>
+
+        <!-- Trigger Button -->
+        <button id="cta-btn" class="group relative px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs md:text-sm font-medium tracking-wide rounded-full transition-all duration-300 ease-out flex items-center gap-2 shadow-lg shadow-zinc-200/50 opacity-0 animate-in" style="animation-delay: 500ms; animation-fill-mode: forwards;">
+            <span class="relative z-10">Initialize Portfolio</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5 relative z-10 transition-transform duration-300 group-hover:translate-x-0.5" stroke-width="1.5"></i>
+        </button>
+    </div>
+
+    <!-- Final State Content -->
+    <div id="main-content" class="absolute inset-0 z-0 hidden flex-col items-center justify-center bg-white p-8">
+        <div class="max-w-xl w-full text-center space-y-6 fade-enter">
+            <div class="w-12 h-12 bg-zinc-50 rounded-full mx-auto flex items-center justify-center mb-4 border border-zinc-100">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600" stroke-width="1.5"></i>
+            </div>
+            <h3 class="text-2xl font-medium tracking-tight text-zinc-900">System Initialized</h3>
+            <p class="text-zinc-500 text-sm leading-relaxed">
+                The particle system has been cleared. Welcome to the workspace.
+            </p>
+            <button onclick="location.reload()" class="mt-8 text-xs text-zinc-400 hover:text-zinc-900 transition-colors">
+                Reset Simulation
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const uiLayer = document.getElementById('ui-layer');
+        const ctaBtn = document.getElementById('cta-btn');
+        const mainContent = document.getElementById('main-content');
+        
+        // VISUAL CONFIGURATION
+        const CONFIG = {
+            gap: 1,               // Dense sampling for no blank spots
+            particleSize: 0.8,    // Slightly larger particles to fill gaps
+            mouseRadius: 60,
+            idleWobble: 0.3,
+            colorName: '39, 39, 42',
+            colorRole: '161, 161, 170',
+            dustSpeed: 2.5,       // Faster dust away
+            dustFade: 0.012,      // Faster fade out
+            driftRadius: 1.2,     // Drift amount for "still forming" effect
+            driftSpeed: 0.015     // Speed of drift oscillation
+        };
+
+        let particles = [];
+        let mouse = { x: -9999, y: -9999 };
+        let isDusting = false;
+        let isForming = false; // Controls when particles start forming text
+        let animationId;
+        let width, height;
+
+        class Particle {
+            constructor(x, y, colorRGB) {
+                // INTRO: Start from completely random positions on screen
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+
+                this.targetX = x;
+                this.targetY = y;
+                this.originX = x;
+                this.originY = y;
+
+                this.color = colorRGB;
+                this.size = Math.random() * 0.2 + CONFIG.particleSize;
+
+                // Physics properties
+                this.vx = (Math.random() - 0.5) * 0.5; // Random initial velocity for wandering
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.ease = Math.random() * 0.06 + 0.03; // Slightly slower for smoother formation
+
+                // Drift properties for "still forming" effect
+                this.driftPhase = Math.random() * Math.PI * 2;
+                this.driftAngle = Math.random() * Math.PI * 2;
+                this.driftAmount = Math.random() * CONFIG.driftRadius;
+
+                // Wandering properties (before forming)
+                this.wanderAngle = Math.random() * Math.PI * 2;
+                this.wanderSpeed = 0.3 + Math.random() * 0.5;
+
+                // OUTRO: Dusting properties
+                const angle = Math.PI + (Math.random() - 0.5) * 0.8; // Wider spread
+                const speed = Math.random() * CONFIG.dustSpeed + 0.5;
+
+                this.dustVx = Math.cos(angle) * speed;
+                this.dustVy = Math.sin(angle) * speed;
+
+                this.activeVelocity = 0;
+                this.acceleration = 0.02 + Math.random() * 0.03; // Faster acceleration
+
+                this.alpha = 1; // Start visible
+                this.formed = false; // Track if particle reached its target
+            }
+
+            update() {
+                if (isDusting) {
+                    // OUTRO LOGIC: Dust away effect (faster)
+                    if (this.activeVelocity < 1.5) {
+                        this.activeVelocity += this.acceleration;
+                    }
+
+                    this.x += this.dustVx * this.activeVelocity;
+                    this.y += this.dustVy * this.activeVelocity;
+
+                    // Turbulence
+                    this.y += (Math.random() - 0.5) * 0.4 * this.activeVelocity;
+                    this.x -= Math.random() * 0.2;
+
+                    this.alpha -= CONFIG.dustFade;
+                } else if (isForming) {
+                    // FORMING LOGIC: Ease toward text position with mouse interaction
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distance = Math.hypot(dx, dy);
+
+                    let forceX = 0;
+                    let forceY = 0;
+
+                    if (distance < CONFIG.mouseRadius) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (CONFIG.mouseRadius - distance) / CONFIG.mouseRadius;
+                        const strength = 4;
+                        forceX = -forceDirectionX * force * strength;
+                        forceY = -forceDirectionY * force * strength;
+                    }
+
+                    // Update drift phase for "still forming" effect
+                    this.driftPhase += CONFIG.driftSpeed;
+
+                    // Calculate drift offset
+                    const driftX = Math.cos(this.driftPhase + this.driftAngle) * this.driftAmount;
+                    const driftY = Math.sin(this.driftPhase + this.driftAngle) * this.driftAmount;
+
+                    // Target position includes drift for organic movement
+                    const targetX = this.originX + forceX + driftX;
+                    const targetY = this.originY + forceY + driftY;
+
+                    // Ease toward target position
+                    this.x += (targetX - this.x) * this.ease;
+                    this.y += (targetY - this.y) * this.ease;
+
+                    // Check if particle has formed (close to origin)
+                    const distToOrigin = Math.hypot(this.x - this.originX, this.y - this.originY);
+                    if (distToOrigin < 5) {
+                        this.formed = true;
+                    }
+                } else {
+                    // WANDERING LOGIC: Random movement before forming
+                    this.wanderAngle += (Math.random() - 0.5) * 0.1;
+                    this.x += Math.cos(this.wanderAngle) * this.wanderSpeed;
+                    this.y += Math.sin(this.wanderAngle) * this.wanderSpeed;
+
+                    // Keep particles on screen with soft boundaries
+                    if (this.x < 0) this.wanderAngle = 0;
+                    if (this.x > width) this.wanderAngle = Math.PI;
+                    if (this.y < 0) this.wanderAngle = Math.PI / 2;
+                    if (this.y > height) this.wanderAngle = -Math.PI / 2;
+                }
+            }
+
+            draw() {
+                if (this.alpha <= 0) return;
+                
+                ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+
+            // Offscreen canvas for text sampling
+            const ctx2 = document.createElement('canvas').getContext('2d');
+            ctx2.canvas.width = width;
+            ctx2.canvas.height = height;
+            
+            const sampleElement = (id, colorRGB) => {
+                const el = document.getElementById(id);
+                if(!el) return;
+                const rect = el.getBoundingClientRect();
+                const style = window.getComputedStyle(el);
+                
+                ctx2.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+                ctx2.fillStyle = 'white';
+                ctx2.textBaseline = 'top';
+                ctx2.textAlign = 'center'; 
+                
+                const centerX = rect.left + rect.width / 2;
+                ctx2.fillText(el.innerText, centerX, rect.top);
+                
+                const buffer = 5;
+                const scanLeft = Math.floor(Math.max(0, rect.left - buffer));
+                const scanTop = Math.floor(Math.max(0, rect.top - buffer));
+                const scanW = Math.ceil(rect.width + buffer * 2);
+                const scanH = Math.ceil(rect.height + buffer * 2);
+
+                const imgData = ctx2.getImageData(scanLeft, scanTop, scanW, scanH);
+                const data = imgData.data;
+                const gap = CONFIG.gap;
+
+                for (let y = 0; y < scanH; y += gap) {
+                    for (let x = 0; x < scanW; x += gap) {
+                        const index = (y * scanW + x) * 4 + 3;
+                        if (data[index] > 128) {
+                            const pX = scanLeft + x;
+                            const pY = scanTop + y;
+                            particles.push(new Particle(pX, pY, colorRGB));
+                        }
+                    }
+                }
+                ctx2.clearRect(0, 0, width, height);
+            };
+
+            sampleElement('text-name', CONFIG.colorName); 
+            sampleElement('text-role', CONFIG.colorRole);
+
+            // Hide original text to show particles
+            document.querySelectorAll('.scanned-text').forEach(el => el.classList.add('virtualized'));
+        }
+
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, width, height);
+
+            let activeParticles = 0;
+            const len = particles.length;
+            
+            for(let i = 0; i < len; i++) {
+                const p = particles[i];
+                if (p.alpha > 0) {
+                    p.update();
+                    p.draw();
+                    activeParticles++;
+                }
+            }
+
+            // Cleanup when empty
+            if (isDusting && activeParticles === 0) {
+                cancelAnimationFrame(animationId);
+                revealContent();
+            }
+        }
+
+        function revealContent() {
+            canvas.style.display = 'none';
+            uiLayer.style.display = 'none';
+            mainContent.classList.remove('hidden');
+            mainContent.classList.add('flex');
+            
+            setTimeout(() => {
+                const contentInner = mainContent.querySelector('.fade-enter');
+                if(contentInner) contentInner.classList.add('fade-enter-active');
+            }, 50);
+        }
+
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        ctaBtn.addEventListener('click', () => {
+            isDusting = true;
+            ctaBtn.classList.add('opacity-0', 'pointer-events-none');
+        });
+
+        document.fonts.ready.then(() => {
+            init();
+            animate();
+            // Start forming after a short delay so user sees random particles first
+            setTimeout(() => {
+                isForming = true;
+            }, 800);
+        });
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if(!isDusting) {
+                   document.querySelectorAll('.scanned-text').forEach(el => el.classList.remove('virtualized'));
+                   init();
+                }
+            }, 250);
+        });
+
+    </script>
+
+</body></html>
