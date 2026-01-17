@@ -550,9 +550,29 @@
     </div>
 
     <div class="section-container" id="section-about">
-        <div class="section-content">
+        <div class="section-content" style="max-width: 800px;">
             <h2>About</h2>
-            <p>Designer and developer focused on crafting interfaces that feel inevitable. Based in the intersection of form and function.</p>
+            <p style="margin-bottom: 1.5rem;">UI/UX designer & frontend developer crafting web experiences with soul, speed, and precision.</p>
+            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;">I design in Figma, build with React + TypeScript, style with Tailwind, and bring interfaces to life using Framer Motion — delivering production-ready products that perform flawlessly.</p>
+            <p style="margin-bottom: 2rem; font-size: 0.95rem;">Final-year Computer Science student actively freelancing and shipping personal projects reaching thousands of users.</p>
+
+            <!-- Info Grid -->
+            <div class="about-info-grid" style="display: flex; justify-content: center; gap: 3rem; margin-top: 2.5rem; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;">
+                <div style="text-align: center;">
+                    <span style="color: #a1a1aa; display: block; margin-bottom: 0.5rem;">Location</span>
+                    <span style="color: #18181b;">Algeria</span>
+                </div>
+                <div style="text-align: center;">
+                    <span style="color: #a1a1aa; display: block; margin-bottom: 0.5rem;">Age</span>
+                    <span style="color: #18181b;">23</span>
+                </div>
+                <div style="text-align: center;">
+                    <span style="color: #a1a1aa; display: block; margin-bottom: 0.5rem;">Status</span>
+                    <span style="color: #18181b;">Available</span>
+                </div>
+            </div>
+
+            <p style="margin-top: 2.5rem; font-size: 0.85rem; color: #52525b; font-weight: 500;">Let's build something exceptional together.</p>
         </div>
     </div>
 
@@ -1433,17 +1453,35 @@
                 const h2 = content.querySelector('h2');
                 const p = content.querySelector('p');
 
-                gsap.fromTo([h2, p],
-                    { opacity: 0, y: 30 },
-                    {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.6,
-                        stagger: 0.15,
-                        delay: CONFIG.apertureDuration * 0.6,
-                        ease: 'power3.out'
-                    }
-                );
+                // If about section, animate all paragraphs and info grid
+                if (sectionName === 'about') {
+                    const allParagraphs = content.querySelectorAll('p');
+                    const infoGrid = content.querySelector('.about-info-grid');
+
+                    gsap.fromTo([h2, ...allParagraphs, infoGrid],
+                        { opacity: 0, y: 30 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.6,
+                            stagger: 0.15,
+                            delay: CONFIG.apertureDuration * 0.6,
+                            ease: 'power3.out'
+                        }
+                    );
+                } else {
+                    gsap.fromTo([h2, p],
+                        { opacity: 0, y: 30 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.6,
+                            stagger: 0.15,
+                            delay: CONFIG.apertureDuration * 0.6,
+                            ease: 'power3.out'
+                        }
+                    );
+                }
 
                 // If contact section, animate the form and focus input
                 if (sectionName === 'contact') {
