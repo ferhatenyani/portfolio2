@@ -1362,6 +1362,7 @@
                 const closeBtn = document.getElementById('close-btn');
                 const centerHint = document.getElementById('center-hint');
                 const zones = document.querySelectorAll('.zone');
+                const zoneLabels = document.querySelectorAll('.zone-label');
                 const backBtn = document.getElementById('back-hero-btn');
                 const pos = ZONE_POSITIONS[sectionName];
 
@@ -1369,6 +1370,15 @@
 
                 zones.forEach(z => z.style.pointerEvents = 'none');
                 centerHint.classList.add('hidden');
+
+                // Hide zone labels when opening a section
+                gsap.to(zoneLabels, {
+                    opacity: 0,
+                    y: -8,
+                    duration: 0.3,
+                    stagger: 0.05,
+                    ease: 'power2.in'
+                });
                 backBtn.style.display = 'none';
 
                 ApertureSystem.setCenter(pos.x * width, pos.y * height);
@@ -1425,6 +1435,7 @@
                 const closeBtn = document.getElementById('close-btn');
                 const centerHint = document.getElementById('center-hint');
                 const zones = document.querySelectorAll('.zone');
+                const zoneLabels = document.querySelectorAll('.zone-label');
                 const backBtn = document.getElementById('back-hero-btn');
 
                 const content = section.querySelector('.section-content');
@@ -1458,6 +1469,16 @@
                     StateManager.clearActiveSection();
                     // Reinitialize zone rings when returning to navigation (no animation needed)
                     ApertureSystem.initZoneRings(false);
+
+                    // Show zone labels again with staggered fade-in
+                    gsap.to(zoneLabels, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.5,
+                        stagger: 0.08,
+                        ease: 'power2.out'
+                    });
+
                     onComplete();
                 });
             },
