@@ -1535,46 +1535,51 @@
                 // Reset zone rings opacity immediately to prevent flash on next nav transition
                 ApertureSystem.hideZoneRings(false);
 
+                // Prepare hero layer early (hidden) so particles can initialize during nav fade
+                heroLayer.style.display = 'flex';
+                heroLayer.style.opacity = '0';
+
+                // Reset zone labels for next transition
+                document.querySelectorAll('.zone-label').forEach(label => {
+                    label.style.opacity = 0;
+                    label.style.transform = 'translateY(8px)';
+                });
+
+                // Reset CTA button state
+                ctaBtn.style.opacity = '0';
+                ctaBtn.style.transform = 'scale(1)';
+                ctaBtn.style.pointerEvents = 'auto';
+                ctaBtn.classList.remove('animate-in');
+
+                // Initialize particles early so they're ready
+                ParticleSystem.initHeroState();
+
+                // Fade out nav layer with blur
                 gsap.to(navLayer, {
                     opacity: 0,
                     filter: 'blur(12px)',
-                    duration: 0.5,
+                    duration: 0.6,
+                    ease: 'power2.inOut',
                     onComplete: () => {
                         navLayer.classList.remove('visible');
                         navLayer.style.opacity = 0;
                         navLayer.style.filter = 'blur(12px)';
-                        // Reset zone labels for next transition
-                        document.querySelectorAll('.zone-label').forEach(label => {
-                            label.style.opacity = 0;
-                            label.style.transform = 'translateY(8px)';
-                        });
-                        heroLayer.style.display = 'flex';
+                    }
+                });
 
-                        // Reset CTA button to its initial state with proper class handling
-                        ctaBtn.style.opacity = '0';
-                        ctaBtn.style.transform = 'scale(1)';
-                        ctaBtn.style.pointerEvents = 'auto';
-                        ctaBtn.classList.add('animate-in'); // Re-add the initial animation class
-
-                        // Reset the animation by removing and re-adding the class to restart it
-                        setTimeout(() => {
-                            ctaBtn.classList.remove('animate-in');
-                            setTimeout(() => {
-                                ctaBtn.classList.add('animate-in');
-                            }, 10);
-                        }, 10);
-
-                        ParticleSystem.initHeroState();
-
-                        gsap.fromTo(heroLayer,
-                            { opacity: 0 },
-                            { opacity: 1, duration: 0.5 }
-                        );
-
-                        setTimeout(() => {
-                            ParticleSystem.startTextFormation();
-                        }, 800);
-
+                // Start fading in hero layer with slight overlap (starts before nav fully fades)
+                gsap.to(heroLayer, {
+                    opacity: 1,
+                    duration: 0.8,
+                    delay: 0.3,
+                    ease: 'power2.out',
+                    onStart: () => {
+                        // Start text formation as hero fades in
+                        ParticleSystem.startTextFormation();
+                    },
+                    onComplete: () => {
+                        // Trigger CTA button animation immediately
+                        ctaBtn.classList.add('animate-in');
                         onComplete();
                     }
                 });
