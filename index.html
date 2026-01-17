@@ -1578,8 +1578,11 @@
                         ParticleSystem.startTextFormation();
                     },
                     onComplete: () => {
-                        // Trigger CTA button animation immediately
-                        ctaBtn.classList.add('animate-in');
+                        // Animate CTA button directly with GSAP (bypasses CSS animation-delay)
+                        gsap.fromTo(ctaBtn,
+                            { opacity: 0, y: 10 },
+                            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+                        );
                         onComplete();
                     }
                 });
