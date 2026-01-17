@@ -241,11 +241,6 @@
             pointer-events: none;
         }
 
-        .section-container.preview {
-            opacity: 0.4;
-            filter: brightness(0.7);
-        }
-
         .section-container.active {
             opacity: 1;
             pointer-events: auto;
@@ -1341,7 +1336,6 @@
                 const backBtn = document.getElementById('back-hero-btn');
                 const pos = ZONE_POSITIONS[sectionName];
 
-                section.classList.remove('preview');
                 section.classList.add('active');
 
                 zones.forEach(z => z.style.pointerEvents = 'none');
@@ -1548,9 +1542,6 @@
 
                 this.hoveredZone = sectionName;
 
-                const section = document.getElementById(`section-${sectionName}`);
-                section.classList.add('preview');
-
                 // Set aperture center for when user clicks and animate ring scale
                 const pos = ZONE_POSITIONS[sectionName];
                 ApertureSystem.setCenter(pos.x * width, pos.y * height);
@@ -1562,9 +1553,6 @@
                 if (StateManager.isTransitioning) return;
 
                 this.hoveredZone = null;
-
-                const section = document.getElementById(`section-${sectionName}`);
-                section.classList.remove('preview');
 
                 // Animate ring scale back down
                 ApertureSystem.clearHoveredZone(sectionName);
