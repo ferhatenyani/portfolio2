@@ -685,8 +685,8 @@
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
                 this.mode = 'wander';
-                this.alpha = Math.random() * 0.3 + 0.1;
-                this.baseAlpha = this.alpha;
+                this.alpha = 0;  // Start with opacity 0 for all particles
+                this.baseAlpha = Math.random() * 0.3 + 0.1;
                 this.wanderAngle = Math.random() * Math.PI * 2;
                 this.wanderSpeed = 0.08 + Math.random() * 0.12;
                 this.size = Math.random() * CONFIG.particleSize + 0.3;
@@ -702,7 +702,8 @@
                 this.originY = targetY;
                 this.color = colorRGB;
                 this.mode = 'wander';
-                this.alpha = 1;
+                this.alpha = 0;  // Start with opacity 0
+                this.baseAlpha = 1;  // Target opacity
                 this.size = Math.random() * 0.2 + CONFIG.particleSize;
                 this.ease = Math.random() * 0.06 + 0.03;
                 this.driftPhase = Math.random() * Math.PI * 2;
@@ -718,6 +719,11 @@
                 this.dustVx = Math.cos(angle) * speed;
                 this.dustVy = Math.sin(angle) * speed;
                 this.dustAcceleration = 0.02 + Math.random() * 0.03;
+
+                // Opacity animation properties
+                this.fadeStartTime = null;
+                this.fadeDelay = 0.1 + Math.random() * 0.2;  // Random short delay
+                this.fadeDuration = 0.4 + Math.random() * 0.2;  // Fast fade-in duration
             }
 
             initZoneParticle(zoneName) {
@@ -770,6 +776,11 @@
                 if (this.x > width) this.wanderAngle = Math.PI;
                 if (this.y < 0) this.wanderAngle = Math.PI / 2;
                 if (this.y > height) this.wanderAngle = -Math.PI / 2;
+
+                // For non-text particles in wander mode, gradually increase opacity to base level
+                if (!this.isTextParticle && this.alpha < this.baseAlpha) {
+                    this.alpha = Math.min(this.alpha + 0.01, this.baseAlpha);
+                }
             }
 
             updateFormation() {
@@ -802,6 +813,24 @@
                 const distToOrigin = Math.hypot(this.x - this.originX, this.y - this.originY);
                 if (distToOrigin < 5) {
                     this.formed = true;
+                }
+
+                // Handle opacity animation
+                if (this.fadeStartTime === null) {
+                    this.fadeStartTime = performance.now();
+                }
+
+                const elapsed = (performance.now() - this.fadeStartTime) / 1000; // Convert to seconds
+
+                if (elapsed >= this.fadeDelay) {
+                    // Calculate fade progress (0 to 1)
+                    const fadeProgress = Math.min((elapsed - this.fadeDelay) / this.fadeDuration, 1);
+                    // Apply easing to the fade (ease-out)
+                    const easedProgress = 1 - Math.pow(1 - fadeProgress, 2);
+                    this.alpha = this.baseAlpha * easedProgress;
+                } else {
+                    // Still in delay phase
+                    this.alpha = 0;
                 }
             }
 
@@ -964,6 +993,7 @@
                 sampleElement('text-name', CONFIG.colors.name);
                 sampleElement('text-role', CONFIG.colors.role);
 
+                // All particles start with opacity 0
                 this.particles = [...this.textParticles];
             },
 
@@ -992,6 +1022,9 @@
                 this.isForming = true;
                 this.textParticles.forEach(p => {
                     p.mode = 'form';
+                    // Reset opacity for the fade-in animation
+                    p.alpha = 0;
+                    p.fadeStartTime = null; // Reset to start the animation
                 });
             },
 
