@@ -108,32 +108,42 @@
             position: fixed;
             z-index: 61;
             cursor: pointer;
-            width: clamp(100px, 15vw, 180px);
-            height: clamp(100px, 15vw, 180px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        /* Projects - largest, much closer to center */
         .zone.top-left {
-            top: calc(25% - clamp(50px, 7.5vw, 90px));
-            left: calc(25% - clamp(50px, 7.5vw, 90px));
+            width: clamp(145px, 21vw, 250px);
+            height: clamp(145px, 21vw, 250px);
+            top: calc(35% - clamp(72.5px, 10.5vw, 125px));
+            left: calc(35% - clamp(72.5px, 10.5vw, 125px));
         }
 
+        /* Skills - top-right */
         .zone.top-right {
-            top: calc(25% - clamp(50px, 7.5vw, 90px));
-            right: calc(25% - clamp(50px, 7.5vw, 90px));
+            width: clamp(130px, 18vw, 200px);
+            height: clamp(130px, 18vw, 200px);
+            top: calc(25% - clamp(65px, 9vw, 100px));
+            right: calc(28% - clamp(65px, 9vw, 100px));
         }
 
+        /* About - bottom-left */
         .zone.bottom-left {
-            bottom: calc(25% - clamp(50px, 7.5vw, 90px));
-            left: calc(25% - clamp(50px, 7.5vw, 90px));
+            width: clamp(140px, 19vw, 230px);
+            height: clamp(140px, 19vw, 230px);
+            bottom: calc(25% - clamp(70px, 9.5vw, 115px));
+            left: calc(25% - clamp(70px, 9.5vw, 115px));
         }
 
+        /* Contact - bottom-right, much closer to center */
         .zone.bottom-right {
-            bottom: calc(25% - clamp(50px, 7.5vw, 90px));
-            right: calc(25% - clamp(50px, 7.5vw, 90px));
+            width: clamp(130px, 18vw, 220px);
+            height: clamp(130px, 18vw, 220px);
+            bottom: calc(35% - clamp(65px, 9vw, 110px));
+            right: calc(35% - clamp(65px, 9vw, 110px));
         }
 
         /* Zone Labels */
@@ -148,6 +158,25 @@
             transition: color 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
             z-index: 2;
+        }
+
+        /* Projects label - largest and bolder */
+        .zone.top-left .zone-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+        }
+
+        /* Contact label - emphasized */
+        .zone.bottom-right .zone-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+        }
+
+        /* About label - slightly larger */
+        .zone.bottom-left .zone-label {
+            font-size: 0.7rem;
         }
 
         .zone:hover .zone-label {
@@ -389,33 +418,54 @@
            MOBILE ADJUSTMENTS
         ================================ */
         @media (max-width: 768px) {
-            .zone {
-                width: clamp(80px, 20vw, 120px);
-                height: clamp(80px, 20vw, 120px);
-            }
-
+            /* Projects - largest, much closer to center */
             .zone.top-left {
-                top: calc(25% - clamp(40px, 10vw, 60px));
-                left: calc(25% - clamp(40px, 10vw, 60px));
+                width: clamp(110px, 26vw, 160px);
+                height: clamp(110px, 26vw, 160px);
+                top: calc(35% - clamp(55px, 13vw, 80px));
+                left: calc(35% - clamp(55px, 13vw, 80px));
             }
 
+            /* Skills - larger zone for better label spacing */
             .zone.top-right {
-                top: calc(25% - clamp(40px, 10vw, 60px));
-                right: calc(25% - clamp(40px, 10vw, 60px));
+                width: clamp(110px, 28vw, 140px);
+                height: clamp(110px, 28vw, 140px);
+                top: calc(25% - clamp(55px, 14vw, 70px));
+                right: calc(28% - clamp(55px, 14vw, 70px));
             }
 
+            /* About - larger zone for better label spacing */
             .zone.bottom-left {
-                bottom: calc(25% - clamp(40px, 10vw, 60px));
-                left: calc(25% - clamp(40px, 10vw, 60px));
+                width: clamp(120px, 30vw, 150px);
+                height: clamp(120px, 30vw, 150px);
+                bottom: calc(25% - clamp(60px, 15vw, 75px));
+                left: calc(25% - clamp(60px, 15vw, 75px));
             }
 
+            /* Contact - much closer to center */
             .zone.bottom-right {
-                bottom: calc(25% - clamp(40px, 10vw, 60px));
-                right: calc(25% - clamp(40px, 10vw, 60px));
+                width: clamp(100px, 24vw, 145px);
+                height: clamp(100px, 24vw, 145px);
+                bottom: calc(35% - clamp(50px, 12vw, 72.5px));
+                right: calc(35% - clamp(50px, 12vw, 72.5px));
             }
 
             .zone-label {
                 font-size: 0.55rem;
+            }
+
+            .zone.top-left .zone-label {
+                font-size: 0.7rem;
+                font-weight: 600;
+            }
+
+            .zone.bottom-right .zone-label {
+                font-size: 0.65rem;
+                font-weight: 600;
+            }
+
+            .zone.bottom-left .zone-label {
+                font-size: 0.6rem;
             }
 
             .close-btn {
@@ -470,14 +520,14 @@
         <div class="zone top-left" data-section="projects">
             <span class="zone-label">Projects</span>
         </div>
-        <div class="zone top-right" data-section="contact">
-            <span class="zone-label">Contact</span>
+        <div class="zone top-right" data-section="skills">
+            <span class="zone-label">Skills</span>
         </div>
         <div class="zone bottom-left" data-section="about">
             <span class="zone-label">About</span>
         </div>
-        <div class="zone bottom-right" data-section="skills">
-            <span class="zone-label">Skills</span>
+        <div class="zone bottom-right" data-section="contact">
+            <span class="zone-label">Contact</span>
         </div>
 
         <!-- Back to Hero Button -->
@@ -572,10 +622,10 @@
 
         // Zone positions (normalized 0-1)
         const ZONE_POSITIONS = {
-            'projects': { x: 0.25, y: 0.25 },
-            'contact': { x: 0.75, y: 0.25 },
-            'about': { x: 0.25, y: 0.75 },
-            'skills': { x: 0.75, y: 0.75 }
+            'projects': { x: 0.35, y: 0.35 },   // Much closer to center, largest
+            'skills': { x: 0.72, y: 0.25 },     // Top-right, shifted left
+            'about': { x: 0.25, y: 0.75 },      // Bottom-left, slightly larger
+            'contact': { x: 0.65, y: 0.65 }     // Much closer to center
         };
 
         // ============================================
@@ -1096,12 +1146,12 @@
             isAnimating: false,
             activeZone: null,
 
-            // Zone ring states for always-visible rings
+            // Zone ring states for always-visible rings with size multipliers
             zoneRings: {
-                'projects': { scale: 1, particles: [] },
-                'contact': { scale: 1, particles: [] },
-                'about': { scale: 1, particles: [] },
-                'skills': { scale: 1, particles: [] }
+                'projects': { scale: 1, baseScale: 2.0, hoverScale: 1.8, particles: [] },  // Largest, much bigger ring
+                'skills': { scale: 1, baseScale: 0.9, hoverScale: 1.5, particles: [] },    // Smaller
+                'about': { scale: 1, baseScale: 1.15, hoverScale: 1.5, particles: [] },    // Slightly larger
+                'contact': { scale: 1, baseScale: 1.8, hoverScale: 1.75, particles: [] }   // Bigger ring, closer to center
             },
 
             // Base radius for zone rings (responsive)
@@ -1126,10 +1176,11 @@
             },
 
             setHoveredZone(zoneName) {
-                // Animate scale up for hovered zone
+                // Animate scale up for hovered zone using custom hoverScale
                 if (zoneName) {
-                    gsap.to(this.zoneRings[zoneName], {
-                        scale: 1.5,
+                    const ring = this.zoneRings[zoneName];
+                    gsap.to(ring, {
+                        scale: ring.hoverScale,
                         duration: 0.4,
                         ease: 'power2.out'
                     });
@@ -1209,7 +1260,8 @@
                     const centerX = pos.x * width;
                     const centerY = pos.y * height;
                     const ring = this.zoneRings[zoneName];
-                    const currentRadius = baseRadius * ring.scale;
+                    // Apply both baseScale (size hierarchy) and scale (hover animation)
+                    const currentRadius = baseRadius * ring.baseScale * ring.scale;
 
                     ring.particles.forEach(p => {
                         p.update(centerX, centerY, currentRadius);
