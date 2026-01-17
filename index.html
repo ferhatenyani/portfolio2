@@ -97,10 +97,17 @@
             z-index: 60;
             display: none;
             opacity: 0;
+            filter: blur(12px);
         }
 
         #nav-layer.visible {
             display: block;
+        }
+
+        /* Zone labels initially hidden for staggered fade-in */
+        #nav-layer .zone-label {
+            opacity: 0;
+            transform: translateY(8px);
         }
 
         /* Zone Areas (circular hit areas) */
@@ -1143,10 +1150,10 @@
 
             // Zone ring states for always-visible rings with size multipliers
             zoneRings: {
-                'projects': { scale: 1, baseScale: 2.0, hoverScale: 1.8, particles: [] },  // Largest, much bigger ring
-                'skills': { scale: 1, baseScale: 0.9, hoverScale: 1.5, particles: [] },    // Smaller
-                'about': { scale: 1, baseScale: 1.15, hoverScale: 1.5, particles: [] },    // Slightly larger
-                'contact': { scale: 1, baseScale: 1.8, hoverScale: 1.75, particles: [] }   // Bigger ring, closer to center
+                'projects': { scale: 1, baseScale: 2.0, hoverScale: 1.8, opacity: 0, particles: [] },  // Largest, much bigger ring
+                'skills': { scale: 1, baseScale: 0.9, hoverScale: 1.5, opacity: 0, particles: [] },    // Smaller
+                'about': { scale: 1, baseScale: 1.15, hoverScale: 1.5, opacity: 0, particles: [] },    // Slightly larger
+                'contact': { scale: 1, baseScale: 1.8, hoverScale: 1.75, opacity: 0, particles: [] }   // Bigger ring, closer to center
             },
 
             // Base radius for zone rings (responsive)
@@ -1154,13 +1161,28 @@
                 return Math.min(width, height) * 0.06; // 6% of smaller dimension
             },
 
-            initZoneRings() {
+            initZoneRings(animate = true) {
                 const particlesPerRing = 60;
-                Object.keys(this.zoneRings).forEach(zone => {
+                const zones = Object.keys(this.zoneRings);
+
+                zones.forEach((zone, index) => {
                     this.zoneRings[zone].particles = [];
+                    this.zoneRings[zone].opacity = 0; // Reset opacity
                     for (let i = 0; i < particlesPerRing; i++) {
                         const angle = (i / particlesPerRing) * Math.PI * 2;
                         this.zoneRings[zone].particles.push(new ApertureParticle(angle));
+                    }
+
+                    // Animate each ring fading in with stagger
+                    if (animate) {
+                        gsap.to(this.zoneRings[zone], {
+                            opacity: 1,
+                            duration: 0.8,
+                            delay: 0.3 + (index * 0.1), // Staggered delay for each ring
+                            ease: 'power2.out'
+                        });
+                    } else {
+                        this.zoneRings[zone].opacity = 1;
                     }
                 });
             },
@@ -1258,9 +1280,16 @@
                     // Apply both baseScale (size hierarchy) and scale (hover animation)
                     const currentRadius = baseRadius * ring.baseScale * ring.scale;
 
+                    // Skip drawing if ring is fully transparent
+                    if (ring.opacity <= 0) return;
+
                     ring.particles.forEach(p => {
                         p.update(centerX, centerY, currentRadius);
+                        // Draw with ring opacity applied
+                        const originalAlpha = p.alpha;
+                        p.alpha = originalAlpha * ring.opacity;
                         p.draw(ctx);
+                        p.alpha = originalAlpha; // Restore original alpha
                     });
                 });
             }
@@ -1302,26 +1331,26 @@
                         ParticleSystem.initNavigationState();
                         ApertureSystem.initZoneRings();
 
-                        // Fade in navigation layer more smoothly with a bit of delay
+                        // Phase 1: Fade in with blur clearing (particles appear first)
                         gsap.to(navLayer, {
                             opacity: 1,
-                            duration: 0.8,
-                            delay: 0.2,
+                            filter: 'blur(0px)',
+                            duration: 1.0,
+                            delay: 0.3,
                             ease: 'power2.out',
                             onComplete: () => {
-                                // Animate zones appearing with stagger
-                                gsap.fromTo('.zone',
-                                    { opacity: 0, scale: 0.8 },
-                                    {
-                                        opacity: 1,
-                                        scale: 1,
-                                        duration: 0.6,
-                                        stagger: 0.1,
-                                        ease: 'power2.out'
-                                    }
-                                );
                                 onComplete();
                             }
+                        });
+
+                        // Phase 2: Zone labels fade in with upward motion (shortly after particles)
+                        gsap.to('.zone-label', {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.7,
+                            stagger: 0.12,
+                            delay: 0.1, // Start shortly after rings begin appearing
+                            ease: 'power3.out'
                         });
                     }
                 }, 50);
@@ -1427,8 +1456,8 @@
                     centerHint.classList.remove('hidden');
                     backBtn.style.display = 'block';
                     StateManager.clearActiveSection();
-                    // Reinitialize zone rings when returning to navigation
-                    ApertureSystem.initZoneRings();
+                    // Reinitialize zone rings when returning to navigation (no animation needed)
+                    ApertureSystem.initZoneRings(false);
                     onComplete();
                 });
             },
@@ -1440,10 +1469,17 @@
 
                 gsap.to(navLayer, {
                     opacity: 0,
+                    filter: 'blur(12px)',
                     duration: 0.5,
                     onComplete: () => {
                         navLayer.classList.remove('visible');
                         navLayer.style.opacity = 0;
+                        navLayer.style.filter = 'blur(12px)';
+                        // Reset zone labels for next transition
+                        document.querySelectorAll('.zone-label').forEach(label => {
+                            label.style.opacity = 0;
+                            label.style.transform = 'translateY(8px)';
+                        });
                         heroLayer.style.display = 'flex';
 
                         // Reset CTA button to its initial state with proper class handling
