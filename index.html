@@ -1532,6 +1532,9 @@
                 const navLayer = document.getElementById('nav-layer');
                 const ctaBtn = document.getElementById('cta-btn');
 
+                // Reset zone rings opacity immediately to prevent flash on next nav transition
+                ApertureSystem.hideZoneRings(false);
+
                 gsap.to(navLayer, {
                     opacity: 0,
                     filter: 'blur(12px)',
