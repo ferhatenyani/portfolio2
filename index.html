@@ -103,77 +103,55 @@
             display: block;
         }
 
-        /* Zone Areas (invisible hit areas) */
+        /* Zone Areas (circular hit areas) */
         .zone {
             position: fixed;
             z-index: 61;
             cursor: pointer;
+            width: clamp(100px, 15vw, 180px);
+            height: clamp(100px, 15vw, 180px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .zone.top-left {
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 50%;
+            top: calc(25% - clamp(50px, 7.5vw, 90px));
+            left: calc(25% - clamp(50px, 7.5vw, 90px));
         }
 
         .zone.top-right {
-            top: 0;
-            right: 0;
-            width: 50%;
-            height: 50%;
+            top: calc(25% - clamp(50px, 7.5vw, 90px));
+            right: calc(25% - clamp(50px, 7.5vw, 90px));
         }
 
         .zone.bottom-left {
-            bottom: 0;
-            left: 0;
-            width: 50%;
-            height: 50%;
+            bottom: calc(25% - clamp(50px, 7.5vw, 90px));
+            left: calc(25% - clamp(50px, 7.5vw, 90px));
         }
 
         .zone.bottom-right {
-            bottom: 0;
-            right: 0;
-            width: 50%;
-            height: 50%;
+            bottom: calc(25% - clamp(50px, 7.5vw, 90px));
+            right: calc(25% - clamp(50px, 7.5vw, 90px));
         }
 
         /* Zone Labels */
         .zone-label {
-            position: absolute;
+            position: relative;
             font-size: 0.65rem;
             font-weight: 500;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: #a1a1aa;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .zone:hover .zone-label,
-        .zone.active .zone-label {
+            color: #18181b;
             opacity: 1;
+            transition: color 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 2;
         }
 
-        .zone.top-left .zone-label {
-            top: 40px;
-            left: 40px;
-        }
-
-        .zone.top-right .zone-label {
-            top: 40px;
-            right: 40px;
-        }
-
-        .zone.bottom-left .zone-label {
-            bottom: 40px;
-            left: 40px;
-        }
-
-        .zone.bottom-right .zone-label {
-            bottom: 40px;
-            right: 40px;
+        .zone:hover .zone-label {
+            color: #3f3f46;
         }
 
         /* Center instruction */
@@ -411,28 +389,33 @@
            MOBILE ADJUSTMENTS
         ================================ */
         @media (max-width: 768px) {
+            .zone {
+                width: clamp(80px, 20vw, 120px);
+                height: clamp(80px, 20vw, 120px);
+            }
+
+            .zone.top-left {
+                top: calc(25% - clamp(40px, 10vw, 60px));
+                left: calc(25% - clamp(40px, 10vw, 60px));
+            }
+
+            .zone.top-right {
+                top: calc(25% - clamp(40px, 10vw, 60px));
+                right: calc(25% - clamp(40px, 10vw, 60px));
+            }
+
+            .zone.bottom-left {
+                bottom: calc(25% - clamp(40px, 10vw, 60px));
+                left: calc(25% - clamp(40px, 10vw, 60px));
+            }
+
+            .zone.bottom-right {
+                bottom: calc(25% - clamp(40px, 10vw, 60px));
+                right: calc(25% - clamp(40px, 10vw, 60px));
+            }
+
             .zone-label {
-                font-size: 0.6rem;
-            }
-
-            .zone.top-left .zone-label,
-            .zone.top-right .zone-label {
-                top: 25px;
-            }
-
-            .zone.bottom-left .zone-label,
-            .zone.bottom-right .zone-label {
-                bottom: 60px;
-            }
-
-            .zone.top-left .zone-label,
-            .zone.bottom-left .zone-label {
-                left: 25px;
-            }
-
-            .zone.top-right .zone-label,
-            .zone.bottom-right .zone-label {
-                right: 25px;
+                font-size: 0.55rem;
             }
 
             .close-btn {
@@ -481,7 +464,7 @@
     ================================ -->
     <div id="nav-layer">
         <!-- Center Hint -->
-        <div class="center-hint" id="center-hint">Hover to preview · Click to enter</div>
+        <div class="center-hint" id="center-hint">Click a section to explore</div>
 
         <!-- Zone Hit Areas -->
         <div class="zone top-left" data-section="projects">
@@ -1111,10 +1094,57 @@
             state: 0,
             center: { x: 0, y: 0 },
             isAnimating: false,
+            activeZone: null,
+
+            // Zone ring states for always-visible rings
+            zoneRings: {
+                'projects': { scale: 1, particles: [] },
+                'contact': { scale: 1, particles: [] },
+                'about': { scale: 1, particles: [] },
+                'skills': { scale: 1, particles: [] }
+            },
+
+            // Base radius for zone rings (responsive)
+            getBaseRadius() {
+                return Math.min(width, height) * 0.06; // 6% of smaller dimension
+            },
+
+            initZoneRings() {
+                const particlesPerRing = 60;
+                Object.keys(this.zoneRings).forEach(zone => {
+                    this.zoneRings[zone].particles = [];
+                    for (let i = 0; i < particlesPerRing; i++) {
+                        const angle = (i / particlesPerRing) * Math.PI * 2;
+                        this.zoneRings[zone].particles.push(new ApertureParticle(angle));
+                    }
+                });
+            },
 
             setCenter(x, y) {
                 this.center.x = x;
                 this.center.y = y;
+            },
+
+            setHoveredZone(zoneName) {
+                // Animate scale up for hovered zone
+                if (zoneName) {
+                    gsap.to(this.zoneRings[zoneName], {
+                        scale: 1.5,
+                        duration: 0.4,
+                        ease: 'power2.out'
+                    });
+                }
+            },
+
+            clearHoveredZone(zoneName) {
+                // Animate scale back down
+                if (zoneName && this.zoneRings[zoneName]) {
+                    gsap.to(this.zoneRings[zoneName], {
+                        scale: 1,
+                        duration: 0.3,
+                        ease: 'power2.in'
+                    });
+                }
             },
 
             animateOpen(duration, onComplete) {
@@ -1144,44 +1174,48 @@
                 });
             },
 
-            animatePeek() {
-                if (this.isAnimating) return;
-                gsap.to(this, {
-                    state: 0.15,
-                    duration: 0.4,
-                    ease: 'power2.out'
-                });
-            },
-
-            animateUnpeek() {
-                if (this.isAnimating) return;
-                gsap.to(this, {
-                    state: 0,
-                    duration: 0.3,
-                    ease: 'power2.in'
-                });
-            },
-
             draw(ctx) {
-                if (this.state <= 0) return;
-                if (this.state >= 1) return;
+                // Draw zone rings when in navigation state (state is 0 or transitioning)
+                if (this.state < 1 && StateManager.current !== AppState.HERO) {
+                    this.drawZoneRings(ctx);
+                }
 
-                const maxRadius = Math.max(width, height) * 1.5;
-                const currentRadius = maxRadius * this.state;
+                // Draw opening/closing aperture animation
+                if (this.state > 0 && this.state < 1) {
+                    const maxRadius = Math.max(width, height) * 1.5;
+                    const currentRadius = maxRadius * this.state;
 
-                ctx.save();
-                ctx.fillStyle = '#fafafa';
-                ctx.beginPath();
-                ctx.rect(0, 0, width, height);
-                ctx.arc(this.center.x, this.center.y, currentRadius, 0, Math.PI * 2, true);
-                ctx.fill();
+                    ctx.save();
+                    ctx.fillStyle = '#fafafa';
+                    ctx.beginPath();
+                    ctx.rect(0, 0, width, height);
+                    ctx.arc(this.center.x, this.center.y, currentRadius, 0, Math.PI * 2, true);
+                    ctx.fill();
 
-                ParticleSystem.apertureParticles.forEach(p => {
-                    p.update(this.center.x, this.center.y, currentRadius);
-                    p.draw(ctx);
+                    ParticleSystem.apertureParticles.forEach(p => {
+                        p.update(this.center.x, this.center.y, currentRadius);
+                        p.draw(ctx);
+                    });
+
+                    ctx.restore();
+                }
+            },
+
+            drawZoneRings(ctx) {
+                const baseRadius = this.getBaseRadius();
+
+                Object.keys(ZONE_POSITIONS).forEach(zoneName => {
+                    const pos = ZONE_POSITIONS[zoneName];
+                    const centerX = pos.x * width;
+                    const centerY = pos.y * height;
+                    const ring = this.zoneRings[zoneName];
+                    const currentRadius = baseRadius * ring.scale;
+
+                    ring.particles.forEach(p => {
+                        p.update(centerX, centerY, currentRadius);
+                        p.draw(ctx);
+                    });
                 });
-
-                ctx.restore();
             }
         };
 
@@ -1219,6 +1253,7 @@
 
                         navLayer.classList.add('visible');
                         ParticleSystem.initNavigationState();
+                        ApertureSystem.initZoneRings();
 
                         // Fade in navigation layer more smoothly with a bit of delay
                         gsap.to(navLayer, {
@@ -1227,14 +1262,14 @@
                             delay: 0.2,
                             ease: 'power2.out',
                             onComplete: () => {
-                                // Gradually show zone labels with stagger
-                                gsap.fromTo('.zone-label',
-                                    { opacity: 0, y: 10 },
+                                // Animate zones appearing with stagger
+                                gsap.fromTo('.zone',
+                                    { opacity: 0, scale: 0.8 },
                                     {
-                                        opacity: 0.7,
-                                        y: 0,
+                                        opacity: 1,
+                                        scale: 1,
                                         duration: 0.6,
-                                        stagger: 0.15,
+                                        stagger: 0.1,
                                         ease: 'power2.out'
                                     }
                                 );
@@ -1346,6 +1381,8 @@
                     centerHint.classList.remove('hidden');
                     backBtn.style.display = 'block';
                     StateManager.clearActiveSection();
+                    // Reinitialize zone rings when returning to navigation
+                    ApertureSystem.initZoneRings();
                     onComplete();
                 });
             },
@@ -1462,9 +1499,10 @@
                 const section = document.getElementById(`section-${sectionName}`);
                 section.classList.add('preview');
 
+                // Set aperture center for when user clicks and animate ring scale
                 const pos = ZONE_POSITIONS[sectionName];
                 ApertureSystem.setCenter(pos.x * width, pos.y * height);
-                ApertureSystem.animatePeek();
+                ApertureSystem.setHoveredZone(sectionName);
             },
 
             onZoneLeave(sectionName) {
@@ -1476,7 +1514,8 @@
                 const section = document.getElementById(`section-${sectionName}`);
                 section.classList.remove('preview');
 
-                ApertureSystem.animateUnpeek();
+                // Animate ring scale back down
+                ApertureSystem.clearHoveredZone(sectionName);
             },
 
             onZoneClick(sectionName) {
