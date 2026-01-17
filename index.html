@@ -1515,13 +1515,27 @@
                 const h2 = content.querySelector('h2');
                 const p = content.querySelector('p');
 
-                gsap.to([p, h2], {
-                    opacity: 0,
-                    y: -20,
-                    duration: 0.3,
-                    stagger: 0.1,
-                    ease: 'power2.in'
-                });
+                // If about section, animate all paragraphs and info grid out
+                if (sectionName === 'about') {
+                    const allParagraphs = content.querySelectorAll('p');
+                    const infoGrid = content.querySelector('.about-info-grid');
+
+                    gsap.to([...allParagraphs, infoGrid, h2].reverse(), {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.3,
+                        stagger: 0.05,
+                        ease: 'power2.in'
+                    });
+                } else {
+                    gsap.to([p, h2], {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.3,
+                        stagger: 0.1,
+                        ease: 'power2.in'
+                    });
+                }
 
                 gsap.to(closeBtn, {
                     opacity: 0,
