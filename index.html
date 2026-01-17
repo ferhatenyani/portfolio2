@@ -1187,6 +1187,40 @@
                 });
             },
 
+            hideZoneRings(animate = true) {
+                const zones = Object.keys(this.zoneRings);
+
+                zones.forEach((zone, index) => {
+                    if (animate) {
+                        gsap.to(this.zoneRings[zone], {
+                            opacity: 0,
+                            duration: 0.3,
+                            delay: index * 0.03,
+                            ease: 'power2.in'
+                        });
+                    } else {
+                        this.zoneRings[zone].opacity = 0;
+                    }
+                });
+            },
+
+            showZoneRings(animate = true) {
+                const zones = Object.keys(this.zoneRings);
+
+                zones.forEach((zone, index) => {
+                    if (animate) {
+                        gsap.to(this.zoneRings[zone], {
+                            opacity: 1,
+                            duration: 0.8,
+                            delay: 0.3 + (index * 0.1), // Match initial page load timing
+                            ease: 'power2.out'
+                        });
+                    } else {
+                        this.zoneRings[zone].opacity = 1;
+                    }
+                });
+            },
+
             setCenter(x, y) {
                 this.center.x = x;
                 this.center.y = y;
@@ -1371,7 +1405,7 @@
                 zones.forEach(z => z.style.pointerEvents = 'none');
                 centerHint.classList.add('hidden');
 
-                // Hide zone labels when opening a section
+                // Hide zone labels and rings when opening a section
                 gsap.to(zoneLabels, {
                     opacity: 0,
                     y: -8,
@@ -1379,6 +1413,7 @@
                     stagger: 0.05,
                     ease: 'power2.in'
                 });
+                ApertureSystem.hideZoneRings(true);
                 backBtn.style.display = 'none';
 
                 ApertureSystem.setCenter(pos.x * width, pos.y * height);
@@ -1467,16 +1502,25 @@
                     centerHint.classList.remove('hidden');
                     backBtn.style.display = 'block';
                     StateManager.clearActiveSection();
-                    // Reinitialize zone rings when returning to navigation (no animation needed)
-                    ApertureSystem.initZoneRings(false);
 
-                    // Show zone labels again with staggered fade-in
+                    // Reinitialize zone rings (don't animate yet - we'll animate with showZoneRings)
+                    ApertureSystem.initZoneRings(false);
+                    // Reset ring opacities to 0 for the fade-in animation
+                    Object.keys(ApertureSystem.zoneRings).forEach(zone => {
+                        ApertureSystem.zoneRings[zone].opacity = 0;
+                    });
+
+                    // Show zone rings and labels together with matching timing (like initial page load)
+                    ApertureSystem.showZoneRings(true);
+
+                    // Show zone labels with same timing as rings
                     gsap.to(zoneLabels, {
                         opacity: 1,
                         y: 0,
-                        duration: 0.5,
-                        stagger: 0.08,
-                        ease: 'power2.out'
+                        duration: 0.7,
+                        stagger: 0.12,
+                        delay: 0.1, // Match the ring animation timing
+                        ease: 'power3.out'
                     });
 
                     onComplete();
