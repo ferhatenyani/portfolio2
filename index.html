@@ -16,6 +16,9 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
+        /* Import secondary font for creative pairing - Space Mono for technical/code aesthetic */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -368,6 +371,192 @@
         }
 
         /* ================================
+           SKILLS SECTION
+        ================================ */
+        #section-skills {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(16px, 4vh, 40px) clamp(16px, 4vw, 40px);
+        }
+
+        .skills-content {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(24px, 4vh, 48px);
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(20px, 3vw, 48px);
+        }
+
+        .skills-grid-bottom {
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 66.666%;
+            margin: 0 auto;
+        }
+
+        .skill-category {
+            text-align: center;
+            cursor: pointer;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .skill-title {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #18181b;
+            margin-bottom: clamp(8px, 1.5vh, 14px);
+        }
+
+        .skill-separator {
+            width: 24px;
+            height: 1px;
+            background: #d4d4d8;
+            margin: 0 auto clamp(10px, 1.5vh, 16px);
+            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .skill-category:hover .skill-separator,
+        .skill-category:focus .skill-separator,
+        .skill-category.active .skill-separator {
+            width: 100%;
+        }
+
+        .skill-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(4px, 0.8vh, 8px);
+        }
+
+        .skill-list li {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(0.7rem, 1.1vw, 0.875rem);
+            font-weight: 400;
+            color: #71717a;
+            line-height: 1.5;
+            transition: color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .skill-category:hover .skill-list li,
+        .skill-category:focus .skill-list li,
+        .skill-category.active .skill-list li {
+            color: #18181b;
+        }
+
+        /* Tablet breakpoint */
+        @media (max-width: 900px) {
+            .skills-grid {
+                gap: clamp(16px, 2.5vw, 32px);
+            }
+
+            .skills-grid-bottom {
+                max-width: 80%;
+            }
+        }
+
+        /* Mobile breakpoint */
+        @media (max-width: 640px) {
+            #section-skills {
+                padding: clamp(12px, 3vh, 24px) clamp(12px, 3vw, 24px);
+            }
+
+            .skills-content {
+                gap: clamp(16px, 3vh, 28px);
+            }
+
+            .skills-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: clamp(12px, 2vw, 20px);
+            }
+
+            .skills-grid-bottom {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 66.666%;
+            }
+
+            .skill-title {
+                font-size: clamp(0.5rem, 2.5vw, 0.65rem);
+                letter-spacing: 0.08em;
+                margin-bottom: clamp(6px, 1vh, 10px);
+            }
+
+            .skill-separator {
+                width: 16px;
+                margin-bottom: clamp(6px, 1vh, 10px);
+            }
+
+            .skill-list li {
+                font-size: clamp(0.55rem, 2.2vw, 0.7rem);
+            }
+
+            .skill-list {
+                gap: clamp(2px, 0.5vh, 5px);
+            }
+        }
+
+        /* Extra small mobile */
+        @media (max-width: 420px) {
+            .skills-grid {
+                grid-template-columns: 1fr;
+                gap: clamp(18px, 4vh, 28px);
+            }
+
+            .skills-grid-bottom {
+                grid-template-columns: 1fr;
+                max-width: 100%;
+            }
+
+            .skill-title {
+                font-size: 0.7rem;
+                letter-spacing: 0.1em;
+            }
+
+            .skill-list li {
+                font-size: 0.75rem;
+            }
+
+            .skill-separator {
+                width: 24px;
+            }
+        }
+
+        /* Very small screens (340px) */
+        @media (max-width: 360px) {
+            #section-skills {
+                padding: 10px;
+            }
+
+            .skills-content {
+                gap: 14px;
+            }
+
+            .skill-title {
+                font-size: 0.6rem;
+                margin-bottom: 5px;
+            }
+
+            .skill-list li {
+                font-size: 0.65rem;
+            }
+
+            .skill-list {
+                gap: 2px;
+            }
+        }
+
+        /* ================================
            CLOSE BUTTON
         ================================ */
         .close-btn {
@@ -577,9 +766,60 @@
     </div>
 
     <div class="section-container" id="section-skills">
-        <div class="section-content">
-            <h2>Skills</h2>
-            <p>Frontend architecture, motion design, creative coding, and the delicate art of making complex things feel simple.</p>
+        <div class="skills-content">
+            <!-- Row 1: 3 columns -->
+            <div class="skills-grid">
+                <div class="skill-category" tabindex="0">
+                    <h3 class="skill-title">Core Strengths</h3>
+                    <div class="skill-separator"></div>
+                    <ul class="skill-list">
+                        <li>Framer Motion</li>
+                        <li>Performance Tuning</li>
+                        <li>Micro-interactions</li>
+                        <li>Responsive Design</li>
+                    </ul>
+                </div>
+                <div class="skill-category" tabindex="0">
+                    <h3 class="skill-title">Frontend Stack</h3>
+                    <div class="skill-separator"></div>
+                    <ul class="skill-list">
+                        <li>React + TypeScript</li>
+                        <li>Tailwind CSS</li>
+                        <li>React Native</li>                        
+                    </ul>
+                </div>
+                <div class="skill-category" tabindex="0">
+                    <h3 class="skill-title">Motion & Animation</h3>
+                    <div class="skill-separator"></div>
+                    <ul class="skill-list">
+                        <li>Framer Motion</li>
+                        <li>GSAP + ScrollTrigger</li>
+                        <li>Performant vanilla JS animations</li>
+                        <li>CSS Motion</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Row 2: 2 columns centered -->
+            <div class="skills-grid skills-grid-bottom">
+                <div class="skill-category" tabindex="0">
+                    <h3 class="skill-title">Design & Prototyping</h3>
+                    <div class="skill-separator"></div>
+                    <ul class="skill-list">
+                        <li>Figma (wireframing, prototyping & collaboration)</li>
+                        <li>Framer</li>
+                        <li>Adobe Photoshop</li>
+                    </ul>
+                </div>
+                <div class="skill-category" tabindex="0">
+                    <h3 class="skill-title">Engineering Tools</h3>
+                    <div class="skill-separator"></div>
+                    <ul class="skill-list">
+                        <li>Git version control workflows</li>
+                        <li>Vercel . Netlify . Cloudflare Pages</li>
+                        <li>Docker . Docker Compose</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1449,38 +1689,55 @@
                     onStart: () => closeBtn.classList.add('visible')
                 });
 
-                const content = section.querySelector('.section-content');
-                const h2 = content.querySelector('h2');
-                const p = content.querySelector('p');
+                // Skills section has different structure - no .section-content
+                if (sectionName === 'skills') {
+                    const skillCategories = section.querySelectorAll('.skill-category');
 
-                // If about section, animate all paragraphs and info grid
-                if (sectionName === 'about') {
-                    const allParagraphs = content.querySelectorAll('p');
-                    const infoGrid = content.querySelector('.about-info-grid');
-
-                    gsap.fromTo([h2, ...allParagraphs, infoGrid],
+                    gsap.fromTo(skillCategories,
                         { opacity: 0, y: 30 },
                         {
                             opacity: 1,
                             y: 0,
-                            duration: 0.6,
-                            stagger: 0.15,
+                            duration: 0.5,
+                            stagger: 0.08,
                             delay: CONFIG.apertureDuration * 0.6,
                             ease: 'power3.out'
                         }
                     );
                 } else {
-                    gsap.fromTo([h2, p],
-                        { opacity: 0, y: 30 },
-                        {
-                            opacity: 1,
-                            y: 0,
-                            duration: 0.6,
-                            stagger: 0.15,
-                            delay: CONFIG.apertureDuration * 0.6,
-                            ease: 'power3.out'
-                        }
-                    );
+                    const content = section.querySelector('.section-content');
+                    const h2 = content.querySelector('h2');
+                    const p = content.querySelector('p');
+
+                    // If about section, animate all paragraphs and info grid
+                    if (sectionName === 'about') {
+                        const allParagraphs = content.querySelectorAll('p');
+                        const infoGrid = content.querySelector('.about-info-grid');
+
+                        gsap.fromTo([h2, ...allParagraphs, infoGrid],
+                            { opacity: 0, y: 30 },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.6,
+                                stagger: 0.15,
+                                delay: CONFIG.apertureDuration * 0.6,
+                                ease: 'power3.out'
+                            }
+                        );
+                    } else {
+                        gsap.fromTo([h2, p],
+                            { opacity: 0, y: 30 },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.6,
+                                stagger: 0.15,
+                                delay: CONFIG.apertureDuration * 0.6,
+                                ease: 'power3.out'
+                            }
+                        );
+                    }
                 }
 
                 // If contact section, animate the form and focus input
@@ -1511,16 +1768,11 @@
                 const zoneLabels = document.querySelectorAll('.zone-label');
                 const backBtn = document.getElementById('back-hero-btn');
 
-                const content = section.querySelector('.section-content');
-                const h2 = content.querySelector('h2');
-                const p = content.querySelector('p');
+                // Skills section has different structure - no .section-content
+                if (sectionName === 'skills') {
+                    const skillCategories = section.querySelectorAll('.skill-category');
 
-                // If about section, animate all paragraphs and info grid out
-                if (sectionName === 'about') {
-                    const allParagraphs = content.querySelectorAll('p');
-                    const infoGrid = content.querySelector('.about-info-grid');
-
-                    gsap.to([...allParagraphs, infoGrid, h2].reverse(), {
+                    gsap.to([...skillCategories].reverse(), {
                         opacity: 0,
                         y: -20,
                         duration: 0.3,
@@ -1528,13 +1780,31 @@
                         ease: 'power2.in'
                     });
                 } else {
-                    gsap.to([p, h2], {
-                        opacity: 0,
-                        y: -20,
-                        duration: 0.3,
-                        stagger: 0.1,
-                        ease: 'power2.in'
-                    });
+                    const content = section.querySelector('.section-content');
+                    const h2 = content.querySelector('h2');
+                    const p = content.querySelector('p');
+
+                    // If about section, animate all paragraphs and info grid out
+                    if (sectionName === 'about') {
+                        const allParagraphs = content.querySelectorAll('p');
+                        const infoGrid = content.querySelector('.about-info-grid');
+
+                        gsap.to([...allParagraphs, infoGrid, h2].reverse(), {
+                            opacity: 0,
+                            y: -20,
+                            duration: 0.3,
+                            stagger: 0.05,
+                            ease: 'power2.in'
+                        });
+                    } else {
+                        gsap.to([p, h2], {
+                            opacity: 0,
+                            y: -20,
+                            duration: 0.3,
+                            stagger: 0.1,
+                            ease: 'power2.in'
+                        });
+                    }
                 }
 
                 gsap.to(closeBtn, {
@@ -1871,6 +2141,49 @@
         };
 
         // ============================================
+        // SKILLS CONTROLLER
+        // ============================================
+        const SkillsController = {
+            init() {
+                const categories = document.querySelectorAll('.skill-category');
+
+                categories.forEach(category => {
+                    // Handle click/tap for mobile
+                    category.addEventListener('click', (e) => {
+                        // Toggle active state for touch devices
+                        if (window.matchMedia('(hover: none)').matches) {
+                            categories.forEach(c => {
+                                if (c !== category) c.classList.remove('active');
+                            });
+                            category.classList.toggle('active');
+                        }
+                    });
+
+                    // Handle touch events
+                    category.addEventListener('touchstart', () => {
+                        category.classList.add('active');
+                    }, { passive: true });
+
+                    category.addEventListener('touchend', () => {
+                        // Keep active state on touch devices until another is tapped
+                        if (!window.matchMedia('(hover: none)').matches) {
+                            setTimeout(() => {
+                                category.classList.remove('active');
+                            }, 500);
+                        }
+                    }, { passive: true });
+                });
+
+                // Click outside to deactivate on mobile
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.skill-category')) {
+                        categories.forEach(c => c.classList.remove('active'));
+                    }
+                });
+            }
+        };
+
+        // ============================================
         // MAIN ANIMATION LOOP
         // ============================================
         function animate() {
@@ -1908,6 +2221,7 @@
             HeroController.init();
             NavigationController.init();
             ContactController.init();
+            SkillsController.init();
 
             ParticleSystem.initHeroState();
             animate();
