@@ -567,7 +567,7 @@
         const CONFIG = {
             // Hero text sampling
             textSampleGap: 1,
-            particleSize: 0.8,
+            particleSize: 1.0,
             mouseRadius: 60,
 
             // Hero state
@@ -586,7 +586,7 @@
             colors: {
                 primary: '39, 39, 42',
                 name: '39, 39, 42',
-                role: '161, 161, 170'
+                role: '82, 82, 91'
             }
         };
 
@@ -936,7 +936,7 @@
                     const centerX = rect.left + rect.width / 2;
                     textSamplingCtx.fillText(el.innerText, centerX, rect.top);
 
-                    const buffer = 5;
+                    const buffer = 20;
                     const scanLeft = Math.floor(Math.max(0, rect.left - buffer));
                     const scanTop = Math.floor(Math.max(0, rect.top - buffer));
                     const scanW = Math.ceil(rect.width + buffer * 2);
