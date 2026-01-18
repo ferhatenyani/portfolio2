@@ -907,6 +907,431 @@
             object-fit: cover;
         }
 
+        /* ================================
+           CASE STUDY STYLES (Project 2)
+        ================================ */
+        .case-study-container {
+            position: relative;
+            width: 100%;
+            max-height: 400px;
+            overflow: hidden;
+        }
+
+        .case-study-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .case-study-content.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Scroll container for panels */
+        .case-study-scroll {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+            height: 360px;
+        }
+
+        .case-study-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Intro panel styling */
+        .case-study-intro {
+            min-width: 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            background: #f4f4f5;
+        }
+
+        .case-study-intro .case-study-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            margin-bottom: 1rem;
+            background: #fafafa;
+            border: 1px solid #e4e4e7;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #71717a;
+        }
+
+        .case-study-intro .case-study-badge .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #18181b;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .case-study-intro h3 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 600;
+            color: #18181b;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .case-study-intro p {
+            font-size: 0.85rem;
+            color: #71717a;
+            line-height: 1.6;
+            max-width: 400px;
+        }
+
+        /* Feature panel styling */
+        .case-study-panel {
+            min-width: 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: #fafafa;
+        }
+
+        .case-study-panel:nth-child(odd) {
+            background: #f4f4f5;
+        }
+
+        .case-study-panel-header {
+            flex-shrink: 0;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .case-study-panel-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #a1a1aa;
+            margin-bottom: 0.5rem;
+        }
+
+        .case-study-panel-label .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #18181b;
+        }
+
+        .case-study-panel-title {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            font-weight: 600;
+            color: #18181b;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+
+        .case-study-panel-desc {
+            font-size: 0.75rem;
+            color: #71717a;
+            line-height: 1.5;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Mockups container */
+        .case-study-mockups {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 0.5rem;
+        }
+
+        /* Mobile app mockups (stacked/rotated style) */
+        .case-study-mockup {
+            position: relative;
+            border: 1px solid #e4e4e7;
+            background: #fafafa;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .case-study-mockup.mockup-primary {
+            max-height: 220px;
+            transform: rotate(-2deg);
+            z-index: 3;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .case-study-mockup.mockup-secondary {
+            max-height: 200px;
+            transform: rotate(1.5deg);
+            z-index: 2;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .case-study-mockup.mockup-tertiary {
+            max-height: 180px;
+            transform: rotate(-1deg);
+            z-index: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .case-study-mockup:hover {
+            transform: scale(1.02) rotate(0deg);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            z-index: 10;
+        }
+
+        .case-study-mockup img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* Desktop mockups (admin - single image per frame style) */
+        .case-study-mockup.mockup-desktop {
+            max-height: 240px;
+            max-width: 100%;
+            transform: none;
+            border-radius: 0;
+        }
+
+        .case-study-mockup.mockup-desktop:hover {
+            transform: scale(1.01);
+        }
+
+        .case-study-mockup.mockup-desktop img {
+            width: 100%;
+            height: auto;
+            max-height: 240px;
+            object-fit: contain;
+        }
+
+        /* Navigation arrows for case study */
+        .case-study-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            border: 1px solid #e4e4e7;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .case-study-container:hover .case-study-nav {
+            opacity: 1;
+        }
+
+        .case-study-nav:hover {
+            background: #18181b;
+            border-color: #18181b;
+        }
+
+        .case-study-nav:hover svg {
+            stroke: #fafafa;
+        }
+
+        .case-study-nav svg {
+            width: 14px;
+            height: 14px;
+            stroke: #71717a;
+            stroke-width: 1.5;
+        }
+
+        .case-study-nav.prev {
+            left: 8px;
+        }
+
+        .case-study-nav.next {
+            right: 8px;
+        }
+
+        .case-study-nav.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Progress indicator */
+        .case-study-progress {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 0;
+        }
+
+        .case-study-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #d4d4d8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .case-study-dot.active {
+            background: #18181b;
+            width: 20px;
+            border-radius: 3px;
+        }
+
+        .case-study-dot:hover:not(.active) {
+            background: #a1a1aa;
+        }
+
+        /* Responsive adjustments for case study */
+        @media (max-width: 1024px) {
+            .case-study-scroll {
+                scroll-snap-type: y mandatory;
+                flex-direction: column;
+                overflow-x: hidden;
+                overflow-y: auto;
+                height: 320px;
+            }
+
+            .case-study-intro,
+            .case-study-panel {
+                min-width: unset;
+                min-height: 100%;
+                scroll-snap-align: start;
+            }
+
+            .case-study-mockups {
+                flex-wrap: wrap;
+            }
+
+            .case-study-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .case-study-container {
+                max-height: 340px;
+            }
+
+            .case-study-scroll {
+                height: 300px;
+            }
+
+            .case-study-mockup.mockup-primary {
+                max-height: 180px;
+            }
+
+            .case-study-mockup.mockup-secondary {
+                max-height: 160px;
+            }
+
+            .case-study-mockup.mockup-tertiary {
+                max-height: 140px;
+            }
+
+            .case-study-mockup.mockup-desktop {
+                max-height: 180px;
+            }
+
+            .case-study-mockup.mockup-desktop img {
+                max-height: 180px;
+            }
+
+            .case-study-panel-title {
+                font-size: 1.1rem;
+            }
+
+            .case-study-panel-desc {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .case-study-container {
+                max-height: 300px;
+            }
+
+            .case-study-scroll {
+                height: 260px;
+            }
+
+            .case-study-intro {
+                padding: 1.5rem 1rem;
+            }
+
+            .case-study-intro h3 {
+                font-size: 1.3rem;
+            }
+
+            .case-study-intro p {
+                font-size: 0.75rem;
+            }
+
+            .case-study-panel {
+                padding: 1rem;
+            }
+
+            .case-study-mockup.mockup-primary {
+                max-height: 150px;
+            }
+
+            .case-study-mockup.mockup-secondary {
+                max-height: 130px;
+            }
+
+            .case-study-mockup.mockup-tertiary {
+                max-height: 110px;
+            }
+
+            .case-study-mockup.mockup-desktop {
+                max-height: 140px;
+            }
+
+            .case-study-mockup.mockup-desktop img {
+                max-height: 140px;
+            }
+
+            .case-study-progress {
+                padding: 8px 0;
+                gap: 4px;
+            }
+
+            .case-study-dot {
+                width: 5px;
+                height: 5px;
+            }
+
+            .case-study-dot.active {
+                width: 16px;
+            }
+        }
+
         /* Project 3 Specific - Video */
         .project-video-container {
             margin: 1.5rem auto;
@@ -1349,93 +1774,429 @@
                                 <span class="project-tag">UI/UX Design</span>
                             </div>
 
-                            <!-- Image Gallery with Toggle -->
+                            <!-- Case Study with Toggle -->
                             <div class="project-gallery">
                                 <div class="gallery-toggle">
-                                    <button class="gallery-toggle-btn active" data-view="user">User App</button>
-                                    <button class="gallery-toggle-btn" data-view="admin">Admin App</button>
+                                    <button class="gallery-toggle-btn active" data-view="user" data-project="2">User App</button>
+                                    <button class="gallery-toggle-btn" data-view="admin" data-project="2">Admin App</button>
                                 </div>
 
-                                <!-- User App Gallery -->
-                                <div class="gallery-grid" id="gallery-user">
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/chat-dark-mode.png" alt="AI Chat Interface" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/main page - quiz.png" alt="Quiz Interface" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/main page - quiz-1.png" alt="Quiz Question" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/main page - correction.png" alt="Course Correction" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/main page - correction-1.png" alt="Correction Processing" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/main page - correction-2.png" alt="Correction Results" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/profilePage1.png" alt="Profile Overview" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/profilePage2.png" alt="Profile Settings" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/access plan.png" alt="Access Plans" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-user/chat-light-mode.png" alt="Light Mode" loading="lazy">
-                                    </div>
-                                </div>
+                                <!-- Case Study Container -->
+                                <div class="case-study-container" id="case-study-project2">
+                                    <!-- User App Case Study -->
+                                    <div class="case-study-content active" id="case-study-user">
+                                        <div class="case-study-scroll" id="user-scroll">
+                                            <!-- Intro Panel -->
+                                            <div class="case-study-intro">
+                                                <div class="case-study-badge">
+                                                    <span class="pulse-dot"></span>
+                                                    <span>Case Study</span>
+                                                </div>
+                                                <h3>ReviseGPT</h3>
+                                                <p>An AI-powered medical education platform designed to support students through intelligent diagnostics, adaptive learning, and course correction.</p>
+                                            </div>
 
-                                <!-- Admin App Gallery (hidden by default) -->
-                                <div class="gallery-grid" id="gallery-admin" style="display: none;">
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/dashboardLightMode.png" alt="Dashboard Light" loading="lazy">
+                                            <!-- Feature 01: AI Diagnostic Chat -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 01</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">AI Diagnostic Chat</h4>
+                                                    <p class="case-study-panel-desc">Natural language processing enables students to ask medical questions and receive instant, accurate diagnostic guidance with cited medical sources.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-primary">
+                                                        <img src="/medicalChatBot/app-user/chat-dark-mode.png" alt="AI Chat Interface" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feature 02: Adaptive Quiz System -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 02</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">Adaptive Quiz System</h4>
+                                                    <p class="case-study-panel-desc">AI-generated quizzes adapt to student performance and learning patterns. Questions reinforce weak areas and build comprehensive medical knowledge.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-primary">
+                                                        <img src="/medicalChatBot/app-user/main page - quiz.png" alt="Quiz Interface" loading="lazy">
+                                                    </div>
+                                                    <div class="case-study-mockup mockup-secondary">
+                                                        <img src="/medicalChatBot/app-user/main page - quiz-1.png" alt="Quiz Question View" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feature 03: PDF Course Correction -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 03</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">PDF Course Correction</h4>
+                                                    <p class="case-study-panel-desc">Upload medical textbooks or study materials to receive AI-powered corrections and annotations. The system identifies outdated information and provides current medical guidelines.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-primary">
+                                                        <img src="/medicalChatBot/app-user/main page - correction.png" alt="Course Correction Upload" loading="lazy">
+                                                    </div>
+                                                    <div class="case-study-mockup mockup-secondary">
+                                                        <img src="/medicalChatBot/app-user/main page - correction-1.png" alt="Correction Processing" loading="lazy">
+                                                    </div>
+                                                    <div class="case-study-mockup mockup-tertiary">
+                                                        <img src="/medicalChatBot/app-user/main page - correction-2.png" alt="Correction Results" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feature 04: Profile & Access -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 04</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">Profile & Access</h4>
+                                                    <p class="case-study-panel-desc">Personalized student profiles with subscription management and premium features tailored for medical education.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-primary">
+                                                        <img src="/medicalChatBot/app-user/profilePage1.png" alt="Student Profile Overview" loading="lazy">
+                                                    </div>
+                                                    <div class="case-study-mockup mockup-secondary">
+                                                        <img src="/medicalChatBot/app-user/profilePage2.png" alt="Profile Settings" loading="lazy">
+                                                    </div>
+                                                    <div class="case-study-mockup mockup-tertiary">
+                                                        <img src="/medicalChatBot/app-user/access plan.png" alt="Access Plans" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feature 05: Light & Dark Mode -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Design System</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">Light & Dark Mode</h4>
+                                                    <p class="case-study-panel-desc">A carefully designed theme system optimized for extended study sessions. Dark mode reduces eye strain during night studying, while light mode ensures clarity in clinical settings.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-primary">
+                                                        <img src="/medicalChatBot/app-user/chat-light-mode.png" alt="Light Mode Interface" loading="lazy">
+                                                    </div>
+                                                    <div class="case-study-mockup mockup-secondary">
+                                                        <img src="/medicalChatBot/app-user/chat-dark-mode.png" alt="Dark Mode Interface" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Navigation Arrows -->
+                                        <button class="case-study-nav prev" data-scroll="user-scroll">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6"/></svg>
+                                        </button>
+                                        <button class="case-study-nav next" data-scroll="user-scroll">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
+                                        </button>
+
+                                        <!-- Progress Dots -->
+                                        <div class="case-study-progress" data-scroll="user-scroll">
+                                            <button class="case-study-dot active" data-index="0"></button>
+                                            <button class="case-study-dot" data-index="1"></button>
+                                            <button class="case-study-dot" data-index="2"></button>
+                                            <button class="case-study-dot" data-index="3"></button>
+                                            <button class="case-study-dot" data-index="4"></button>
+                                            <button class="case-study-dot" data-index="5"></button>
+                                        </div>
                                     </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/dashboardDarkMode.png" alt="Dashboard Dark" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/usersPage.png" alt="Users Page" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/usersDetailsModal.png" alt="User Details" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/editUserModal.png" alt="Edit User" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/quizAnalyticsPage.png" alt="Quiz Analytics" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/quizAnalyticsPage2.png" alt="Quiz Analytics Detail" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/correctionsPage.png" alt="Corrections Page" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/correctionDetailsModal.png" alt="Correction Details" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/reviewCorrectionModal.png" alt="Review Correction" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/payementsManegementPage.png" alt="Payments" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/transactionDetailsModal.png" alt="Transaction Details" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/settingsPage.png" alt="Settings" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/settingsPage2.png" alt="Settings Advanced" loading="lazy">
-                                    </div>
-                                    <div class="gallery-item">
-                                        <img src="/medicalChatBot/app-admin/changePasswordModal.png" alt="Change Password" loading="lazy">
+
+                                    <!-- Admin App Case Study (hidden by default) -->
+                                    <div class="case-study-content" id="case-study-admin">
+                                        <div class="case-study-scroll" id="admin-scroll">
+                                            <!-- Intro Panel -->
+                                            <div class="case-study-intro">
+                                                <div class="case-study-badge">
+                                                    <span class="pulse-dot"></span>
+                                                    <span>Case Study</span>
+                                                </div>
+                                                <h3>Admin Dashboard</h3>
+                                                <p>Comprehensive admin platform for managing medical education content, monitoring student progress, and overseeing course corrections.</p>
+                                            </div>
+
+                                            <!-- Feature 01: Admin Dashboard -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 01</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">Admin Dashboard</h4>
+                                                    <p class="case-study-panel-desc">Centralized command center with real-time analytics, student activity monitoring, and platform health metrics.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/dashboardLightMode.png" alt="Admin Dashboard Light Mode" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Dashboard Dark Mode -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 01</span>
+                                                    </div>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/dashboardDarkMode.png" alt="Admin Dashboard Dark Mode" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feature 02: User Management -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 02</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">User Management</h4>
+                                                    <p class="case-study-panel-desc">Complete oversight of student and educator accounts. View detailed user profiles, edit permissions, and monitor individual learning progress.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/usersPage.png" alt="Users Management Page" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- User Details -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 02</span>
+                                                    </div>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/usersDetailsModal.png" alt="User Details Modal" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Edit User -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 02</span>
+                                                    </div>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/editUserModal.png" alt="Edit User Modal" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feature 03: Quiz Analytics -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 03</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">Quiz Analytics</h4>
+                                                    <p class="case-study-panel-desc">Deep insights into student performance and quiz effectiveness. Track completion rates, difficulty patterns, and learning outcomes.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/quizAnalyticsPage.png" alt="Quiz Analytics Overview" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Quiz Analytics Detail -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 03</span>
+                                                    </div>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/quizAnalyticsPage2.png" alt="Quiz Analytics Detail" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feature 04: Course Correction Review -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 04</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">Course Correction Review</h4>
+                                                    <p class="case-study-panel-desc">Review, approve, and manage AI-generated course corrections. Examine detailed correction reports and validate suggested updates.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/correctionsPage.png" alt="Corrections Management" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Correction Details -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 04</span>
+                                                    </div>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/correctionDetailsModal.png" alt="Correction Details" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Review Correction -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 04</span>
+                                                    </div>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/reviewCorrectionModal.png" alt="Review Correction Modal" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feature 05: Payment Management -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 05</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">Payment Management</h4>
+                                                    <p class="case-study-panel-desc">Monitor subscription revenue, track transactions, and manage payment operations with detailed financial reporting.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/payementsManegementPage.png" alt="Payments Management" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Transaction Details -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 05</span>
+                                                    </div>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/transactionDetailsModal.png" alt="Transaction Details" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feature 06: Settings & Security -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 06</span>
+                                                    </div>
+                                                    <h4 class="case-study-panel-title">Settings & Security</h4>
+                                                    <p class="case-study-panel-desc">Platform configuration and security controls. Manage system settings, configure AI parameters, and maintain security.</p>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/settingsPage.png" alt="Settings Configuration" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Settings Advanced -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 06</span>
+                                                    </div>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/settingsPage2.png" alt="Settings Advanced" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Change Password -->
+                                            <div class="case-study-panel">
+                                                <div class="case-study-panel-header">
+                                                    <div class="case-study-panel-label">
+                                                        <span class="dot"></span>
+                                                        <span>Feature 06</span>
+                                                    </div>
+                                                </div>
+                                                <div class="case-study-mockups">
+                                                    <div class="case-study-mockup mockup-desktop">
+                                                        <img src="/medicalChatBot/app-admin/changePasswordModal.png" alt="Change Password" loading="lazy">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Navigation Arrows -->
+                                        <button class="case-study-nav prev" data-scroll="admin-scroll">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6"/></svg>
+                                        </button>
+                                        <button class="case-study-nav next" data-scroll="admin-scroll">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
+                                        </button>
+
+                                        <!-- Progress Dots -->
+                                        <div class="case-study-progress" data-scroll="admin-scroll">
+                                            <button class="case-study-dot active" data-index="0"></button>
+                                            <button class="case-study-dot" data-index="1"></button>
+                                            <button class="case-study-dot" data-index="2"></button>
+                                            <button class="case-study-dot" data-index="3"></button>
+                                            <button class="case-study-dot" data-index="4"></button>
+                                            <button class="case-study-dot" data-index="5"></button>
+                                            <button class="case-study-dot" data-index="6"></button>
+                                            <button class="case-study-dot" data-index="7"></button>
+                                            <button class="case-study-dot" data-index="8"></button>
+                                            <button class="case-study-dot" data-index="9"></button>
+                                            <button class="case-study-dot" data-index="10"></button>
+                                            <button class="case-study-dot" data-index="11"></button>
+                                            <button class="case-study-dot" data-index="12"></button>
+                                            <button class="case-study-dot" data-index="13"></button>
+                                            <button class="case-study-dot" data-index="14"></button>
+                                            <button class="case-study-dot" data-index="15"></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2998,9 +3759,9 @@
             initGalleryToggle() {
                 const toggleBtns = document.querySelectorAll('.gallery-toggle-btn');
 
-                // Project 2 galleries
-                const userGallery = document.getElementById('gallery-user');
-                const adminGallery = document.getElementById('gallery-admin');
+                // Project 2 case studies
+                const userCaseStudy = document.getElementById('case-study-user');
+                const adminCaseStudy = document.getElementById('case-study-admin');
 
                 // Project 3 views
                 const project3UserView = document.getElementById('project3-user-view');
@@ -3016,28 +3777,22 @@
                         siblingBtns.forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
 
-                        // Handle Project 2 toggle
-                        if (!projectNum || projectNum === '2') {
+                        // Handle Project 2 case study toggle
+                        if (projectNum === '2') {
                             if (view === 'user') {
-                                gsap.to(adminGallery, {
-                                    opacity: 0,
-                                    duration: 0.2,
-                                    onComplete: () => {
-                                        adminGallery.style.display = 'none';
-                                        userGallery.style.display = 'grid';
-                                        gsap.fromTo(userGallery, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-                                    }
-                                });
+                                adminCaseStudy.classList.remove('active');
+                                userCaseStudy.classList.add('active');
+                                // Reset scroll position
+                                const userScroll = document.getElementById('user-scroll');
+                                if (userScroll) userScroll.scrollLeft = 0;
+                                this.updateCaseStudyDots('user-scroll', 0);
                             } else {
-                                gsap.to(userGallery, {
-                                    opacity: 0,
-                                    duration: 0.2,
-                                    onComplete: () => {
-                                        userGallery.style.display = 'none';
-                                        adminGallery.style.display = 'grid';
-                                        gsap.fromTo(adminGallery, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-                                    }
-                                });
+                                userCaseStudy.classList.remove('active');
+                                adminCaseStudy.classList.add('active');
+                                // Reset scroll position
+                                const adminScroll = document.getElementById('admin-scroll');
+                                if (adminScroll) adminScroll.scrollLeft = 0;
+                                this.updateCaseStudyDots('admin-scroll', 0);
                             }
                         }
 
@@ -3066,6 +3821,89 @@
                             }
                         }
                     });
+                });
+
+                // Initialize case study navigation
+                this.initCaseStudyNavigation();
+            },
+
+            initCaseStudyNavigation() {
+                // Handle navigation arrows
+                document.querySelectorAll('.case-study-nav').forEach(navBtn => {
+                    navBtn.addEventListener('click', () => {
+                        const scrollId = navBtn.dataset.scroll;
+                        const scrollContainer = document.getElementById(scrollId);
+                        if (!scrollContainer) return;
+
+                        const isVertical = window.innerWidth < 1024;
+                        const panelSize = isVertical ? scrollContainer.offsetHeight : scrollContainer.offsetWidth;
+                        const currentScroll = isVertical ? scrollContainer.scrollTop : scrollContainer.scrollLeft;
+                        const currentIndex = Math.round(currentScroll / panelSize);
+                        const panels = scrollContainer.querySelectorAll('.case-study-intro, .case-study-panel');
+                        const maxIndex = panels.length - 1;
+
+                        let newIndex;
+                        if (navBtn.classList.contains('prev')) {
+                            newIndex = Math.max(0, currentIndex - 1);
+                        } else {
+                            newIndex = Math.min(maxIndex, currentIndex + 1);
+                        }
+
+                        if (isVertical) {
+                            scrollContainer.scrollTo({ top: panelSize * newIndex, behavior: 'smooth' });
+                        } else {
+                            scrollContainer.scrollTo({ left: panelSize * newIndex, behavior: 'smooth' });
+                        }
+
+                        this.updateCaseStudyDots(scrollId, newIndex);
+                    });
+                });
+
+                // Handle progress dots
+                document.querySelectorAll('.case-study-progress').forEach(progressContainer => {
+                    const scrollId = progressContainer.dataset.scroll;
+                    progressContainer.querySelectorAll('.case-study-dot').forEach(dot => {
+                        dot.addEventListener('click', () => {
+                            const index = parseInt(dot.dataset.index);
+                            const scrollContainer = document.getElementById(scrollId);
+                            if (!scrollContainer) return;
+
+                            const isVertical = window.innerWidth < 1024;
+                            const panelSize = isVertical ? scrollContainer.offsetHeight : scrollContainer.offsetWidth;
+
+                            if (isVertical) {
+                                scrollContainer.scrollTo({ top: panelSize * index, behavior: 'smooth' });
+                            } else {
+                                scrollContainer.scrollTo({ left: panelSize * index, behavior: 'smooth' });
+                            }
+
+                            this.updateCaseStudyDots(scrollId, index);
+                        });
+                    });
+                });
+
+                // Handle scroll updates for progress dots
+                document.querySelectorAll('.case-study-scroll').forEach(scrollContainer => {
+                    let scrollTimeout;
+                    scrollContainer.addEventListener('scroll', () => {
+                        clearTimeout(scrollTimeout);
+                        scrollTimeout = setTimeout(() => {
+                            const isVertical = window.innerWidth < 1024;
+                            const panelSize = isVertical ? scrollContainer.offsetHeight : scrollContainer.offsetWidth;
+                            const currentScroll = isVertical ? scrollContainer.scrollTop : scrollContainer.scrollLeft;
+                            const currentIndex = Math.round(currentScroll / panelSize);
+                            this.updateCaseStudyDots(scrollContainer.id, currentIndex);
+                        }, 50);
+                    });
+                });
+            },
+
+            updateCaseStudyDots(scrollId, activeIndex) {
+                const progressContainer = document.querySelector(`.case-study-progress[data-scroll="${scrollId}"]`);
+                if (!progressContainer) return;
+
+                progressContainer.querySelectorAll('.case-study-dot').forEach((dot, index) => {
+                    dot.classList.toggle('active', index === activeIndex);
                 });
             },
 
@@ -3135,14 +3973,21 @@
                 });
                 this.updateArrows();
 
-                // Reset Project 2 gallery to user view
-                const userGallery = document.getElementById('gallery-user');
-                const adminGallery = document.getElementById('gallery-admin');
+                // Reset Project 2 case study to user view
+                const userCaseStudy = document.getElementById('case-study-user');
+                const adminCaseStudy = document.getElementById('case-study-admin');
 
-                if (userGallery && adminGallery) {
-                    userGallery.style.display = 'grid';
-                    userGallery.style.opacity = '1';
-                    adminGallery.style.display = 'none';
+                if (userCaseStudy && adminCaseStudy) {
+                    userCaseStudy.classList.add('active');
+                    adminCaseStudy.classList.remove('active');
+                    // Reset scroll positions
+                    const userScroll = document.getElementById('user-scroll');
+                    const adminScroll = document.getElementById('admin-scroll');
+                    if (userScroll) userScroll.scrollLeft = 0;
+                    if (adminScroll) adminScroll.scrollLeft = 0;
+                    // Reset dots
+                    this.updateCaseStudyDots('user-scroll', 0);
+                    this.updateCaseStudyDots('admin-scroll', 0);
                 }
 
                 // Reset Project 3 toggle to user view
