@@ -231,6 +231,21 @@
             50% { opacity: 0; }
         }
 
+        /* Intro CTA responsive adjustments */
+        @media (max-width: 600px) {
+            .intro-cta-overlay {
+                font-size: clamp(1rem, 3.5vw, 1.5rem);
+            }
+        }
+
+        @media (max-width: 420px) {
+            .intro-cta-overlay {
+                font-size: clamp(0.8rem, 4vw, 1rem);
+                white-space: normal;
+                max-width: 90%;
+            }
+        }
+
         /* Back to Hero button */
         #back-hero-btn {
             position: fixed;
