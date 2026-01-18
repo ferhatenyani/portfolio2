@@ -935,7 +935,7 @@
         .case-study-container {
             position: relative;
             width: 100%;
-            max-height: 500px;
+            max-height: 600px;
             overflow: hidden;
         }
 
@@ -960,7 +960,7 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
             -webkit-overflow-scrolling: touch;
-            height: 460px;
+            height: 560px;
         }
 
         .case-study-scroll::-webkit-scrollbar {
@@ -1089,7 +1089,8 @@
             justify-content: center;
             overflow: visible;
             padding: 1rem;
-            min-height: 320px;
+            min-height: 380px;
+            flex-wrap: wrap;
         }
 
         /* Mobile app mockups (stacked/rotated style) */
@@ -1099,24 +1100,33 @@
             background: #fafafa;
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .case-study-mockup.mockup-primary {
-            max-height: 300px;
+            height: 55vh;
+            max-height: 480px;
+            width: auto;
             transform: rotate(-2deg);
             z-index: 3;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         }
 
         .case-study-mockup.mockup-secondary {
-            max-height: 270px;
+            height: 48vh;
+            max-height: 420px;
+            width: auto;
             transform: rotate(1.5deg);
             z-index: 2;
             box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
         }
 
         .case-study-mockup.mockup-tertiary {
-            max-height: 240px;
+            height: 42vh;
+            max-height: 360px;
+            width: auto;
             transform: rotate(-1deg);
             z-index: 1;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -1136,8 +1146,10 @@
 
         /* Desktop mockups (admin - single image per frame style) */
         .case-study-mockup.mockup-desktop {
-            max-height: 340px;
+            height: auto;
+            max-height: 65vh;
             max-width: 100%;
+            width: auto;
             transform: none;
             border-radius: 0;
         }
@@ -1147,9 +1159,10 @@
         }
 
         .case-study-mockup.mockup-desktop img {
-            width: 100%;
+            width: auto;
             height: auto;
-            max-height: 340px;
+            max-height: 65vh;
+            max-width: 100%;
             object-fit: contain;
         }
 
@@ -1234,7 +1247,7 @@
         /* Responsive adjustments for case study */
         @media (max-width: 1024px) {
             .case-study-container {
-                max-height: 450px;
+                max-height: 550px;
             }
 
             .case-study-scroll {
@@ -1242,7 +1255,7 @@
                 flex-direction: column;
                 overflow-x: hidden;
                 overflow-y: auto;
-                height: 420px;
+                height: 520px;
             }
 
             .case-study-intro,
@@ -1254,27 +1267,30 @@
 
             .case-study-mockups {
                 flex-wrap: wrap;
-                min-height: 280px;
+                min-height: 380px;
             }
 
             .case-study-mockup.mockup-primary {
-                max-height: 260px;
+                height: 50vh;
+                max-height: 420px;
             }
 
             .case-study-mockup.mockup-secondary {
-                max-height: 230px;
+                height: 44vh;
+                max-height: 370px;
             }
 
             .case-study-mockup.mockup-tertiary {
-                max-height: 200px;
+                height: 38vh;
+                max-height: 320px;
             }
 
             .case-study-mockup.mockup-desktop {
-                max-height: 300px;
+                max-height: 55vh;
             }
 
             .case-study-mockup.mockup-desktop img {
-                max-height: 300px;
+                max-height: 55vh;
             }
 
             .case-study-nav {
@@ -1284,35 +1300,39 @@
 
         @media (max-width: 768px) {
             .case-study-container {
-                max-height: 400px;
+                max-height: 500px;
             }
 
             .case-study-scroll {
-                height: 370px;
+                height: 470px;
             }
 
             .case-study-mockups {
-                min-height: 240px;
+                min-height: 320px;
+                gap: 1rem;
             }
 
             .case-study-mockup.mockup-primary {
-                max-height: 220px;
+                height: 45vh;
+                max-height: 380px;
             }
 
             .case-study-mockup.mockup-secondary {
-                max-height: 195px;
+                height: 40vh;
+                max-height: 340px;
             }
 
             .case-study-mockup.mockup-tertiary {
-                max-height: 170px;
+                height: 35vh;
+                max-height: 300px;
             }
 
             .case-study-mockup.mockup-desktop {
-                max-height: 260px;
+                max-height: 50vh;
             }
 
             .case-study-mockup.mockup-desktop img {
-                max-height: 260px;
+                max-height: 50vh;
             }
 
             .case-study-panel-title {
@@ -1324,18 +1344,89 @@
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 640px) {
             .case-study-container {
-                max-height: 360px;
+                max-height: 480px;
             }
 
             .case-study-scroll {
-                height: 330px;
+                height: 450px;
             }
 
             .case-study-mockups {
-                min-height: 200px;
-                gap: 12px;
+                min-height: 280px;
+                gap: 1rem;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* Dribbble-style mobile mockups */
+            .case-study-mockup.mockup-primary {
+                height: auto;
+                max-height: none;
+                width: 55%;
+                max-width: 180px;
+                transform: rotate(-2deg) translateY(-8px);
+            }
+
+            .case-study-mockup.mockup-secondary {
+                height: auto;
+                max-height: none;
+                width: 50%;
+                max-width: 165px;
+                transform: rotate(1.5deg) translateY(4px);
+            }
+
+            .case-study-mockup.mockup-tertiary {
+                height: auto;
+                max-height: none;
+                width: 45%;
+                max-width: 150px;
+                transform: rotate(-1deg) translateY(0px);
+            }
+
+            .case-study-mockup img {
+                width: 100%;
+                height: auto;
+            }
+
+            .case-study-mockup.mockup-desktop {
+                max-height: 45vh;
+                width: auto;
+            }
+
+            .case-study-mockup.mockup-desktop img {
+                max-height: 45vh;
+                width: auto;
+            }
+
+            .case-study-intro {
+                padding: 2rem 1.25rem;
+            }
+
+            .case-study-intro h3 {
+                font-size: 1.4rem;
+            }
+
+            .case-study-intro p {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .case-study-container {
+                max-height: 450px;
+            }
+
+            .case-study-scroll {
+                height: 420px;
+            }
+
+            .case-study-mockups {
+                min-height: 250px;
+                gap: 0.875rem;
             }
 
             .case-study-intro {
@@ -1355,23 +1446,26 @@
             }
 
             .case-study-mockup.mockup-primary {
-                max-height: 180px;
+                width: 52%;
+                max-width: 165px;
             }
 
             .case-study-mockup.mockup-secondary {
-                max-height: 160px;
+                width: 48%;
+                max-width: 150px;
             }
 
             .case-study-mockup.mockup-tertiary {
-                max-height: 140px;
+                width: 44%;
+                max-width: 140px;
             }
 
             .case-study-mockup.mockup-desktop {
-                max-height: 200px;
+                max-height: 40vh;
             }
 
             .case-study-mockup.mockup-desktop img {
-                max-height: 200px;
+                max-height: 40vh;
             }
 
             .case-study-progress {
@@ -1386,6 +1480,44 @@
 
             .case-study-dot.active {
                 width: 16px;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .case-study-container {
+                max-height: 420px;
+            }
+
+            .case-study-scroll {
+                height: 390px;
+            }
+
+            .case-study-mockups {
+                min-height: 220px;
+                gap: 0.75rem;
+            }
+
+            .case-study-mockup.mockup-primary {
+                width: 50%;
+                max-width: 150px;
+            }
+
+            .case-study-mockup.mockup-secondary {
+                width: 46%;
+                max-width: 140px;
+            }
+
+            .case-study-mockup.mockup-tertiary {
+                width: 42%;
+                max-width: 130px;
+            }
+
+            .case-study-mockup.mockup-desktop {
+                max-height: 35vh;
+            }
+
+            .case-study-mockup.mockup-desktop img {
+                max-height: 35vh;
             }
         }
 
