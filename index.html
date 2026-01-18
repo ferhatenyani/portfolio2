@@ -213,6 +213,24 @@
             white-space: nowrap;
         }
 
+        /* Typewriter cursor */
+        .intro-cta-overlay::after {
+            content: '|';
+            display: inline-block;
+            margin-left: 2px;
+            animation: typewriter-blink 0.7s step-end infinite;
+            opacity: 0;
+        }
+
+        .intro-cta-overlay.typing::after {
+            opacity: 1;
+        }
+
+        @keyframes typewriter-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
         /* Back to Hero button */
         #back-hero-btn {
             position: fixed;
@@ -4113,21 +4131,41 @@
 
                         navLayer.classList.add('visible');
 
-                        // Phase 1: Show intro CTA text first (fade in)
-                        gsap.to(introCta, {
-                            opacity: 1,
-                            duration: 0.6,
-                            delay: 0.2,
-                            ease: 'power2.out'
-                        });
+                        // Phase 1: Typewriter effect for intro CTA
+                        const fullText = introCta.getAttribute('data-i18n')
+                            ? I18nController.t(introCta.getAttribute('data-i18n'))
+                            : introCta.textContent;
+                        introCta.textContent = '';
+                        introCta.style.opacity = '1';
+                        introCta.classList.add('typing');
 
-                        // Phase 2: Hold for 2 seconds, then fade out intro CTA
-                        gsap.to(introCta, {
-                            opacity: 0,
-                            duration: 0.5,
-                            delay: 1.5, // 0.2 delay + 0.6 fade in + ~1.4s hold = 2.2s before fade out
-                            ease: 'power2.in',
-                            onComplete: () => {
+                        let charIndex = 0;
+                        const typeSpeed = 45; // ms per character
+
+                        const typeNextChar = () => {
+                            if (charIndex < fullText.length) {
+                                introCta.textContent += fullText.charAt(charIndex);
+                                charIndex++;
+                                setTimeout(typeNextChar, typeSpeed);
+                            } else {
+                                // Typing complete - hold briefly then fade out
+                                setTimeout(() => {
+                                    introCta.classList.remove('typing');
+                                    gsap.to(introCta, {
+                                        opacity: 0,
+                                        duration: 0.5,
+                                        ease: 'power2.in',
+                                        onComplete: fadeOutComplete
+                                    });
+                                }, 800); // Hold after typing completes
+                            }
+                        };
+
+                        // Start typing after a brief delay
+                        setTimeout(typeNextChar, 200);
+
+                        // Phase 2: After fade out, show nav content
+                        const fadeOutComplete = () => {
                                 // Phase 3: Now initialize and show the nav content
                                 ParticleSystem.initNavigationState();
                                 ApertureSystem.initZoneRings();
@@ -4150,8 +4188,7 @@
                                     delay: 0.1,
                                     ease: 'power3.out'
                                 });
-                            }
-                        });
+                        };
                     }
                 }, 50);
             },
