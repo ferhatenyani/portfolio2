@@ -193,24 +193,6 @@
             color: #3f3f46;
         }
 
-        /* Center instruction */
-        .center-hint {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 0.7rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: #d4d4d8;
-            z-index: 55;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .center-hint.hidden {
-            opacity: 0;
-        }
 
         /* Intro CTA overlay for hero-to-nav transition */
         .intro-cta-overlay {
@@ -2218,7 +2200,6 @@
     ================================ -->
     <div id="nav-layer">
         <!-- Center Hint -->
-        <div class="center-hint" id="center-hint">Click a section to explore</div>
 
         <!-- Zone Hit Areas -->
         <div class="zone top-left" data-section="projects">
@@ -3707,7 +3688,6 @@
                 const heroLayer = document.getElementById('hero-layer');
                 const navLayer = document.getElementById('nav-layer');
                 const introCta = document.getElementById('intro-cta-overlay');
-                const centerHint = document.getElementById('center-hint');
 
                 // Wait for dust animation to nearly complete before showing navigation
                 const checkDust = setInterval(() => {
@@ -3715,9 +3695,6 @@
                         clearInterval(checkDust);
 
                         navLayer.classList.add('visible');
-
-                        // Hide the regular center hint initially
-                        centerHint.style.opacity = '0';
 
                         // Phase 1: Show intro CTA text first (fade in)
                         gsap.to(introCta, {
@@ -3744,15 +3721,7 @@
                                     filter: 'blur(0px)',
                                     duration: 0.8,
                                     ease: 'power2.out',
-                                    onComplete: () => {
-                                        // Show the regular center hint after transition
-                                        gsap.to(centerHint, {
-                                            opacity: 1,
-                                            duration: 0.4,
-                                            ease: 'power2.out'
-                                        });
-                                        onComplete();
-                                    }
+                                    onComplete: onComplete
                                 });
 
                                 // Zone labels fade in with upward motion
@@ -3774,7 +3743,6 @@
                 const { sectionName } = data;
                 const section = document.getElementById(`section-${sectionName}`);
                 const closeBtn = document.getElementById('close-btn');
-                const centerHint = document.getElementById('center-hint');
                 const zones = document.querySelectorAll('.zone');
                 const zoneLabels = document.querySelectorAll('.zone-label');
                 const backBtn = document.getElementById('back-hero-btn');
@@ -3783,7 +3751,6 @@
                 section.classList.add('active');
 
                 zones.forEach(z => z.style.pointerEvents = 'none');
-                centerHint.classList.add('hidden');
 
                 // Hide zone labels and rings when opening a section
                 gsap.to(zoneLabels, {
@@ -3887,7 +3854,6 @@
                 const sectionName = StateManager.activeSection;
                 const section = document.getElementById(`section-${sectionName}`);
                 const closeBtn = document.getElementById('close-btn');
-                const centerHint = document.getElementById('center-hint');
                 const zones = document.querySelectorAll('.zone');
                 const zoneLabels = document.querySelectorAll('.zone-label');
                 const backBtn = document.getElementById('back-hero-btn');
@@ -3948,7 +3914,6 @@
                 ApertureSystem.animateClose(CONFIG.apertureDuration, () => {
                     section.classList.remove('active');
                     zones.forEach(z => z.style.pointerEvents = 'auto');
-                    centerHint.classList.remove('hidden');
                     backBtn.style.display = 'block';
                     StateManager.clearActiveSection();
 
