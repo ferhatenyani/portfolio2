@@ -212,26 +212,46 @@
             opacity: 0;
         }
 
+        /* Intro CTA overlay for hero-to-nav transition */
+        .intro-cta-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: #18181b;
+            z-index: 65;
+            pointer-events: none;
+            opacity: 0;
+            text-align: center;
+            white-space: nowrap;
+        }
+
         /* Back to Hero button */
         #back-hero-btn {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
+            font-family: 'Space Mono', monospace;
             font-size: 0.7rem;
-            letter-spacing: 0.15em;
+            font-weight: 700;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #a1a1aa;
-            background: none;
-            border: none;
+            color: #fafafa;
+            background: #18181b;
+            border: 1px solid #18181b;
             cursor: pointer;
             z-index: 62;
-            transition: color 0.3s ease;
-            padding: 10px 20px;
+            transition: all 0.3s ease;
+            padding: 14px 28px;
         }
 
         #back-hero-btn:hover {
-            color: #18181b;
+            background: #3f3f46;
+            border-color: #3f3f46;
         }
 
         /* ================================
@@ -923,19 +943,7 @@
             text-align: center;
         }
 
-        /* Project Number Badge */
-        .project-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border: 1px solid #d4d4d8;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
-            color: #71717a;
-            margin-bottom: 1.5rem;
-        }
+        
 
         /* Project Title */
         .project-title {
@@ -2168,6 +2176,8 @@
 
             #back-hero-btn {
                 bottom: 20px;
+                padding: 12px 24px;
+                font-size: 0.65rem;
             }
         }
     </style>
@@ -2199,6 +2209,9 @@
             <i data-lucide="arrow-right" class="w-3.5 h-3.5 relative z-10 transition-transform duration-300 group-hover:translate-x-0.5" stroke-width="1.5"></i>
         </button>
     </div>
+
+    <!-- Intro CTA Overlay (appears first during hero-to-nav transition, outside nav-layer) -->
+    <div class="intro-cta-overlay" id="intro-cta-overlay">Click a section to explore</div>
 
     <!-- ================================
          NAVIGATION LAYER
@@ -2255,8 +2268,7 @@
                     <!-- Project 1: Power BI Dashboard -->
                     <div class="project-slide" data-index="0">
                         <div class="project-content">
-                            <div class="project-number">01</div>
-                            <h2 class="project-title">Embedded Analytics Dashboard with Power BI</h2>
+                            <h2 class="project-title">ReportHub</h2>
                             <p class="project-description">
                                 A modern SaaS application featuring embedded Power BI dashboards, designed with a clear separation between User and Admin experiences. The focus is on data clarity, role-based access, and smooth interactions, delivering complex analytics through a clean, intuitive interface.
                             </p>
@@ -2276,8 +2288,7 @@
                     <!-- Project 2: ReviseGPT (Medical AI) -->
                     <div class="project-slide" data-index="1">
                         <div class="project-content">
-                            <div class="project-number">02</div>
-                            <h2 class="project-title">ReviseGPT — AI-Powered Medical Learning Platform</h2>
+                            <h2 class="project-title">ReviseGPT</h2>
                             <p class="project-description">
                                 An intelligent platform empowering medical students and professors with AI-driven diagnostics, adaptive quizzes, and automated course corrections — paired with a powerful admin dashboard for content oversight.
                             </p>
@@ -2724,8 +2735,7 @@
                     <!-- Project 3: Bookstore -->
                     <div class="project-slide" data-index="2">
                         <div class="project-content">
-                            <div class="project-number">03</div>
-                            <h2 class="project-title">Full-Stack Bookstore with Admin CMS</h2>
+                            <h2 class="project-title">Esprit Livre</h2>
                             <p class="project-description">
                                 A full-featured book e-commerce platform with a dedicated User app for browsing and purchasing, and a powerful Admin app giving the store owner complete control over products, orders, and content. The project emphasizes usability, motion-driven feedback, and scalable UI architecture.
                             </p>
@@ -3496,7 +3506,10 @@
 
             // Base radius for zone rings (responsive)
             getBaseRadius() {
-                return Math.min(width, height) * 0.06; // 6% of smaller dimension
+                // Increase radius on mobile for better spacing between text and rings
+                const isMobile = window.innerWidth <= 768;
+                const basePercent = isMobile ? 0.09 : 0.06; // 9% on mobile, 6% on desktop
+                return Math.min(width, height) * basePercent;
             },
 
             initZoneRings(animate = true) {
@@ -3693,6 +3706,8 @@
             heroToNavigation(data, onComplete) {
                 const heroLayer = document.getElementById('hero-layer');
                 const navLayer = document.getElementById('nav-layer');
+                const introCta = document.getElementById('intro-cta-overlay');
+                const centerHint = document.getElementById('center-hint');
 
                 // Wait for dust animation to nearly complete before showing navigation
                 const checkDust = setInterval(() => {
@@ -3700,29 +3715,56 @@
                         clearInterval(checkDust);
 
                         navLayer.classList.add('visible');
-                        ParticleSystem.initNavigationState();
-                        ApertureSystem.initZoneRings();
 
-                        // Phase 1: Fade in with blur clearing (particles appear first)
-                        gsap.to(navLayer, {
+                        // Hide the regular center hint initially
+                        centerHint.style.opacity = '0';
+
+                        // Phase 1: Show intro CTA text first (fade in)
+                        gsap.to(introCta, {
                             opacity: 1,
-                            filter: 'blur(0px)',
-                            duration: 1.0,
-                            delay: 0.3,
-                            ease: 'power2.out',
-                            onComplete: () => {
-                                onComplete();
-                            }
+                            duration: 0.6,
+                            delay: 0.2,
+                            ease: 'power2.out'
                         });
 
-                        // Phase 2: Zone labels fade in with upward motion (shortly after particles)
-                        gsap.to('.zone-label', {
-                            opacity: 1,
-                            y: 0,
-                            duration: 0.7,
-                            stagger: 0.12,
-                            delay: 0.1, // Start shortly after rings begin appearing
-                            ease: 'power3.out'
+                        // Phase 2: Hold for 2 seconds, then fade out intro CTA
+                        gsap.to(introCta, {
+                            opacity: 0,
+                            duration: 0.5,
+                            delay: 2.2, // 0.2 delay + 0.6 fade in + ~1.4s hold = 2.2s before fade out
+                            ease: 'power2.in',
+                            onComplete: () => {
+                                // Phase 3: Now initialize and show the nav content
+                                ParticleSystem.initNavigationState();
+                                ApertureSystem.initZoneRings();
+
+                                // Fade in nav layer with blur clearing
+                                gsap.to(navLayer, {
+                                    opacity: 1,
+                                    filter: 'blur(0px)',
+                                    duration: 0.8,
+                                    ease: 'power2.out',
+                                    onComplete: () => {
+                                        // Show the regular center hint after transition
+                                        gsap.to(centerHint, {
+                                            opacity: 1,
+                                            duration: 0.4,
+                                            ease: 'power2.out'
+                                        });
+                                        onComplete();
+                                    }
+                                });
+
+                                // Zone labels fade in with upward motion
+                                gsap.to('.zone-label', {
+                                    opacity: 1,
+                                    y: 0,
+                                    duration: 0.7,
+                                    stagger: 0.12,
+                                    delay: 0.1,
+                                    ease: 'power3.out'
+                                });
+                            }
                         });
                     }
                 }, 50);
