@@ -819,6 +819,55 @@
             justify-content: center;
             padding: clamp(20px, 4vh, 40px) clamp(20px, 4vw, 60px);
             gap: clamp(8px, 2vw, 24px);
+            position: relative;
+        }
+
+        /* Close button positioning for projects section */
+        #section-projects .close-btn-projects {
+            position: absolute;
+            top: 50%;
+            right: clamp(20px, 4vw, 60px);
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #18181b;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: background 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        #section-projects .close-btn-projects:hover {
+            background: #3f3f46;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        #section-projects .close-btn-projects.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #section-projects .close-btn-projects::before,
+        #section-projects .close-btn-projects::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 2px;
+            background: #fafafa;
+        }
+
+        #section-projects .close-btn-projects::before {
+            transform: rotate(45deg);
+        }
+
+        #section-projects .close-btn-projects::after {
+            transform: rotate(-45deg);
         }
 
         .project-tab {
@@ -1903,6 +1952,17 @@
                 padding: 16px 20px;
             }
 
+            #section-projects .close-btn-projects {
+                width: 38px;
+                height: 38px;
+                right: 16px;
+            }
+
+            #section-projects .close-btn-projects::before,
+            #section-projects .close-btn-projects::after {
+                width: 14px;
+            }
+
             .project-tab {
                 font-size: 0.6rem;
                 padding: 8px 12px;
@@ -1952,6 +2012,17 @@
         }
 
         @media (max-width: 480px) {
+            #section-projects .close-btn-projects {
+                width: 34px;
+                height: 34px;
+                right: 12px;
+            }
+
+            #section-projects .close-btn-projects::before,
+            #section-projects .close-btn-projects::after {
+                width: 12px;
+            }
+
             .project-slide {
                 padding: 16px;
                 padding-left: clamp(50px, 16vw, 70px);
@@ -2232,6 +2303,8 @@
                 <button class="project-tab active" data-project="0">Project 1</button>
                 <button class="project-tab" data-project="1">Project 2</button>
                 <button class="project-tab" data-project="2">Project 3</button>
+                <!-- Close button for projects section -->
+                <button class="close-btn-projects" id="close-btn-projects" aria-label="Close section"></button>
             </div>
 
             <!-- Projects Carousel -->
@@ -3743,6 +3816,7 @@
                 const { sectionName } = data;
                 const section = document.getElementById(`section-${sectionName}`);
                 const closeBtn = document.getElementById('close-btn');
+                const closeBtnProjects = document.getElementById('close-btn-projects');
                 const zones = document.querySelectorAll('.zone');
                 const zoneLabels = document.querySelectorAll('.zone-label');
                 const backBtn = document.getElementById('back-hero-btn');
@@ -3769,12 +3843,24 @@
                     onComplete();
                 });
 
-                gsap.to(closeBtn, {
-                    opacity: 1,
-                    duration: 0.3,
-                    delay: CONFIG.apertureDuration * 0.5,
-                    onStart: () => closeBtn.classList.add('visible')
-                });
+                // Show appropriate close button based on section
+                if (sectionName === 'projects') {
+                    // Use projects-specific close button
+                    gsap.to(closeBtnProjects, {
+                        opacity: 1,
+                        duration: 0.3,
+                        delay: CONFIG.apertureDuration * 0.5,
+                        onStart: () => closeBtnProjects.classList.add('visible')
+                    });
+                } else {
+                    // Use main close button for other sections
+                    gsap.to(closeBtn, {
+                        opacity: 1,
+                        duration: 0.3,
+                        delay: CONFIG.apertureDuration * 0.5,
+                        onStart: () => closeBtn.classList.add('visible')
+                    });
+                }
 
                 // Skills section has different structure - no .section-content
                 if (sectionName === 'skills') {
@@ -3854,6 +3940,7 @@
                 const sectionName = StateManager.activeSection;
                 const section = document.getElementById(`section-${sectionName}`);
                 const closeBtn = document.getElementById('close-btn');
+                const closeBtnProjects = document.getElementById('close-btn-projects');
                 const zones = document.querySelectorAll('.zone');
                 const zoneLabels = document.querySelectorAll('.zone-label');
                 const backBtn = document.getElementById('back-hero-btn');
@@ -3900,11 +3987,20 @@
                     }
                 }
 
-                gsap.to(closeBtn, {
-                    opacity: 0,
-                    duration: 0.2,
-                    onComplete: () => closeBtn.classList.remove('visible')
-                });
+                // Hide appropriate close button based on section
+                if (sectionName === 'projects') {
+                    gsap.to(closeBtnProjects, {
+                        opacity: 0,
+                        duration: 0.2,
+                        onComplete: () => closeBtnProjects.classList.remove('visible')
+                    });
+                } else {
+                    gsap.to(closeBtn, {
+                        opacity: 0,
+                        duration: 0.2,
+                        onComplete: () => closeBtn.classList.remove('visible')
+                    });
+                }
 
                 // Reset contact controller if leaving contact section
                 if (sectionName === 'contact') {
@@ -4003,14 +4099,25 @@
             },
 
             sectionToHero(data, onComplete) {
-                const section = document.getElementById(`section-${StateManager.activeSection}`);
+                const sectionName = StateManager.activeSection;
+                const section = document.getElementById(`section-${sectionName}`);
                 const closeBtn = document.getElementById('close-btn');
+                const closeBtnProjects = document.getElementById('close-btn-projects');
 
-                gsap.to(closeBtn, {
-                    opacity: 0,
-                    duration: 0.2,
-                    onComplete: () => closeBtn.classList.remove('visible')
-                });
+                // Hide appropriate close button based on section
+                if (sectionName === 'projects') {
+                    gsap.to(closeBtnProjects, {
+                        opacity: 0,
+                        duration: 0.2,
+                        onComplete: () => closeBtnProjects.classList.remove('visible')
+                    });
+                } else {
+                    gsap.to(closeBtn, {
+                        opacity: 0,
+                        duration: 0.2,
+                        onComplete: () => closeBtn.classList.remove('visible')
+                    });
+                }
 
                 ApertureSystem.animateClose(CONFIG.apertureDuration * 0.5, () => {
                     section.classList.remove('active');
@@ -4029,6 +4136,7 @@
             init() {
                 const zones = document.querySelectorAll('.zone');
                 const closeBtn = document.getElementById('close-btn');
+                const closeBtnProjects = document.getElementById('close-btn-projects');
                 const backHeroBtn = document.getElementById('back-hero-btn');
 
                 zones.forEach(zone => {
@@ -4047,6 +4155,13 @@
 
                 closeBtn.addEventListener('click', () => this.closeSection());
                 closeBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.closeSection();
+                });
+
+                // Projects section close button
+                closeBtnProjects.addEventListener('click', () => this.closeSection());
+                closeBtnProjects.addEventListener('touchend', (e) => {
                     e.preventDefault();
                     this.closeSection();
                 });
