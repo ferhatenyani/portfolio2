@@ -1,0 +1,194 @@
+{
+  "meta": {
+    "title": "Ferhaten Yani | Portfolio"
+  },
+  "hero": {
+    "name": "Ferhaten Yani",
+    "role": "Dev Frontend & Designer UI/UX",
+    "cta": "Accéder au portfolio"
+  },
+  "nav": {
+    "introCta": "Cliquez sur une section pour explorer",
+    "projects": "Projets",
+    "skills": "Compétences",
+    "about": "À propos",
+    "contact": "Contact",
+    "backToStart": "Retour au début"
+  },
+  "projects": {
+    "tabs": {
+      "project1": "Projet 1",
+      "project2": "Projet 2",
+      "project3": "Projet 3"
+    },
+    "project1": {
+      "title": "ReportHub",
+      "description": "Une application SaaS moderne intégrant des tableaux de bord Power BI, conçue avec une séparation claire entre les expériences Utilisateur et Admin. L'accent est mis sur la clarté des données, l'accès basé sur les rôles et des interactions fluides, offrant des analyses complexes via une interface épurée et intuitive.",
+      "viewDemo": "Voir la Démo"
+    },
+    "project2": {
+      "title": "ReviseGPT",
+      "description": "Une plateforme intelligente qui accompagne les étudiants en médecine et les professeurs avec des diagnostics pilotés par l'IA, des quiz adaptatifs et des corrections de cours automatisées — associée à un puissant tableau de bord admin pour la supervision du contenu.",
+      "userApp": "App Utilisateur",
+      "adminApp": "App Admin",
+      "caseStudy": {
+        "badge": "Étude de cas",
+        "intro": {
+          "title": "ReviseGPT",
+          "description": "Une plateforme d'éducation médicale alimentée par l'IA, conçue pour accompagner les étudiants à travers des diagnostics intelligents, un apprentissage adaptatif et la correction de cours."
+        },
+        "adminIntro": {
+          "title": "Tableau de bord Admin",
+          "description": "Plateforme admin complète pour gérer le contenu éducatif médical, suivre les progrès des étudiants et superviser les corrections de cours."
+        },
+        "features": {
+          "feature01": {
+            "label": "Fonctionnalité 01",
+            "title": "Chat Diagnostic IA",
+            "description": "Le traitement du langage naturel permet aux étudiants de poser des questions médicales et de recevoir instantanément des conseils diagnostiques précis avec des sources médicales citées."
+          },
+          "feature02": {
+            "label": "Fonctionnalité 02",
+            "title": "Système de Quiz Adaptatif",
+            "description": "Les quiz générés par l'IA s'adaptent aux performances et aux schémas d'apprentissage des étudiants. Les questions renforcent les points faibles et construisent des connaissances médicales complètes."
+          },
+          "feature03": {
+            "label": "Fonctionnalité 03",
+            "title": "Correction de Cours PDF",
+            "description": "Téléchargez des manuels médicaux ou des supports d'étude pour recevoir des corrections et annotations alimentées par l'IA. Le système identifie les informations obsolètes et fournit les directives médicales actuelles."
+          },
+          "feature04": {
+            "label": "Fonctionnalité 04",
+            "title": "Profil & Accès",
+            "description": "Profils étudiants personnalisés avec gestion des abonnements et fonctionnalités premium adaptées à l'éducation médicale."
+          },
+          "feature05": {
+            "label": "Design System",
+            "title": "Mode Clair & Sombre",
+            "description": "Un système de thèmes soigneusement conçu, optimisé pour les sessions d'étude prolongées. Le mode sombre réduit la fatigue oculaire pendant les études nocturnes, tandis que le mode clair assure la clarté en milieu clinique."
+          },
+          "adminFeature01": {
+            "label": "Fonctionnalité 01",
+            "title": "Tableau de bord Admin",
+            "description": "Centre de commande centralisé avec analyses en temps réel, suivi de l'activité des étudiants et métriques de santé de la plateforme."
+          },
+          "adminFeature02": {
+            "label": "Fonctionnalité 02",
+            "title": "Gestion des Utilisateurs",
+            "description": "Supervision complète des comptes étudiants et enseignants. Consultez les profils détaillés, modifiez les permissions et suivez les progrès individuels."
+          },
+          "adminFeature03": {
+            "label": "Fonctionnalité 03",
+            "title": "Analyses des Quiz",
+            "description": "Aperçus approfondis sur les performances des étudiants et l'efficacité des quiz. Suivez les taux de complétion, les schémas de difficulté et les résultats d'apprentissage."
+          },
+          "adminFeature04": {
+            "label": "Fonctionnalité 04",
+            "title": "Révision des Corrections",
+            "description": "Examinez, approuvez et gérez les corrections de cours générées par l'IA. Analysez les rapports de correction détaillés et validez les mises à jour suggérées."
+          },
+          "adminFeature05": {
+            "label": "Fonctionnalité 05",
+            "title": "Gestion des Paiements",
+            "description": "Surveillez les revenus d'abonnement, suivez les transactions et gérez les opérations de paiement avec des rapports financiers détaillés."
+          },
+          "adminFeature06": {
+            "label": "Fonctionnalité 06",
+            "title": "Paramètres & Sécurité",
+            "description": "Configuration de la plateforme et contrôles de sécurité. Gérez les paramètres système, configurez les paramètres IA et maintenez la sécurité."
+          }
+        }
+      }
+    },
+    "project3": {
+      "title": "Esprit Livre",
+      "description": "Une plateforme e-commerce de livres complète avec une application Utilisateur dédiée pour la navigation et l'achat, et une puissante application Admin donnant au propriétaire de la boutique un contrôle total sur les produits, commandes et contenus. Le projet met l'accent sur l'utilisabilité, les retours pilotés par le mouvement et une architecture UI évolutive.",
+      "userApp": "App Utilisateur",
+      "adminApp": "App Admin",
+      "viewDemo": "Voir la Démo",
+      "videoPlaceholder": "Vidéo démo bientôt disponible"
+    }
+  },
+  "about": {
+    "title": "À propos",
+    "intro": "Designer UI/UX & développeur frontend créant des expériences web avec âme, rapidité et précision.",
+    "paragraph1": "Je conçois sur Figma, développe avec React + TypeScript, stylise avec Tailwind, et donne vie aux interfaces avec Framer Motion — livrant des produits prêts pour la production qui fonctionnent parfaitement.",
+    "paragraph2": "Étudiant en dernière année d'informatique, freelance actif et créateur de projets personnels touchant des milliers d'utilisateurs.",
+    "location": {
+      "label": "Localisation",
+      "value": "Algérie"
+    },
+    "age": {
+      "label": "Âge",
+      "value": "23"
+    },
+    "status": {
+      "label": "Statut",
+      "value": "Disponible"
+    },
+    "cta": "Construisons quelque chose d'exceptionnel ensemble."
+  },
+  "skills": {
+    "coreStrengths": {
+      "title": "Points Forts",
+      "items": [
+        "Framer Motion",
+        "Optimisation Performance",
+        "Micro-interactions",
+        "Design Responsive"
+      ]
+    },
+    "frontendStack": {
+      "title": "Stack Frontend",
+      "items": [
+        "React + TypeScript",
+        "Tailwind CSS",
+        "React Native"
+      ]
+    },
+    "motionAnimation": {
+      "title": "Motion & Animation",
+      "items": [
+        "Framer Motion",
+        "GSAP + ScrollTrigger",
+        "Animations JS vanilla performantes",
+        "CSS Motion"
+      ]
+    },
+    "designPrototyping": {
+      "title": "Design & Prototypage",
+      "items": [
+        "Figma (wireframing, prototypage & collaboration)",
+        "Framer",
+        "Adobe Photoshop"
+      ]
+    },
+    "engineeringTools": {
+      "title": "Outils Ingénierie",
+      "items": [
+        "Workflows de contrôle de version Git",
+        "Vercel . Netlify . Cloudflare Pages",
+        "Docker . Docker Compose"
+      ]
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "intro": "Ouvert à la collaboration sur des projets ambitieux. Créons quelque chose de significatif ensemble.",
+    "emailPlaceholder": "votre@email.com",
+    "emailHint": "Appuyez sur Entrée pour continuer",
+    "emailErrorEmpty": "Veuillez entrer votre email",
+    "emailErrorInvalid": "Veuillez entrer un email valide",
+    "messagePlaceholder": "Votre message...",
+    "send": "Envoyer",
+    "thankYou": {
+      "title": "Merci",
+      "message": "Votre message a été reçu. Je vous répondrai bientôt.",
+      "sendAnother": "Envoyer un autre message"
+    }
+  },
+  "langToggle": {
+    "en": "EN",
+    "fr": "FR"
+  }
+}

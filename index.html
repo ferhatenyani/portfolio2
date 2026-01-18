@@ -2169,6 +2169,93 @@
         /* ================================
            MOBILE ADJUSTMENTS
         ================================ */
+        /* ================================
+           LANGUAGE TOGGLE
+        ================================ */
+        #lang-toggle {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 300;
+            display: flex;
+            gap: 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            background: transparent;
+            border: 1px solid #d4d4d8;
+            overflow: hidden;
+        }
+
+        #lang-toggle button {
+            padding: 10px 14px;
+            background: transparent;
+            border: none;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        #lang-toggle button::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 60%;
+            background: #d4d4d8;
+        }
+
+        #lang-toggle button:last-child::after {
+            display: none;
+        }
+
+        #lang-toggle button:hover {
+            color: #71717a;
+        }
+
+        #lang-toggle button.active {
+            background: #18181b;
+            color: #fafafa;
+        }
+
+        #lang-toggle button.active::after {
+            display: none;
+        }
+
+        /* Ensure toggle is always visible on all layers */
+        #lang-toggle.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            #lang-toggle {
+                top: 20px;
+                left: 20px;
+                font-size: 0.6rem;
+            }
+
+            #lang-toggle button {
+                padding: 8px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #lang-toggle {
+                top: 16px;
+                left: 16px;
+                font-size: 0.55rem;
+            }
+
+            #lang-toggle button {
+                padding: 7px 10px;
+            }
+        }
+
         @media (max-width: 768px) {
             /* Projects - largest, much closer to center */
             .zone.top-left {
@@ -2236,6 +2323,12 @@
     </style>
 </head>
 <body>
+    <!-- Language Toggle -->
+    <div id="lang-toggle" class="visible">
+        <button id="lang-en" class="active" data-lang="en">EN</button>
+        <button id="lang-fr" data-lang="fr">FR</button>
+    </div>
+
     <!-- Canvas Layers -->
     <canvas id="particle-canvas"></canvas>
     <canvas id="aperture-canvas"></canvas>
@@ -2248,23 +2341,23 @@
 
         <!-- Target Text for Particle System -->
         <div class="relative w-full flex flex-col items-center justify-center mb-12">
-            <h1 id="text-name" class="scanned-text text-5xl md:text-7xl font-semibold tracking-tighter text-zinc-900 mb-6 leading-tight">
+            <h1 id="text-name" class="scanned-text text-5xl md:text-7xl font-semibold tracking-tighter text-zinc-900 mb-6 leading-tight" data-i18n="hero.name">
                 Ferhaten Yani
             </h1>
-            <h2 id="text-role" class="scanned-text text-xl md:text-2xl font-medium text-zinc-1000 tracking-tight uppercase">
+            <h2 id="text-role" class="scanned-text text-xl md:text-2xl font-medium text-zinc-1000 tracking-tight uppercase" data-i18n="hero.role">
                 Frontend Dev & UI/UX Designer
             </h2>
         </div>
 
         <!-- Trigger Button -->
         <button id="cta-btn" class="group relative px-6 py-2.5 bg-transparent border border-zinc-900 hover:bg-zinc-900/10 text-zinc-900 text-xs md:text-sm font-medium tracking-wide rounded-full transition-all duration-300 ease-out flex items-center gap-2 animate-in" style="animation-delay: 2000ms; opacity: 0;">
-            <span class="relative z-10">Enter Portfolio</span>
+            <span class="relative z-10" data-i18n="hero.cta">Enter Portfolio</span>
             <i data-lucide="arrow-right" class="w-3.5 h-3.5 relative z-10 transition-transform duration-300 group-hover:translate-x-0.5" stroke-width="1.5"></i>
         </button>
     </div>
 
     <!-- Intro CTA Overlay (appears first during hero-to-nav transition, outside nav-layer) -->
-    <div class="intro-cta-overlay" id="intro-cta-overlay">Click a section to explore</div>
+    <div class="intro-cta-overlay" id="intro-cta-overlay" data-i18n="nav.introCta">Click a section to explore</div>
 
     <!-- ================================
          NAVIGATION LAYER
@@ -2274,20 +2367,20 @@
 
         <!-- Zone Hit Areas -->
         <div class="zone top-left" data-section="projects">
-            <span class="zone-label">Projects</span>
+            <span class="zone-label" data-i18n="nav.projects">Projects</span>
         </div>
         <div class="zone top-right" data-section="skills">
-            <span class="zone-label">Skills</span>
+            <span class="zone-label" data-i18n="nav.skills">Skills</span>
         </div>
         <div class="zone bottom-left" data-section="about">
-            <span class="zone-label">About</span>
+            <span class="zone-label" data-i18n="nav.about">About</span>
         </div>
         <div class="zone bottom-right" data-section="contact">
-            <span class="zone-label">Contact</span>
+            <span class="zone-label" data-i18n="nav.contact">Contact</span>
         </div>
 
         <!-- Back to Hero Button -->
-        <button id="back-hero-btn">Back to Start</button>
+        <button id="back-hero-btn" data-i18n="nav.backToStart">Back to Start</button>
     </div>
 
     <!-- Close Button (shared) -->
@@ -2300,9 +2393,9 @@
         <div class="section-content">
             <!-- Projects Header with Tabs -->
             <div class="projects-header">
-                <button class="project-tab active" data-project="0">Project 1</button>
-                <button class="project-tab" data-project="1">Project 2</button>
-                <button class="project-tab" data-project="2">Project 3</button>
+                <button class="project-tab active" data-project="0" data-i18n="projects.tabs.project1">Project 1</button>
+                <button class="project-tab" data-project="1" data-i18n="projects.tabs.project2">Project 2</button>
+                <button class="project-tab" data-project="2" data-i18n="projects.tabs.project3">Project 3</button>
                 <!-- Close button for projects section -->
                 <button class="close-btn-projects" id="close-btn-projects" aria-label="Close section"></button>
             </div>
@@ -2322,8 +2415,8 @@
                     <!-- Project 1: Power BI Dashboard -->
                     <div class="project-slide" data-index="0">
                         <div class="project-content">
-                            <h2 class="project-title">ReportHub</h2>
-                            <p class="project-description">
+                            <h2 class="project-title" data-i18n="projects.project1.title">ReportHub</h2>
+                            <p class="project-description" data-i18n="projects.project1.description">
                                 A modern SaaS application featuring embedded Power BI dashboards, designed with a clear separation between User and Admin experiences. The focus is on data clarity, role-based access, and smooth interactions, delivering complex analytics through a clean, intuitive interface.
                             </p>
                             <div class="project-tags">
@@ -2333,7 +2426,7 @@
                                 <span class="project-tag">Framer Motion</span>
                             </div>
                             <a href="#" class="project-link" target="_blank" rel="noopener">
-                                View Live Demo
+                                <span data-i18n="projects.project1.viewDemo">View Live Demo</span>
                                 <i data-lucide="arrow-right" stroke-width="1.5"></i>
                             </a>
                         </div>
@@ -2342,8 +2435,8 @@
                     <!-- Project 2: ReviseGPT (Medical AI) -->
                     <div class="project-slide" data-index="1">
                         <div class="project-content">
-                            <h2 class="project-title">ReviseGPT</h2>
-                            <p class="project-description">
+                            <h2 class="project-title" data-i18n="projects.project2.title">ReviseGPT</h2>
+                            <p class="project-description" data-i18n="projects.project2.description">
                                 An intelligent platform empowering medical students and professors with AI-driven diagnostics, adaptive quizzes, and automated course corrections — paired with a powerful admin dashboard for content oversight.
                             </p>
                             <div class="project-tags">
@@ -2356,11 +2449,11 @@
                                 <div class="gallery-toggle">
                                     <button class="gallery-toggle-btn active" data-view="user" data-project="2">
                                         <i data-lucide="smartphone" stroke-width="1.5"></i>
-                                        User App
+                                        <span data-i18n="projects.project2.userApp">User App</span>
                                     </button>
                                     <button class="gallery-toggle-btn" data-view="admin" data-project="2">
                                         <i data-lucide="layout-dashboard" stroke-width="1.5"></i>
-                                        Admin App
+                                        <span data-i18n="projects.project2.adminApp">Admin App</span>
                                     </button>
                                 </div>
 
@@ -2373,10 +2466,10 @@
                                             <div class="case-study-intro">
                                                 <div class="case-study-badge">
                                                     <span class="pulse-dot"></span>
-                                                    <span>Case Study</span>
+                                                    <span data-i18n="projects.project2.caseStudy.badge">Case Study</span>
                                                 </div>
-                                                <h3>ReviseGPT</h3>
-                                                <p>An AI-powered medical education platform designed to support students through intelligent diagnostics, adaptive learning, and course correction.</p>
+                                                <h3 data-i18n="projects.project2.caseStudy.intro.title">ReviseGPT</h3>
+                                                <p data-i18n="projects.project2.caseStudy.intro.description">An AI-powered medical education platform designed to support students through intelligent diagnostics, adaptive learning, and course correction.</p>
                                             </div>
 
                                             <!-- Feature 01: AI Diagnostic Chat -->
@@ -2384,10 +2477,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 01</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.feature01.label">Feature 01</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">AI Diagnostic Chat</h4>
-                                                    <p class="case-study-panel-desc">Natural language processing enables students to ask medical questions and receive instant, accurate diagnostic guidance with cited medical sources.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature01.title">AI Diagnostic Chat</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature01.description">Natural language processing enables students to ask medical questions and receive instant, accurate diagnostic guidance with cited medical sources.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2401,10 +2494,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 02</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.feature02.label">Feature 02</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">Adaptive Quiz System</h4>
-                                                    <p class="case-study-panel-desc">AI-generated quizzes adapt to student performance and learning patterns. Questions reinforce weak areas and build comprehensive medical knowledge.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature02.title">Adaptive Quiz System</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature02.description">AI-generated quizzes adapt to student performance and learning patterns. Questions reinforce weak areas and build comprehensive medical knowledge.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2421,10 +2514,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 03</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.feature03.label">Feature 03</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">PDF Course Correction</h4>
-                                                    <p class="case-study-panel-desc">Upload medical textbooks or study materials to receive AI-powered corrections and annotations. The system identifies outdated information and provides current medical guidelines.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature03.title">PDF Course Correction</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature03.description">Upload medical textbooks or study materials to receive AI-powered corrections and annotations. The system identifies outdated information and provides current medical guidelines.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2444,10 +2537,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 04</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.feature04.label">Feature 04</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">Profile & Access</h4>
-                                                    <p class="case-study-panel-desc">Personalized student profiles with subscription management and premium features tailored for medical education.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature04.title">Profile & Access</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature04.description">Personalized student profiles with subscription management and premium features tailored for medical education.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2467,10 +2560,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Design System</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.feature05.label">Design System</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">Light & Dark Mode</h4>
-                                                    <p class="case-study-panel-desc">A carefully designed theme system optimized for extended study sessions. Dark mode reduces eye strain during night studying, while light mode ensures clarity in clinical settings.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature05.title">Light & Dark Mode</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature05.description">A carefully designed theme system optimized for extended study sessions. Dark mode reduces eye strain during night studying, while light mode ensures clarity in clinical settings.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2509,10 +2602,10 @@
                                             <div class="case-study-intro">
                                                 <div class="case-study-badge">
                                                     <span class="pulse-dot"></span>
-                                                    <span>Case Study</span>
+                                                    <span data-i18n="projects.project2.caseStudy.badge">Case Study</span>
                                                 </div>
-                                                <h3>Admin Dashboard</h3>
-                                                <p>Comprehensive admin platform for managing medical education content, monitoring student progress, and overseeing course corrections.</p>
+                                                <h3 data-i18n="projects.project2.caseStudy.adminIntro.title">Admin Dashboard</h3>
+                                                <p data-i18n="projects.project2.caseStudy.adminIntro.description">Comprehensive admin platform for managing medical education content, monitoring student progress, and overseeing course corrections.</p>
                                             </div>
 
                                             <!-- Feature 01: Admin Dashboard -->
@@ -2520,10 +2613,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 01</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature01.label">Feature 01</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">Admin Dashboard</h4>
-                                                    <p class="case-study-panel-desc">Centralized command center with real-time analytics, student activity monitoring, and platform health metrics.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature01.title">Admin Dashboard</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature01.description">Centralized command center with real-time analytics, student activity monitoring, and platform health metrics.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -2552,10 +2645,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 02</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature02.label">Feature 02</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">User Management</h4>
-                                                    <p class="case-study-panel-desc">Complete oversight of student and educator accounts. View detailed user profiles, edit permissions, and monitor individual learning progress.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature02.title">User Management</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature02.description">Complete oversight of student and educator accounts. View detailed user profiles, edit permissions, and monitor individual learning progress.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -2599,10 +2692,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 03</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature03.label">Feature 03</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">Quiz Analytics</h4>
-                                                    <p class="case-study-panel-desc">Deep insights into student performance and quiz effectiveness. Track completion rates, difficulty patterns, and learning outcomes.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature03.title">Quiz Analytics</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature03.description">Deep insights into student performance and quiz effectiveness. Track completion rates, difficulty patterns, and learning outcomes.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -2631,10 +2724,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 04</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature04.label">Feature 04</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">Course Correction Review</h4>
-                                                    <p class="case-study-panel-desc">Review, approve, and manage AI-generated course corrections. Examine detailed correction reports and validate suggested updates.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature04.title">Course Correction Review</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature04.description">Review, approve, and manage AI-generated course corrections. Examine detailed correction reports and validate suggested updates.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -2678,10 +2771,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 05</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature05.label">Feature 05</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">Payment Management</h4>
-                                                    <p class="case-study-panel-desc">Monitor subscription revenue, track transactions, and manage payment operations with detailed financial reporting.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature05.title">Payment Management</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature05.description">Monitor subscription revenue, track transactions, and manage payment operations with detailed financial reporting.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -2710,10 +2803,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span>Feature 06</span>
+                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature06.label">Feature 06</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title">Settings & Security</h4>
-                                                    <p class="case-study-panel-desc">Platform configuration and security controls. Manage system settings, configure AI parameters, and maintain security.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature06.title">Settings & Security</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature06.description">Platform configuration and security controls. Manage system settings, configure AI parameters, and maintain security.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -2789,8 +2882,8 @@
                     <!-- Project 3: Bookstore -->
                     <div class="project-slide" data-index="2">
                         <div class="project-content">
-                            <h2 class="project-title">Esprit Livre</h2>
-                            <p class="project-description">
+                            <h2 class="project-title" data-i18n="projects.project3.title">Esprit Livre</h2>
+                            <p class="project-description" data-i18n="projects.project3.description">
                                 A full-featured book e-commerce platform with a dedicated User app for browsing and purchasing, and a powerful Admin app giving the store owner complete control over products, orders, and content. The project emphasizes usability, motion-driven feedback, and scalable UI architecture.
                             </p>
                             <div class="project-tags">
@@ -2806,18 +2899,18 @@
                                 <div class="gallery-toggle">
                                     <button class="gallery-toggle-btn active" data-view="user" data-project="3">
                                         <i data-lucide="shopping-bag" stroke-width="1.5"></i>
-                                        User App
+                                        <span data-i18n="projects.project3.userApp">User App</span>
                                     </button>
                                     <button class="gallery-toggle-btn" data-view="admin" data-project="3">
                                         <i data-lucide="layout-dashboard" stroke-width="1.5"></i>
-                                        Admin App
+                                        <span data-i18n="projects.project3.adminApp">Admin App</span>
                                     </button>
                                 </div>
 
                                 <!-- User App View - Live Demo Button -->
                                 <div id="project3-user-view" style="margin-top: 1.5rem;">
                                     <a href="#" class="project-link" target="_blank" rel="noopener">
-                                        View Live Demo
+                                        <span data-i18n="projects.project3.viewDemo">View Live Demo</span>
                                         <i data-lucide="arrow-right" stroke-width="1.5"></i>
                                     </a>
                                 </div>
@@ -2827,7 +2920,7 @@
                                     <div class="project-video-container">
                                         <div class="video-placeholder">
                                             <i data-lucide="play-circle" stroke-width="1"></i>
-                                            <span>Demo Video Coming Soon</span>
+                                            <span data-i18n="projects.project3.videoPlaceholder">Demo Video Coming Soon</span>
                                         </div>
                                         <!-- Replace placeholder with actual video when ready:
                                         <video controls poster="/path/to/poster.jpg">
@@ -2846,28 +2939,28 @@
 
     <div class="section-container" id="section-about">
         <div class="section-content" style="max-width: 800px;">
-            <h2>About</h2>
-            <p style="margin-bottom: 1.5rem;">UI/UX designer & frontend developer crafting web experiences with soul, speed, and precision.</p>
-            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;">I design in Figma, build with React + TypeScript, style with Tailwind, and bring interfaces to life using Framer Motion — delivering production-ready products that perform flawlessly.</p>
-            <p style="margin-bottom: 2rem; font-size: 0.95rem;">Final-year Computer Science student actively freelancing and shipping personal projects reaching thousands of users.</p>
+            <h2 data-i18n="about.title">About</h2>
+            <p style="margin-bottom: 1.5rem;" data-i18n="about.intro">UI/UX designer & frontend developer crafting web experiences with soul, speed, and precision.</p>
+            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;" data-i18n="about.paragraph1">I design in Figma, build with React + TypeScript, style with Tailwind, and bring interfaces to life using Framer Motion — delivering production-ready products that perform flawlessly.</p>
+            <p style="margin-bottom: 2rem; font-size: 0.95rem;" data-i18n="about.paragraph2">Final-year Computer Science student actively freelancing and shipping personal projects reaching thousands of users.</p>
 
             <!-- Info Grid -->
             <div class="about-info-grid" style="display: flex; justify-content: center; gap: 3rem; margin-top: 2.5rem; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;">
                 <div style="text-align: center;">
-                    <span style="color: #a1a1aa; display: block; margin-bottom: 0.5rem;">Location</span>
-                    <span style="color: #18181b;">Algeria</span>
+                    <span style="color: #a1a1aa; display: block; margin-bottom: 0.5rem;" data-i18n="about.location.label">Location</span>
+                    <span style="color: #18181b;" data-i18n="about.location.value">Algeria</span>
                 </div>
                 <div style="text-align: center;">
-                    <span style="color: #a1a1aa; display: block; margin-bottom: 0.5rem;">Age</span>
-                    <span style="color: #18181b;">23</span>
+                    <span style="color: #a1a1aa; display: block; margin-bottom: 0.5rem;" data-i18n="about.age.label">Age</span>
+                    <span style="color: #18181b;" data-i18n="about.age.value">23</span>
                 </div>
                 <div style="text-align: center;">
-                    <span style="color: #a1a1aa; display: block; margin-bottom: 0.5rem;">Status</span>
-                    <span style="color: #18181b;">Available</span>
+                    <span style="color: #a1a1aa; display: block; margin-bottom: 0.5rem;" data-i18n="about.status.label">Status</span>
+                    <span style="color: #18181b;" data-i18n="about.status.value">Available</span>
                 </div>
             </div>
 
-            <p style="margin-top: 2.5rem; font-size: 0.85rem; color: #52525b; font-weight: 500;">Let's build something exceptional together.</p>
+            <p style="margin-top: 2.5rem; font-size: 0.85rem; color: #52525b; font-weight: 500;" data-i18n="about.cta">Let's build something exceptional together.</p>
         </div>
     </div>
 
@@ -2876,9 +2969,9 @@
             <!-- Row 1: 3 columns -->
             <div class="skills-grid">
                 <div class="skill-category" tabindex="0">
-                    <h3 class="skill-title">Core Strengths</h3>
+                    <h3 class="skill-title" data-i18n="skills.coreStrengths.title">Core Strengths</h3>
                     <div class="skill-separator"></div>
-                    <ul class="skill-list">
+                    <ul class="skill-list" data-i18n-list="skills.coreStrengths.items">
                         <li>Framer Motion</li>
                         <li>Performance Tuning</li>
                         <li>Micro-interactions</li>
@@ -2886,18 +2979,18 @@
                     </ul>
                 </div>
                 <div class="skill-category" tabindex="0">
-                    <h3 class="skill-title">Frontend Stack</h3>
+                    <h3 class="skill-title" data-i18n="skills.frontendStack.title">Frontend Stack</h3>
                     <div class="skill-separator"></div>
-                    <ul class="skill-list">
+                    <ul class="skill-list" data-i18n-list="skills.frontendStack.items">
                         <li>React + TypeScript</li>
                         <li>Tailwind CSS</li>
-                        <li>React Native</li>                        
+                        <li>React Native</li>
                     </ul>
                 </div>
                 <div class="skill-category" tabindex="0">
-                    <h3 class="skill-title">Motion & Animation</h3>
+                    <h3 class="skill-title" data-i18n="skills.motionAnimation.title">Motion & Animation</h3>
                     <div class="skill-separator"></div>
-                    <ul class="skill-list">
+                    <ul class="skill-list" data-i18n-list="skills.motionAnimation.items">
                         <li>Framer Motion</li>
                         <li>GSAP + ScrollTrigger</li>
                         <li>Performant vanilla JS animations</li>
@@ -2908,18 +3001,18 @@
             <!-- Row 2: 2 columns centered -->
             <div class="skills-grid skills-grid-bottom">
                 <div class="skill-category" tabindex="0">
-                    <h3 class="skill-title">Design & Prototyping</h3>
+                    <h3 class="skill-title" data-i18n="skills.designPrototyping.title">Design & Prototyping</h3>
                     <div class="skill-separator"></div>
-                    <ul class="skill-list">
+                    <ul class="skill-list" data-i18n-list="skills.designPrototyping.items">
                         <li>Figma (wireframing, prototyping & collaboration)</li>
                         <li>Framer</li>
                         <li>Adobe Photoshop</li>
                     </ul>
                 </div>
                 <div class="skill-category" tabindex="0">
-                    <h3 class="skill-title">Engineering Tools</h3>
+                    <h3 class="skill-title" data-i18n="skills.engineeringTools.title">Engineering Tools</h3>
                     <div class="skill-separator"></div>
-                    <ul class="skill-list">
+                    <ul class="skill-list" data-i18n-list="skills.engineeringTools.items">
                         <li>Git version control workflows</li>
                         <li>Vercel . Netlify . Cloudflare Pages</li>
                         <li>Docker . Docker Compose</li>
@@ -2937,8 +3030,8 @@
 
             <!-- Step 1: Email Input View -->
             <div class="contact-step" id="contact-step-email">
-                <h2>Contact</h2>
-                <p>Open to collaboration on ambitious projects. Let's create something meaningful together.</p>
+                <h2 data-i18n="contact.title">Contact</h2>
+                <p data-i18n="contact.intro">Open to collaboration on ambitious projects. Let's create something meaningful together.</p>
 
                 <div class="contact-input-wrapper">
                     <input
@@ -2946,11 +3039,12 @@
                         id="contact-email-input"
                         class="contact-input"
                         placeholder="your@email.com"
+                        data-i18n-placeholder="contact.emailPlaceholder"
                         autocomplete="email"
                         autocapitalize="off"
                         spellcheck="false"
                     >
-                    <div class="contact-hint" id="contact-hint-email">Press Enter to continue</div>
+                    <div class="contact-hint" id="contact-hint-email" data-i18n="contact.emailHint">Press Enter to continue</div>
                 </div>
             </div>
 
@@ -2969,12 +3063,13 @@
                         id="contact-message-input"
                         class="contact-message-input"
                         placeholder="Your message..."
+                        data-i18n-placeholder="contact.messagePlaceholder"
                         rows="1"
                     ></textarea>
                 </div>
 
                 <button class="contact-send-btn" id="contact-send-btn">
-                    <span>Send</span>
+                    <span data-i18n="contact.send">Send</span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -2984,9 +3079,9 @@
                 <div class="contact-thank-you-icon">
                     <i data-lucide="check" class="w-12 h-12"></i>
                 </div>
-                <h2>Thank You</h2>
-                <p>Your message has been received. I'll get back to you soon.</p>
-                <button class="contact-reset-btn" id="contact-reset-btn">Send another message</button>
+                <h2 data-i18n="contact.thankYou.title">Thank You</h2>
+                <p data-i18n="contact.thankYou.message">Your message has been received. I'll get back to you soon.</p>
+                <button class="contact-reset-btn" id="contact-reset-btn" data-i18n="contact.thankYou.sendAnother">Send another message</button>
             </div>
         </div>
     </div>
@@ -2994,6 +3089,253 @@
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
+
+        // ============================================
+        // INTERNATIONALIZATION (i18n) CONTROLLER
+        // ============================================
+        const I18nController = {
+            currentLang: 'en',
+            translations: {},
+            isLoaded: false,
+
+            async init() {
+                // Load saved language preference
+                const savedLang = localStorage.getItem('portfolio-lang') || 'en';
+
+                // Load translations
+                await this.loadTranslations('en');
+                await this.loadTranslations('fr');
+
+                this.isLoaded = true;
+
+                // Set initial language
+                this.setLanguage(savedLang, false);
+
+                // Bind toggle buttons
+                this.bindEvents();
+            },
+
+            async loadTranslations(lang) {
+                try {
+                    const response = await fetch(`${lang}.json`);
+                    if (response.ok) {
+                        this.translations[lang] = await response.json();
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load ${lang}.json:`, error);
+                }
+            },
+
+            bindEvents() {
+                const langToggle = document.getElementById('lang-toggle');
+                if (!langToggle) return;
+
+                langToggle.querySelectorAll('button').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const lang = btn.dataset.lang;
+                        if (lang !== this.currentLang) {
+                            this.setLanguage(lang, true);
+                        }
+                    });
+                });
+            },
+
+            setLanguage(lang, animate = true) {
+                if (!this.translations[lang]) return;
+
+                this.currentLang = lang;
+                localStorage.setItem('portfolio-lang', lang);
+
+                // Update toggle buttons
+                document.querySelectorAll('#lang-toggle button').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === lang);
+                });
+
+                // Apply translations
+                if (animate) {
+                    this.applyTranslationsAnimated();
+                } else {
+                    this.applyTranslations();
+                }
+
+                // Dispatch event for other components to react
+                document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
+            },
+
+            getNestedValue(obj, path) {
+                return path.split('.').reduce((current, key) => {
+                    return current && current[key] !== undefined ? current[key] : null;
+                }, obj);
+            },
+
+            applyTranslations() {
+                const translations = this.translations[this.currentLang];
+                if (!translations) return;
+
+                // Update all elements with data-i18n attribute
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    const value = this.getNestedValue(translations, key);
+                    if (value) {
+                        el.textContent = value;
+                    }
+                });
+
+                // Update placeholder attributes
+                document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-placeholder');
+                    const value = this.getNestedValue(translations, key);
+                    if (value) {
+                        el.placeholder = value;
+                    }
+                });
+
+                // Update list items (skills)
+                document.querySelectorAll('[data-i18n-list]').forEach(ul => {
+                    const key = ul.getAttribute('data-i18n-list');
+                    const items = this.getNestedValue(translations, key);
+                    if (items && Array.isArray(items)) {
+                        const listItems = ul.querySelectorAll('li');
+                        items.forEach((text, index) => {
+                            if (listItems[index]) {
+                                listItems[index].textContent = text;
+                            }
+                        });
+                    }
+                });
+            },
+
+            applyTranslationsAnimated() {
+                const translations = this.translations[this.currentLang];
+                if (!translations) return;
+
+                // Elements to animate
+                const elements = document.querySelectorAll('[data-i18n], [data-i18n-list] li');
+
+                // Determine which elements should be visible based on current app state
+                const heroLayer = document.getElementById('hero-layer');
+                const navLayer = document.getElementById('nav-layer');
+                const introCta = document.getElementById('intro-cta-overlay');
+                const activeSection = StateManager.activeSection;
+
+                // Apply translations with subtle fade
+                elements.forEach(el => {
+                    // Check if element should be animated based on current state
+                    const isInHeroLayer = heroLayer && heroLayer.contains(el);
+                    const isInNavLayer = navLayer && navLayer.contains(el);
+                    const isIntroCta = el === introCta;
+                    const isInActiveSection = activeSection &&
+                        el.closest(`#section-${activeSection}`);
+
+                    // Determine if element is currently visible and should animate
+                    let shouldAnimate = true;
+                    let targetOpacity = 1;
+
+                    // In NAVIGATION or SECTION_OPEN state, hero layer elements should stay hidden
+                    if (StateManager.current !== AppState.HERO) {
+                        if (isInHeroLayer) {
+                            // Don't animate hero elements - just update text silently
+                            shouldAnimate = false;
+                        }
+                        if (isIntroCta) {
+                            // Intro CTA should stay at its current opacity
+                            shouldAnimate = false;
+                        }
+                    }
+
+                    // In SECTION_OPEN state, zone labels should stay hidden
+                    if (StateManager.current === AppState.SECTION_OPEN) {
+                        if (isInNavLayer && el.classList.contains('zone-label')) {
+                            shouldAnimate = false;
+                        }
+                    }
+
+                    // In HERO state, nav layer elements should stay hidden
+                    if (StateManager.current === AppState.HERO) {
+                        if (isInNavLayer) {
+                            shouldAnimate = false;
+                        }
+                    }
+
+                    if (shouldAnimate) {
+                        // Get current computed opacity to restore after animation
+                        const computedStyle = window.getComputedStyle(el);
+                        const currentOpacity = parseFloat(computedStyle.opacity);
+
+                        // Only animate if element is currently visible
+                        if (currentOpacity > 0) {
+                            gsap.to(el, {
+                                opacity: 0,
+                                duration: 0.15,
+                                ease: 'power2.in',
+                                onComplete: () => {
+                                    // Update content
+                                    if (el.hasAttribute('data-i18n')) {
+                                        const key = el.getAttribute('data-i18n');
+                                        const value = this.getNestedValue(translations, key);
+                                        if (value) {
+                                            el.textContent = value;
+                                        }
+                                    }
+
+                                    gsap.to(el, {
+                                        opacity: currentOpacity,
+                                        duration: 0.2,
+                                        ease: 'power2.out'
+                                    });
+                                }
+                            });
+                        } else {
+                            // Element not visible - just update text without animation
+                            if (el.hasAttribute('data-i18n')) {
+                                const key = el.getAttribute('data-i18n');
+                                const value = this.getNestedValue(translations, key);
+                                if (value) {
+                                    el.textContent = value;
+                                }
+                            }
+                        }
+                    } else {
+                        // Don't animate - just update the text content silently
+                        if (el.hasAttribute('data-i18n')) {
+                            const key = el.getAttribute('data-i18n');
+                            const value = this.getNestedValue(translations, key);
+                            if (value) {
+                                el.textContent = value;
+                            }
+                        }
+                    }
+                });
+
+                // Update placeholder attributes (no animation needed)
+                document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-placeholder');
+                    const value = this.getNestedValue(translations, key);
+                    if (value) {
+                        el.placeholder = value;
+                    }
+                });
+
+                // Update list items
+                document.querySelectorAll('[data-i18n-list]').forEach(ul => {
+                    const key = ul.getAttribute('data-i18n-list');
+                    const items = this.getNestedValue(translations, key);
+                    if (items && Array.isArray(items)) {
+                        const listItems = ul.querySelectorAll('li');
+                        items.forEach((text, index) => {
+                            if (listItems[index]) {
+                                listItems[index].textContent = text;
+                            }
+                        });
+                    }
+                });
+            },
+
+            // Helper method to get current translation
+            t(key) {
+                return this.getNestedValue(this.translations[this.currentLang], key) || key;
+            }
+        };
 
         // ============================================
         // CONFIGURATION
@@ -4307,7 +4649,7 @@
                     // Remove error state on input
                     this.emailInput.classList.remove('invalid');
                     this.emailHint.classList.remove('error');
-                    this.emailHint.textContent = 'Press Enter to continue';
+                    this.emailHint.textContent = I18nController.t('contact.emailHint');
                 });
 
                 this.emailInput.addEventListener('keydown', (e) => {
@@ -4373,12 +4715,12 @@
                 const email = this.emailInput.value.trim();
 
                 if (!email) {
-                    this.showEmailError('Please enter your email');
+                    this.showEmailError(I18nController.t('contact.emailErrorEmpty'));
                     return;
                 }
 
                 if (!this.validateEmail(email)) {
-                    this.showEmailError('Please enter a valid email');
+                    this.showEmailError(I18nController.t('contact.emailErrorInvalid'));
                     return;
                 }
 
@@ -4603,7 +4945,7 @@
                 }
                 if (this.emailHint) {
                     this.emailHint.classList.remove('error');
-                    this.emailHint.textContent = 'Press Enter to continue';
+                    this.emailHint.textContent = I18nController.t('contact.emailHint');
                 }
 
                 // Reset send button
@@ -5106,9 +5448,12 @@
         // ============================================
         // INITIALIZATION
         // ============================================
-        function init() {
+        async function init() {
             width = particleCanvas.width = apertureCanvas.width = window.innerWidth;
             height = particleCanvas.height = apertureCanvas.height = window.innerHeight;
+
+            // Initialize i18n first
+            await I18nController.init();
 
             HeroController.init();
             NavigationController.init();

@@ -1,0 +1,194 @@
+{
+  "meta": {
+    "title": "Ferhaten Yani | Portfolio"
+  },
+  "hero": {
+    "name": "Ferhaten Yani",
+    "role": "Frontend Dev & UI/UX Designer",
+    "cta": "Enter Portfolio"
+  },
+  "nav": {
+    "introCta": "Click a section to explore",
+    "projects": "Projects",
+    "skills": "Skills",
+    "about": "About",
+    "contact": "Contact",
+    "backToStart": "Back to Start"
+  },
+  "projects": {
+    "tabs": {
+      "project1": "Project 1",
+      "project2": "Project 2",
+      "project3": "Project 3"
+    },
+    "project1": {
+      "title": "ReportHub",
+      "description": "A modern SaaS application featuring embedded Power BI dashboards, designed with a clear separation between User and Admin experiences. The focus is on data clarity, role-based access, and smooth interactions, delivering complex analytics through a clean, intuitive interface.",
+      "viewDemo": "View Live Demo"
+    },
+    "project2": {
+      "title": "ReviseGPT",
+      "description": "An intelligent platform empowering medical students and professors with AI-driven diagnostics, adaptive quizzes, and automated course corrections — paired with a powerful admin dashboard for content oversight.",
+      "userApp": "User App",
+      "adminApp": "Admin App",
+      "caseStudy": {
+        "badge": "Case Study",
+        "intro": {
+          "title": "ReviseGPT",
+          "description": "An AI-powered medical education platform designed to support students through intelligent diagnostics, adaptive learning, and course correction."
+        },
+        "adminIntro": {
+          "title": "Admin Dashboard",
+          "description": "Comprehensive admin platform for managing medical education content, monitoring student progress, and overseeing course corrections."
+        },
+        "features": {
+          "feature01": {
+            "label": "Feature 01",
+            "title": "AI Diagnostic Chat",
+            "description": "Natural language processing enables students to ask medical questions and receive instant, accurate diagnostic guidance with cited medical sources."
+          },
+          "feature02": {
+            "label": "Feature 02",
+            "title": "Adaptive Quiz System",
+            "description": "AI-generated quizzes adapt to student performance and learning patterns. Questions reinforce weak areas and build comprehensive medical knowledge."
+          },
+          "feature03": {
+            "label": "Feature 03",
+            "title": "PDF Course Correction",
+            "description": "Upload medical textbooks or study materials to receive AI-powered corrections and annotations. The system identifies outdated information and provides current medical guidelines."
+          },
+          "feature04": {
+            "label": "Feature 04",
+            "title": "Profile & Access",
+            "description": "Personalized student profiles with subscription management and premium features tailored for medical education."
+          },
+          "feature05": {
+            "label": "Design System",
+            "title": "Light & Dark Mode",
+            "description": "A carefully designed theme system optimized for extended study sessions. Dark mode reduces eye strain during night studying, while light mode ensures clarity in clinical settings."
+          },
+          "adminFeature01": {
+            "label": "Feature 01",
+            "title": "Admin Dashboard",
+            "description": "Centralized command center with real-time analytics, student activity monitoring, and platform health metrics."
+          },
+          "adminFeature02": {
+            "label": "Feature 02",
+            "title": "User Management",
+            "description": "Complete oversight of student and educator accounts. View detailed user profiles, edit permissions, and monitor individual learning progress."
+          },
+          "adminFeature03": {
+            "label": "Feature 03",
+            "title": "Quiz Analytics",
+            "description": "Deep insights into student performance and quiz effectiveness. Track completion rates, difficulty patterns, and learning outcomes."
+          },
+          "adminFeature04": {
+            "label": "Feature 04",
+            "title": "Course Correction Review",
+            "description": "Review, approve, and manage AI-generated course corrections. Examine detailed correction reports and validate suggested updates."
+          },
+          "adminFeature05": {
+            "label": "Feature 05",
+            "title": "Payment Management",
+            "description": "Monitor subscription revenue, track transactions, and manage payment operations with detailed financial reporting."
+          },
+          "adminFeature06": {
+            "label": "Feature 06",
+            "title": "Settings & Security",
+            "description": "Platform configuration and security controls. Manage system settings, configure AI parameters, and maintain security."
+          }
+        }
+      }
+    },
+    "project3": {
+      "title": "Esprit Livre",
+      "description": "A full-featured book e-commerce platform with a dedicated User app for browsing and purchasing, and a powerful Admin app giving the store owner complete control over products, orders, and content. The project emphasizes usability, motion-driven feedback, and scalable UI architecture.",
+      "userApp": "User App",
+      "adminApp": "Admin App",
+      "viewDemo": "View Live Demo",
+      "videoPlaceholder": "Demo Video Coming Soon"
+    }
+  },
+  "about": {
+    "title": "About",
+    "intro": "UI/UX designer & frontend developer crafting web experiences with soul, speed, and precision.",
+    "paragraph1": "I design in Figma, build with React + TypeScript, style with Tailwind, and bring interfaces to life using Framer Motion — delivering production-ready products that perform flawlessly.",
+    "paragraph2": "Final-year Computer Science student actively freelancing and shipping personal projects reaching thousands of users.",
+    "location": {
+      "label": "Location",
+      "value": "Algeria"
+    },
+    "age": {
+      "label": "Age",
+      "value": "23"
+    },
+    "status": {
+      "label": "Status",
+      "value": "Available"
+    },
+    "cta": "Let's build something exceptional together."
+  },
+  "skills": {
+    "coreStrengths": {
+      "title": "Core Strengths",
+      "items": [
+        "Framer Motion",
+        "Performance Tuning",
+        "Micro-interactions",
+        "Responsive Design"
+      ]
+    },
+    "frontendStack": {
+      "title": "Frontend Stack",
+      "items": [
+        "React + TypeScript",
+        "Tailwind CSS",
+        "React Native"
+      ]
+    },
+    "motionAnimation": {
+      "title": "Motion & Animation",
+      "items": [
+        "Framer Motion",
+        "GSAP + ScrollTrigger",
+        "Performant vanilla JS animations",
+        "CSS Motion"
+      ]
+    },
+    "designPrototyping": {
+      "title": "Design & Prototyping",
+      "items": [
+        "Figma (wireframing, prototyping & collaboration)",
+        "Framer",
+        "Adobe Photoshop"
+      ]
+    },
+    "engineeringTools": {
+      "title": "Engineering Tools",
+      "items": [
+        "Git version control workflows",
+        "Vercel . Netlify . Cloudflare Pages",
+        "Docker . Docker Compose"
+      ]
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "intro": "Open to collaboration on ambitious projects. Let's create something meaningful together.",
+    "emailPlaceholder": "your@email.com",
+    "emailHint": "Press Enter to continue",
+    "emailErrorEmpty": "Please enter your email",
+    "emailErrorInvalid": "Please enter a valid email",
+    "messagePlaceholder": "Your message...",
+    "send": "Send",
+    "thankYou": {
+      "title": "Thank You",
+      "message": "Your message has been received. I'll get back to you soon.",
+      "sendAnother": "Send another message"
+    }
+  },
+  "langToggle": {
+    "en": "EN",
+    "fr": "FR"
+  }
+}
