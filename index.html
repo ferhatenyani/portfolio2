@@ -3731,7 +3731,7 @@
                         gsap.to(introCta, {
                             opacity: 0,
                             duration: 0.5,
-                            delay: 2.2, // 0.2 delay + 0.6 fade in + ~1.4s hold = 2.2s before fade out
+                            delay: 1.5, // 0.2 delay + 0.6 fade in + ~1.4s hold = 2.2s before fade out
                             ease: 'power2.in',
                             onComplete: () => {
                                 // Phase 3: Now initialize and show the nav content
@@ -4187,11 +4187,18 @@
             stepThanks: null,
             resetBtn: null,
 
-            // Font scaling config
+            // Font scaling config for message
             fontConfig: {
                 maxFont: 3.5,    // rem - starting font size
                 minFont: 1,     // rem - minimum font size
                 charsToMin: 200 // characters at which we hit min font
+            },
+
+            // Font scaling config for email (smaller reduction)
+            emailFontConfig: {
+                maxFont: 4,      // rem - starting font size (matches CSS clamp max)
+                minFont: 1.8,    // rem - minimum font size (slightly smaller)
+                charsToMin: 40   // emails typically max around 40 chars
             },
 
             init() {
@@ -4216,6 +4223,7 @@
                 // Email input events
                 this.emailInput.addEventListener('input', (e) => {
                     this.updatePreview(e.target.value);
+                    this.adjustEmailFontSize();
                     // Remove error state on input
                     this.emailInput.classList.remove('invalid');
                     this.emailHint.classList.remove('error');
@@ -4395,6 +4403,24 @@
                 this.messageInput.style.fontSize = `clamp(${minResponsive}rem, ${vwValue}vw, ${maxResponsive}rem)`;
             },
 
+            adjustEmailFontSize() {
+                const text = this.emailInput.value;
+                const charCount = text.length;
+                const { maxFont, minFont, charsToMin } = this.emailFontConfig;
+
+                // Calculate font size based on character count
+                // Linear interpolation from maxFont to minFont
+                const ratio = Math.min(charCount / charsToMin, 1);
+                const fontSize = maxFont - (ratio * (maxFont - minFont));
+
+                // Apply responsive font size using clamp
+                const minResponsive = fontSize * 0.5;  // 50% for mobile
+                const maxResponsive = fontSize;
+                const vwValue = fontSize * 1.5;
+
+                this.emailInput.style.fontSize = `clamp(${minResponsive}rem, ${vwValue}vw, ${maxResponsive}rem)`;
+            },
+
             autoResizeTextarea() {
                 // Reset height to auto to get the correct scrollHeight
                 this.messageInput.style.height = 'auto';
@@ -4415,7 +4441,8 @@
                 if (text.length > 0) {
                     this.preview.textContent = text;
                     this.preview.classList.add('visible');
-                    const opacity = Math.min(text.length * 0.015, 0.12);
+                    // Lighter opacity to not disturb the user
+                    const opacity = Math.min(text.length * 0.008, 0.05);
                     this.preview.style.opacity = opacity;
                 } else {
                     this.preview.classList.remove('visible');
@@ -4487,6 +4514,7 @@
                 if (this.emailInput) {
                     this.emailInput.value = '';
                     this.emailInput.classList.remove('invalid');
+                    this.emailInput.style.fontSize = '';
                 }
                 if (this.messageInput) {
                     this.messageInput.value = '';
