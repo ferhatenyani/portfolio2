@@ -647,12 +647,14 @@
             align-items: flex-start;
             justify-content: center;
             padding: clamp(20px, 4vw, 60px);
+            padding-left: clamp(60px, 8vw, 100px);
+            padding-right: clamp(60px, 8vw, 100px);
             box-sizing: border-box;
             opacity: 0;
             pointer-events: none;
             overflow-y: auto;
             overflow-x: hidden;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .project-slide.active {
@@ -808,11 +810,11 @@
         }
 
         .project-nav-arrow.prev {
-            left: clamp(16px, 3vw, 40px);
+            left: clamp(20px, 4vw, 50px);
         }
 
         .project-nav-arrow.next {
-            right: clamp(16px, 3vw, 40px);
+            right: clamp(20px, 4vw, 50px);
         }
 
         .project-nav-arrow:disabled {
@@ -908,7 +910,8 @@
         /* Project 3 Specific - Video */
         .project-video-container {
             margin: 1.5rem auto;
-            max-width: 600px;
+            max-width: 900px;
+            width: 100%;
             aspect-ratio: 16/9;
             background: #f4f4f5;
             border: 1px solid #e4e4e7;
@@ -944,6 +947,29 @@
             text-transform: uppercase;
         }
 
+        /* Project 3 Gallery - reusing Project 2 pattern */
+        #project3-user-view,
+        #project3-admin-view {
+            width: 100%;
+        }
+
+        /* Tablet Adjustments for Projects */
+        @media (max-width: 900px) {
+            .project-slide {
+                padding: clamp(20px, 3vw, 40px);
+                padding-left: clamp(70px, 10vw, 100px);
+                padding-right: clamp(70px, 10vw, 100px);
+            }
+
+            .project-nav-arrow.prev {
+                left: clamp(16px, 3vw, 30px);
+            }
+
+            .project-nav-arrow.next {
+                right: clamp(16px, 3vw, 30px);
+            }
+        }
+
         /* Mobile Adjustments for Projects */
         @media (max-width: 768px) {
             .projects-header {
@@ -951,12 +977,58 @@
             }
 
             .project-tab {
-                font-size: 0.55rem;
-                padding: 6px 10px;
+                font-size: 0.6rem;
+                padding: 8px 12px;
             }
 
             .project-slide {
                 padding: 20px;
+                padding-left: clamp(55px, 14vw, 80px);
+                padding-right: clamp(55px, 14vw, 80px);
+            }
+
+            .project-nav-arrow {
+                width: 40px;
+                height: 40px;
+            }
+
+            .project-nav-arrow i {
+                width: 16px;
+                height: 16px;
+            }
+
+            .project-nav-arrow.prev {
+                left: 12px;
+            }
+
+            .project-nav-arrow.next {
+                right: 12px;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                max-height: 200px;
+            }
+
+            .project-video-container {
+                max-width: 100%;
+            }
+
+            .project-title {
+                font-size: clamp(1.5rem, 5vw, 2.2rem);
+            }
+
+            .project-description {
+                font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+                line-height: 1.6;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .project-slide {
+                padding: 16px;
+                padding-left: clamp(50px, 16vw, 70px);
+                padding-right: clamp(50px, 16vw, 70px);
             }
 
             .project-nav-arrow {
@@ -970,26 +1042,15 @@
             }
 
             .project-nav-arrow.prev {
-                left: 10px;
+                left: 8px;
             }
 
             .project-nav-arrow.next {
-                right: 10px;
+                right: 8px;
             }
 
-            .gallery-grid {
-                grid-template-columns: repeat(2, 1fr);
-                max-height: 200px;
-            }
-
-            .project-video-container {
-                max-width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
             .project-title {
-                font-size: 1.5rem;
+                font-size: clamp(1.3rem, 6vw, 1.6rem);
             }
 
             .project-description {
@@ -1008,6 +1069,53 @@
             .gallery-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
+            }
+
+            .project-number {
+                width: 28px;
+                height: 28px;
+                font-size: 0.6rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Extra small mobile */
+        @media (max-width: 360px) {
+            .project-slide {
+                padding: 12px;
+                padding-left: 48px;
+                padding-right: 48px;
+            }
+
+            .project-nav-arrow {
+                width: 32px;
+                height: 32px;
+            }
+
+            .project-nav-arrow i {
+                width: 12px;
+                height: 12px;
+            }
+
+            .project-nav-arrow.prev {
+                left: 6px;
+            }
+
+            .project-nav-arrow.next {
+                right: 6px;
+            }
+
+            .project-tab {
+                font-size: 0.5rem;
+                padding: 6px 8px;
+            }
+
+            .project-title {
+                font-size: 1.2rem;
+            }
+
+            .project-description {
+                font-size: 0.75rem;
             }
         }
 
@@ -1350,23 +1458,36 @@
                                 <span class="project-tag">Spring Boot</span>
                             </div>
 
-                            <!-- Video Placeholder -->
-                            <div class="project-video-container">
-                                <div class="video-placeholder">
-                                    <i data-lucide="play-circle" stroke-width="1"></i>
-                                    <span>Demo Video Coming Soon</span>
+                            <!-- User/Admin Toggle for Project 3 -->
+                            <div class="project-gallery">
+                                <div class="gallery-toggle">
+                                    <button class="gallery-toggle-btn active" data-view="user" data-project="3">User App</button>
+                                    <button class="gallery-toggle-btn" data-view="admin" data-project="3">Admin App</button>
                                 </div>
-                                <!-- Replace placeholder with actual video when ready:
-                                <video controls poster="/path/to/poster.jpg">
-                                    <source src="/path/to/demo-video.mp4" type="video/mp4">
-                                </video>
-                                -->
-                            </div>
 
-                            <a href="#" class="project-link" target="_blank" rel="noopener">
-                                View Live Demo
-                                <i data-lucide="arrow-right" stroke-width="1.5"></i>
-                            </a>
+                                <!-- User App View - Live Demo Button -->
+                                <div id="project3-user-view" style="margin-top: 1.5rem;">
+                                    <a href="#" class="project-link" target="_blank" rel="noopener">
+                                        View Live Demo
+                                        <i data-lucide="arrow-right" stroke-width="1.5"></i>
+                                    </a>
+                                </div>
+
+                                <!-- Admin App View - Video Preview (hidden by default) -->
+                                <div id="project3-admin-view" style="display: none;">
+                                    <div class="project-video-container">
+                                        <div class="video-placeholder">
+                                            <i data-lucide="play-circle" stroke-width="1"></i>
+                                            <span>Demo Video Coming Soon</span>
+                                        </div>
+                                        <!-- Replace placeholder with actual video when ready:
+                                        <video controls poster="/path/to/poster.jpg">
+                                            <source src="/path/to/demo-video.mp4" type="video/mp4">
+                                        </video>
+                                        -->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2876,38 +2997,73 @@
 
             initGalleryToggle() {
                 const toggleBtns = document.querySelectorAll('.gallery-toggle-btn');
+
+                // Project 2 galleries
                 const userGallery = document.getElementById('gallery-user');
                 const adminGallery = document.getElementById('gallery-admin');
+
+                // Project 3 views
+                const project3UserView = document.getElementById('project3-user-view');
+                const project3AdminView = document.getElementById('project3-admin-view');
 
                 toggleBtns.forEach(btn => {
                     btn.addEventListener('click', () => {
                         const view = btn.dataset.view;
+                        const projectNum = btn.dataset.project;
 
-                        // Update active state
-                        toggleBtns.forEach(b => b.classList.remove('active'));
+                        // Get sibling toggle buttons (within same gallery-toggle container)
+                        const siblingBtns = btn.parentElement.querySelectorAll('.gallery-toggle-btn');
+                        siblingBtns.forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
 
-                        // Toggle galleries with fade animation
-                        if (view === 'user') {
-                            gsap.to(adminGallery, {
-                                opacity: 0,
-                                duration: 0.2,
-                                onComplete: () => {
-                                    adminGallery.style.display = 'none';
-                                    userGallery.style.display = 'grid';
-                                    gsap.fromTo(userGallery, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-                                }
-                            });
-                        } else {
-                            gsap.to(userGallery, {
-                                opacity: 0,
-                                duration: 0.2,
-                                onComplete: () => {
-                                    userGallery.style.display = 'none';
-                                    adminGallery.style.display = 'grid';
-                                    gsap.fromTo(adminGallery, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-                                }
-                            });
+                        // Handle Project 2 toggle
+                        if (!projectNum || projectNum === '2') {
+                            if (view === 'user') {
+                                gsap.to(adminGallery, {
+                                    opacity: 0,
+                                    duration: 0.2,
+                                    onComplete: () => {
+                                        adminGallery.style.display = 'none';
+                                        userGallery.style.display = 'grid';
+                                        gsap.fromTo(userGallery, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+                                    }
+                                });
+                            } else {
+                                gsap.to(userGallery, {
+                                    opacity: 0,
+                                    duration: 0.2,
+                                    onComplete: () => {
+                                        userGallery.style.display = 'none';
+                                        adminGallery.style.display = 'grid';
+                                        gsap.fromTo(adminGallery, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+                                    }
+                                });
+                            }
+                        }
+
+                        // Handle Project 3 toggle
+                        if (projectNum === '3') {
+                            if (view === 'user') {
+                                gsap.to(project3AdminView, {
+                                    opacity: 0,
+                                    duration: 0.2,
+                                    onComplete: () => {
+                                        project3AdminView.style.display = 'none';
+                                        project3UserView.style.display = 'block';
+                                        gsap.fromTo(project3UserView, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+                                    }
+                                });
+                            } else {
+                                gsap.to(project3UserView, {
+                                    opacity: 0,
+                                    duration: 0.2,
+                                    onComplete: () => {
+                                        project3UserView.style.display = 'none';
+                                        project3AdminView.style.display = 'block';
+                                        gsap.fromTo(project3AdminView, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+                                    }
+                                });
+                            }
                         }
                     });
                 });
@@ -2941,10 +3097,10 @@
                 // Update arrow states
                 this.updateArrows();
 
-                // Reset animation lock after fade transition completes
+                // Reset animation lock after fade transition completes (matches 0.6s CSS transition)
                 setTimeout(() => {
                     this.isAnimating = false;
-                }, 400);
+                }, 600);
             },
 
             prev() {
@@ -2979,19 +3135,31 @@
                 });
                 this.updateArrows();
 
-                // Reset gallery to user view
+                // Reset Project 2 gallery to user view
                 const userGallery = document.getElementById('gallery-user');
                 const adminGallery = document.getElementById('gallery-admin');
-                const toggleBtns = document.querySelectorAll('.gallery-toggle-btn');
 
                 if (userGallery && adminGallery) {
                     userGallery.style.display = 'grid';
                     userGallery.style.opacity = '1';
                     adminGallery.style.display = 'none';
-                    toggleBtns.forEach(btn => {
-                        btn.classList.toggle('active', btn.dataset.view === 'user');
-                    });
                 }
+
+                // Reset Project 3 toggle to user view
+                const project3UserView = document.getElementById('project3-user-view');
+                const project3AdminView = document.getElementById('project3-admin-view');
+
+                if (project3UserView && project3AdminView) {
+                    project3UserView.style.display = 'block';
+                    project3UserView.style.opacity = '1';
+                    project3AdminView.style.display = 'none';
+                }
+
+                // Reset all toggle buttons to user view active state
+                const toggleBtns = document.querySelectorAll('.gallery-toggle-btn');
+                toggleBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.view === 'user');
+                });
             },
 
             // Animate content in when section opens
