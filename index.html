@@ -4007,6 +4007,7 @@
             prevBtn: null,
             nextBtn: null,
             isAnimating: false,
+            animationTimeout: null,
 
             init() {
                 this.track = document.getElementById('projects-track');
@@ -4195,6 +4196,12 @@
             },
 
             goToProject(index) {
+                // Failsafe: if isAnimating has been stuck for more than 1 second, force reset it
+                if (this.isAnimating && this.animationTimeout) {
+                    clearTimeout(this.animationTimeout);
+                    this.isAnimating = false;
+                }
+
                 if (this.isAnimating || index === this.currentIndex) return;
                 if (index < 0 || index >= this.totalProjects) return;
 
@@ -4202,13 +4209,27 @@
                 const previousIndex = this.currentIndex;
                 this.currentIndex = index;
 
+                // Kill any existing GSAP animations on slides to prevent conflicts
+                this.slides.forEach(slide => {
+                    gsap.killTweensOf(slide);
+                    gsap.killTweensOf(slide.querySelector('.project-content'));
+                    const content = slide.querySelector('.project-content');
+                    if (content && content.children) {
+                        gsap.killTweensOf(content.children);
+                    }
+                });
+
                 // Fade out current slide, fade in new slide
                 this.slides.forEach((slide, i) => {
                     if (i === previousIndex) {
                         slide.classList.remove('active');
+                        // Explicitly set opacity as backup
+                        slide.style.opacity = '0';
                     }
                     if (i === index) {
                         slide.classList.add('active');
+                        // Explicitly set opacity as backup
+                        slide.style.opacity = '1';
                         // Reset scroll position when switching projects
                         slide.scrollTop = 0;
                     }
@@ -4222,9 +4243,16 @@
                 // Update arrow states
                 this.updateArrows();
 
+                // Reinitialize Lucide icons in case they didn't render
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+
                 // Reset animation lock after fade transition completes (matches 0.6s CSS transition)
-                setTimeout(() => {
+                // Using stored timeout reference so we can clear it if needed
+                this.animationTimeout = setTimeout(() => {
                     this.isAnimating = false;
+                    this.animationTimeout = null;
                 }, 600);
             },
 
@@ -4247,11 +4275,30 @@
 
             // Reset to first project when section opens
             reset() {
+                // Clear any stuck animation state
+                if (this.animationTimeout) {
+                    clearTimeout(this.animationTimeout);
+                    this.animationTimeout = null;
+                }
+                this.isAnimating = false;
                 this.currentIndex = 0;
 
-                // Show only the first slide
+                // Kill all GSAP animations on slides
+                this.slides.forEach(slide => {
+                    gsap.killTweensOf(slide);
+                    const content = slide.querySelector('.project-content');
+                    if (content) {
+                        gsap.killTweensOf(content);
+                        if (content.children) {
+                            gsap.killTweensOf(content.children);
+                        }
+                    }
+                });
+
+                // Show only the first slide with explicit opacity
                 this.slides.forEach((slide, i) => {
                     slide.classList.toggle('active', i === 0);
+                    slide.style.opacity = i === 0 ? '1' : '0';
                     slide.scrollTop = 0;
                 });
 
