@@ -860,12 +860,12 @@
 
         /* Close button positioning for projects section */
         #section-projects .close-btn-projects {
-            position: absolute;
-            top: 50%;
-            right: clamp(20px, 4vw, 60px);
-            transform: translateY(-50%);
-            width: 44px;
-            height: 44px;
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            transform: none;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background: #18181b;
             border: none;
@@ -876,12 +876,12 @@
             opacity: 0;
             pointer-events: none;
             transition: background 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
-            z-index: 10;
+            z-index: 200;
         }
 
         #section-projects .close-btn-projects:hover {
             background: #3f3f46;
-            transform: translateY(-50%) scale(1.05);
+            transform: scale(1.05);
         }
 
         #section-projects .close-btn-projects.visible {
@@ -1993,9 +1993,10 @@
             }
 
             #section-projects .close-btn-projects {
-                width: 38px;
-                height: 38px;
-                right: 16px;
+                top: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
             }
 
             #section-projects .close-btn-projects::before,
@@ -2057,14 +2058,15 @@
             }
 
             #section-projects .close-btn-projects {
-                width: 34px;
-                height: 34px;
-                right: 12px;
+                top: 16px;
+                right: 16px;
+                width: 40px;
+                height: 40px;
             }
 
             #section-projects .close-btn-projects::before,
             #section-projects .close-btn-projects::after {
-                width: 12px;
+                width: 16px;
             }
 
             .project-slide {
@@ -2166,7 +2168,7 @@
         ================================ */
         .close-btn {
             position: fixed;
-            top: 80px;
+            top: 30px;
             right: 30px;
             width: 50px;
             height: 50px;
@@ -2352,7 +2354,7 @@
             }
 
             .close-btn {
-                top: 70px;
+                top: 20px;
                 right: 20px;
                 width: 44px;
                 height: 44px;
@@ -2362,6 +2364,20 @@
                 bottom: 20px;
                 padding: 12px 24px;
                 font-size: 0.65rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .close-btn {
+                top: 16px;
+                right: 16px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .close-btn::before,
+            .close-btn::after {
+                width: 16px;
             }
         }
     </style>
@@ -2434,14 +2450,14 @@
          SECTION CONTAINERS
     ================================ -->
     <div class="section-container" id="section-projects">
+        <!-- Close button for projects section -->
+        <button class="close-btn-projects" id="close-btn-projects" aria-label="Close section"></button>
         <div class="section-content">
             <!-- Projects Header with Tabs -->
             <div class="projects-header">
                 <button class="project-tab active" data-project="0" data-i18n="projects.tabs.project1">Project 1</button>
                 <button class="project-tab" data-project="1" data-i18n="projects.tabs.project2">Project 2</button>
                 <button class="project-tab" data-project="2" data-i18n="projects.tabs.project3">Project 3</button>
-                <!-- Close button for projects section -->
-                <button class="close-btn-projects" id="close-btn-projects" aria-label="Close section"></button>
             </div>
 
             <!-- Projects Carousel -->
