@@ -4841,20 +4841,34 @@
                 // On touch devices: blur input when keyboard is dismissed
                 // This handles the case where user taps outside or dismisses keyboard
                 if (this.isTouchDevice()) {
-                    // Use visualViewport resize to detect keyboard dismiss
                     if (window.visualViewport) {
-                        let lastHeight = window.visualViewport.height;
+                        let initialHeight = window.visualViewport.height;
+                        let keyboardOpen = false;
+                        let resizeTimeout = null;
+
                         window.visualViewport.addEventListener('resize', () => {
                             const currentHeight = window.visualViewport.height;
-                            // Keyboard closed (viewport height increased)
-                            if (currentHeight > lastHeight) {
-                                // Blur the active input immediately
-                                if (document.activeElement === this.emailInput ||
-                                    document.activeElement === this.messageInput) {
-                                    document.activeElement.blur();
+                            const heightDiff = currentHeight - initialHeight;
+
+                            // Clear any pending timeout
+                            if (resizeTimeout) clearTimeout(resizeTimeout);
+
+                            // Debounce to wait for resize to stabilize
+                            resizeTimeout = setTimeout(() => {
+                                // Keyboard opened (viewport shrunk significantly)
+                                if (heightDiff < -100) {
+                                    keyboardOpen = true;
                                 }
-                            }
-                            lastHeight = currentHeight;
+                                // Keyboard closed (viewport back to near original)
+                                else if (keyboardOpen && heightDiff > -50) {
+                                    keyboardOpen = false;
+                                    // Blur the active input
+                                    if (document.activeElement === this.emailInput ||
+                                        document.activeElement === this.messageInput) {
+                                        document.activeElement.blur();
+                                    }
+                                }
+                            }, 100);
                         });
                     }
                 }
