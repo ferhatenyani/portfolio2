@@ -1,0 +1,7 @@
+Emailjs implementation: 
+in contact section remove focus when keyboard is dismissed: 
+intro animation performance audit: 
+sections text labels fonts and weight: 
+sections ring sizes: 
+contact section dismiss is not smooth (placeholder fades out at last): 
+remove back input animation in contact section: 

@@ -427,6 +427,47 @@
             color: #ef4444;
         }
 
+        /* Next Button for Email Step */
+        .contact-next-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 2rem;
+            padding: 14px 28px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #fafafa;
+            background: #18181b;
+            border: 1px solid #18181b;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .contact-next-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .contact-next-btn:hover {
+            background: #3f3f46;
+            border-color: #3f3f46;
+        }
+
+        .contact-next-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .contact-next-btn:hover i {
+            transform: translateX(3px);
+        }
+
         /* ================================
            STEP 2: MESSAGE INPUT
         ================================ */
@@ -3106,6 +3147,11 @@
                     >
                     <div class="contact-hint" id="contact-hint-email" data-i18n="contact.emailHint">Press Enter to continue</div>
                 </div>
+
+                <button class="contact-next-btn" id="contact-next-btn">
+                    <span data-i18n="contact.next">Next</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
             </div>
 
             <!-- Step 2: Message Input View -->
@@ -4683,6 +4729,7 @@
             emailDisplay: null,
             emailEditBtn: null,
             sendBtn: null,
+            nextBtn: null,
             stepEmail: null,
             stepMessage: null,
             stepThanks: null,
@@ -4712,6 +4759,7 @@
                 this.emailDisplay = document.getElementById('contact-email-display');
                 this.emailEditBtn = document.getElementById('contact-email-edit');
                 this.sendBtn = document.getElementById('contact-send-btn');
+                this.nextBtn = document.getElementById('contact-next-btn');
                 this.stepEmail = document.getElementById('contact-step-email');
                 this.stepMessage = document.getElementById('contact-step-message');
                 this.stepThanks = document.getElementById('contact-step-thanks');
@@ -4725,6 +4773,7 @@
                 this.emailInput.addEventListener('input', (e) => {
                     this.updatePreview(e.target.value);
                     this.adjustEmailFontSize();
+                    this.toggleNextButton();
                     // Remove error state on input
                     this.emailInput.classList.remove('invalid');
                     this.emailHint.classList.remove('error');
@@ -4778,11 +4827,37 @@
                     this.submitMessage();
                 });
 
+                // Next button (email step)
+                this.nextBtn.addEventListener('click', () => {
+                    this.validateAndProceed();
+                });
+
                 // Reset button (in thank you view)
                 this.resetBtn.addEventListener('click', () => {
                     this.reset();
                     this.focusInput();
                 });
+
+                // On touch devices: blur input when keyboard is dismissed
+                // This handles the case where user taps outside or dismisses keyboard
+                if (this.isTouchDevice()) {
+                    // Use visualViewport resize to detect keyboard dismiss
+                    if (window.visualViewport) {
+                        let lastHeight = window.visualViewport.height;
+                        window.visualViewport.addEventListener('resize', () => {
+                            const currentHeight = window.visualViewport.height;
+                            // Keyboard closed (viewport height increased)
+                            if (currentHeight > lastHeight) {
+                                // Blur the active input immediately
+                                if (document.activeElement === this.emailInput ||
+                                    document.activeElement === this.messageInput) {
+                                    document.activeElement.blur();
+                                }
+                            }
+                            lastHeight = currentHeight;
+                        });
+                    }
+                }
             },
 
             validateEmail(email) {
@@ -4938,6 +5013,15 @@
                 }
             },
 
+            toggleNextButton() {
+                const hasContent = this.emailInput.value.trim().length > 0;
+                if (hasContent) {
+                    this.nextBtn.classList.add('visible');
+                } else {
+                    this.nextBtn.classList.remove('visible');
+                }
+            },
+
             updatePreview(text) {
                 if (text.length > 0) {
                     this.preview.textContent = text;
@@ -4996,7 +5080,15 @@
                 this.updatePreview('');
             },
 
+            // Check if device is touch-based (mobile/tablet)
+            isTouchDevice() {
+                return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            },
+
             focusInput() {
+                // Don't auto-focus on touch devices to prevent keyboard from opening automatically
+                if (this.isTouchDevice()) return;
+
                 setTimeout(() => {
                     if (this.currentStep === 'email' && this.emailInput) {
                         this.emailInput.focus();
@@ -5027,8 +5119,9 @@
                     this.emailHint.textContent = I18nController.t('contact.emailHint');
                 }
 
-                // Reset send button
+                // Reset send button and next button
                 this.sendBtn.classList.remove('visible');
+                this.nextBtn.classList.remove('visible');
 
                 // Clear preview
                 this.updatePreview('');

@@ -180,6 +180,7 @@
     "emailErrorEmpty": "Please enter your email",
     "emailErrorInvalid": "Please enter a valid email",
     "messagePlaceholder": "Your message...",
+    "next": "Next",
     "send": "Send",
     "thankYou": {
       "title": "Thank You",
