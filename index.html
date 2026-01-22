@@ -4443,52 +4443,6 @@
                             stagger: 0.05,
                             ease: 'power2.in'
                         });
-                    } else if (sectionName === 'contact') {
-                        // Contact section: animate all visible step elements together
-                        const activeStep = content.querySelector('.contact-step[style*="display: block"], .contact-step:not([style*="display: none"]):not([style])');
-                        const elementsToAnimate = [];
-
-                        if (activeStep) {
-                            // Collect all visible elements within the active step
-                            const stepH2 = activeStep.querySelector('h2');
-                            const stepP = activeStep.querySelector('p');
-                            const inputWrapper = activeStep.querySelector('.contact-input-wrapper');
-                            const emailBadge = activeStep.querySelector('.contact-email-badge');
-                            const messageWrapper = activeStep.querySelector('.contact-message-wrapper');
-                            const nextBtn = activeStep.querySelector('.contact-next-btn');
-                            const sendBtn = activeStep.querySelector('.contact-send-btn');
-                            const thankYouIcon = activeStep.querySelector('.contact-thank-you-icon');
-                            const resetBtn = activeStep.querySelector('.contact-reset-btn');
-
-                            // Add elements in reverse visual order (bottom to top)
-                            if (resetBtn) elementsToAnimate.push(resetBtn);
-                            if (sendBtn) elementsToAnimate.push(sendBtn);
-                            if (nextBtn) elementsToAnimate.push(nextBtn);
-                            if (messageWrapper) elementsToAnimate.push(messageWrapper);
-                            if (inputWrapper) elementsToAnimate.push(inputWrapper);
-                            if (emailBadge) elementsToAnimate.push(emailBadge);
-                            if (stepP) elementsToAnimate.push(stepP);
-                            if (thankYouIcon) elementsToAnimate.push(thankYouIcon);
-                            if (stepH2) elementsToAnimate.push(stepH2);
-                        }
-
-                        // Also fade out the background preview
-                        const preview = content.querySelector('.contact-preview');
-                        if (preview) {
-                            gsap.to(preview, {
-                                opacity: 0,
-                                duration: 0.2,
-                                ease: 'power2.in'
-                            });
-                        }
-
-                        gsap.to(elementsToAnimate, {
-                            opacity: 0,
-                            y: -20,
-                            duration: 0.3,
-                            stagger: 0.05,
-                            ease: 'power2.in'
-                        });
                     } else {
                         gsap.to([p, h2], {
                             opacity: 0,
