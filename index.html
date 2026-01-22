@@ -4369,6 +4369,19 @@
                                 ease: 'power3.out'
                             }
                         );
+                    } else if (sectionName === 'contact') {
+                        const contactElements = content.querySelectorAll('.contact-input, .contact-hint, .contact-email-badge, .contact-message-input, .contact-send-btn, .contact-thank-you-icon, .contact-reset-btn, .contact-next-btn');
+                        gsap.fromTo([h2, p, ...contactElements],
+                            { opacity: 0, y: 30 },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.6,
+                                stagger: 0.15,
+                                delay: CONFIG.apertureDuration * 0.6,
+                                ease: 'power3.out'
+                            }
+                        );
                     } else {
                         gsap.fromTo([h2, p],
                             { opacity: 0, y: 30 },
@@ -4441,6 +4454,16 @@
                             y: -20,
                             duration: 0.3,
                             stagger: 0.05,
+                            ease: 'power2.in'
+                        });
+                    } else if (sectionName === 'contact') {
+                        // Include contact-specific elements (input, hint, buttons) in the fade-out
+                        const contactElements = content.querySelectorAll('.contact-input, .contact-hint, .contact-email-badge, .contact-message-input, .contact-send-btn, .contact-thank-you-icon, .contact-reset-btn, .contact-next-btn');
+                        gsap.to([p, h2, ...contactElements], {
+                            opacity: 0,
+                            y: -20,
+                            duration: 0.3,
+                            stagger: 0.1,
                             ease: 'power2.in'
                         });
                     } else {
