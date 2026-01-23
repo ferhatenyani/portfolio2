@@ -15,6 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
     <style>
         /* Import secondary font for creative pairing - Space Mono for technical/code aesthetic */
@@ -581,6 +582,54 @@
 
         .contact-send-btn:hover i {
             transform: translateX(3px);
+        }
+
+        /* Send button loading state */
+        .contact-send-btn.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .contact-send-btn .btn-spinner {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid transparent;
+            border-top-color: #fafafa;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .contact-send-btn.loading .btn-spinner {
+            display: inline-block;
+        }
+
+        .contact-send-btn.loading .btn-icon {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Contact error message */
+        .contact-error-message {
+            margin-top: 1rem;
+            padding: 12px 20px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            font-size: 0.75rem;
+            letter-spacing: 0.02em;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .contact-error-message.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* ================================
@@ -3175,9 +3224,13 @@
                 </div>
 
                 <button class="contact-send-btn" id="contact-send-btn">
-                    <span data-i18n="contact.send">Send</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    <span class="btn-text" data-i18n="contact.send">Send</span>
+                    <span class="btn-loading-text" style="display: none;">Sending...</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 btn-icon"></i>
+                    <span class="btn-spinner"></span>
                 </button>
+
+                <div class="contact-error-message" id="contact-error-message"></div>
             </div>
 
             <!-- Step 3: Thank You View -->
@@ -5072,49 +5125,115 @@
                 }
             },
 
-            submitMessage() {
+            async submitMessage() {
                 const message = this.messageInput.value.trim();
                 if (!message || !this.email) return;
 
-                // Get input position for particle explosion
+                // Prevent double submission
+                if (this.isSending) return;
+                this.isSending = true;
+
+                // Show loading state
+                this.setLoadingState(true);
+                this.hideError();
+
+                // Get input position for particle explosion (prepare before async)
                 const rect = this.messageInput.getBoundingClientRect();
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
                 const fontSize = parseInt(window.getComputedStyle(this.messageInput).fontSize);
 
-                // Explode the typed text into particles
-                ParticleSystem.createTextExplosion(message, centerX, centerY, fontSize);
+                try {
+                    // Send email via EmailJS
+                    await emailjs.send(
+                        'service_98zar7x',
+                        'template_c75clya',
+                        {
+                            email: this.email,
+                            message: message
+                        }
+                    );
 
-                // Store data for later EmailJS integration
-                const formData = {
-                    email: this.email,
-                    message: message
-                };
-                console.log('Contact form data:', formData);
+                    // Success: Explode the typed text into particles
+                    ParticleSystem.createTextExplosion(message, centerX, centerY, fontSize);
 
-                // Transition to thank you view
-                gsap.to(this.stepMessage, {
-                    opacity: 0,
-                    y: -20,
-                    duration: 0.3,
-                    ease: 'power2.in',
-                    onComplete: () => {
-                        this.stepMessage.style.display = 'none';
-                        this.stepThanks.style.display = 'flex';
-                        this.currentStep = 'thanks';
+                    // Transition to thank you view
+                    gsap.to(this.stepMessage, {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.3,
+                        ease: 'power2.in',
+                        onComplete: () => {
+                            this.stepMessage.style.display = 'none';
+                            this.stepThanks.style.display = 'flex';
+                            this.currentStep = 'thanks';
 
-                        // Reinitialize Lucide icons for the check icon
-                        lucide.createIcons();
+                            // Reinitialize Lucide icons for the check icon
+                            lucide.createIcons();
 
-                        gsap.fromTo(this.stepThanks,
-                            { opacity: 0, y: 20 },
-                            { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
-                        );
+                            gsap.fromTo(this.stepThanks,
+                                { opacity: 0, y: 20 },
+                                { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+                            );
+                        }
+                    });
+
+                    // Clear preview
+                    this.updatePreview('');
+
+                } catch (error) {
+                    console.error('EmailJS error:', error);
+
+                    // Show detailed error message based on error type
+                    let errorMessage = I18nController.t('contact.error.generic');
+
+                    if (!navigator.onLine) {
+                        errorMessage = I18nController.t('contact.error.network');
+                    } else if (error.status === 400) {
+                        errorMessage = I18nController.t('contact.error.validation');
+                    } else if (error.status === 401 || error.status === 403) {
+                        errorMessage = I18nController.t('contact.error.auth');
+                    } else if (error.status === 429) {
+                        errorMessage = I18nController.t('contact.error.rateLimit');
+                    } else if (error.status >= 500) {
+                        errorMessage = I18nController.t('contact.error.server');
                     }
-                });
 
-                // Clear preview
-                this.updatePreview('');
+                    this.showError(errorMessage);
+                } finally {
+                    this.isSending = false;
+                    this.setLoadingState(false);
+                }
+            },
+
+            setLoadingState(isLoading) {
+                const btnText = this.sendBtn.querySelector('.btn-text');
+                const btnLoadingText = this.sendBtn.querySelector('.btn-loading-text');
+
+                if (isLoading) {
+                    this.sendBtn.classList.add('loading');
+                    btnText.style.display = 'none';
+                    btnLoadingText.style.display = 'inline';
+                } else {
+                    this.sendBtn.classList.remove('loading');
+                    btnText.style.display = 'inline';
+                    btnLoadingText.style.display = 'none';
+                }
+            },
+
+            showError(message) {
+                const errorEl = document.getElementById('contact-error-message');
+                if (errorEl) {
+                    errorEl.textContent = message;
+                    errorEl.classList.add('visible');
+                }
+            },
+
+            hideError() {
+                const errorEl = document.getElementById('contact-error-message');
+                if (errorEl) {
+                    errorEl.classList.remove('visible');
+                }
             },
 
             // Check if device is touch-based (mobile/tablet)
@@ -5139,6 +5258,7 @@
                 // Reset state
                 this.email = '';
                 this.currentStep = 'email';
+                this.isSending = false;
 
                 // Clear inputs
                 if (this.emailInput) {
@@ -5159,6 +5279,8 @@
                 // Reset send button and next button
                 this.sendBtn.classList.remove('visible');
                 this.nextBtn.classList.remove('visible');
+                this.setLoadingState(false);
+                this.hideError();
 
                 // Clear preview
                 this.updatePreview('');
@@ -5663,6 +5785,9 @@
 
             // Initialize i18n first
             await I18nController.init();
+
+            // Initialize EmailJS
+            emailjs.init('6xclFYMoBC1fgWG1M');
 
             HeroController.init();
             NavigationController.init();

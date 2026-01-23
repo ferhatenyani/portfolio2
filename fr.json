@@ -186,6 +186,14 @@
       "title": "Merci",
       "message": "Votre message a été reçu. Je vous répondrai bientôt.",
       "sendAnother": "Envoyer un autre message"
+    },
+    "error": {
+      "generic": "Échec de l'envoi du message. Veuillez réessayer.",
+      "network": "Pas de connexion internet. Vérifiez votre réseau et réessayez.",
+      "validation": "Format d'email ou de message invalide. Vérifiez votre saisie.",
+      "auth": "Service temporairement indisponible. Veuillez réessayer plus tard.",
+      "rateLimit": "Trop de requêtes. Veuillez patienter un moment et réessayer.",
+      "server": "Erreur serveur. Veuillez réessayer plus tard."
     }
   },
   "langToggle": {
