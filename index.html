@@ -3502,7 +3502,7 @@
         // ============================================
         const CONFIG = {
             // Hero text sampling
-            textSampleGap: 1,
+            textSampleGap: 3,
             particleSize: 1.0,
             mouseRadius: 60,
 
@@ -3686,15 +3686,16 @@
                 this.wanderSpeed = 0.1 + Math.random() * 0.15;
             }
 
-            update(hoveredZone) {
+            update(hoveredZone, now) {
                 switch (this.mode) {
                     case 'wander':
                         this.updateWander();
                         break;
                     case 'form':
-                        this.updateFormation();
+                        this.updateFormation(now);
                         break;
                     case 'dust':
+                        if (this.alpha <= 0) break;
                         this.updateDust();
                         break;
                     case 'concentrate':
@@ -3719,7 +3720,7 @@
                 }
             }
 
-            updateFormation() {
+            updateFormation(now) {
                 const dx = mouse.x - this.x;
                 const dy = mouse.y - this.y;
                 const distance = Math.hypot(dx, dy);
@@ -3753,10 +3754,10 @@
 
                 // Handle opacity animation
                 if (this.fadeStartTime === null) {
-                    this.fadeStartTime = performance.now();
+                    this.fadeStartTime = now;
                 }
 
-                const elapsed = (performance.now() - this.fadeStartTime) / 1000; // Convert to seconds
+                const elapsed = (now - this.fadeStartTime) / 1000; // Convert to seconds
 
                 if (elapsed >= this.fadeDelay) {
                     // Calculate fade progress (0 to 1)
@@ -4024,9 +4025,9 @@
                 }
             },
 
-            update(hoveredZone) {
+            update(hoveredZone, now) {
                 this.particles.forEach(p => {
-                    p.update(hoveredZone);
+                    p.update(hoveredZone, now);
                 });
 
                 this.explosionParticles = this.explosionParticles.filter(p => p.alpha > 0);
@@ -4039,7 +4040,11 @@
             },
 
             getActiveParticleCount() {
-                return this.particles.filter(p => p.alpha > 0).length;
+                let count = 0;
+                for (let i = 0; i < this.particles.length; i++) {
+                    if (this.particles[i].alpha > 0) count++;
+                }
+                return count;
             }
         };
 
@@ -5759,9 +5764,10 @@
             apertureCtx.clearRect(0, 0, width, height);
 
             const hoveredZone = NavigationController.hoveredZone;
+            const now = performance.now();
 
             if (ApertureSystem.state < 1) {
-                ParticleSystem.update(hoveredZone);
+                ParticleSystem.update(hoveredZone, now);
                 ParticleSystem.draw(particleCtx);
             }
 
