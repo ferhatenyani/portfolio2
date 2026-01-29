@@ -3870,6 +3870,9 @@
             explosionParticles: [],
             isForming: false,
             isDusting: false,
+            isSolidified: false,
+            formationCheckStartTime: null,
+            pulseScale: 1.0,
 
             init() {
                 this.particles = [];
@@ -3878,6 +3881,9 @@
                 this.explosionParticles = [];
                 this.isForming = false;
                 this.isDusting = false;
+                this.isSolidified = false;
+                this.formationCheckStartTime = null;
+                this.pulseScale = 1.0;
             },
 
             initHeroState() {
@@ -3894,13 +3900,41 @@
                     const rect = el.getBoundingClientRect();
                     const style = window.getComputedStyle(el);
 
+                    // Clear canvas before sampling
+                    textSamplingCtx.clearRect(0, 0, width, height);
+
+                    // Apply all text rendering properties to match DOM exactly
                     textSamplingCtx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
                     textSamplingCtx.fillStyle = 'white';
                     textSamplingCtx.textBaseline = 'top';
-                    textSamplingCtx.textAlign = 'center';
 
+                    // Apply letter spacing manually by drawing each character with spacing
+                    const letterSpacing = parseFloat(style.letterSpacing) || 0;
+                    const text = el.innerText;
                     const centerX = rect.left + rect.width / 2;
-                    textSamplingCtx.fillText(el.innerText, centerX, rect.top);
+
+                    if (letterSpacing && letterSpacing !== 0) {
+                        // Use LEFT alignment for manual character positioning
+                        textSamplingCtx.textAlign = 'left';
+
+                        // Calculate total width with letter spacing
+                        let totalWidth = 0;
+                        for (let i = 0; i < text.length; i++) {
+                            totalWidth += textSamplingCtx.measureText(text[i]).width;
+                            if (i < text.length - 1) totalWidth += letterSpacing;
+                        }
+
+                        // Draw each character with proper spacing (currentX is left edge)
+                        let currentX = centerX - totalWidth / 2;
+                        for (let i = 0; i < text.length; i++) {
+                            textSamplingCtx.fillText(text[i], currentX, rect.top);
+                            currentX += textSamplingCtx.measureText(text[i]).width + letterSpacing;
+                        }
+                    } else {
+                        // Use CENTER alignment for single fillText call
+                        textSamplingCtx.textAlign = 'center';
+                        textSamplingCtx.fillText(text, centerX, rect.top);
+                    }
 
                     const buffer = 20;
                     const scanLeft = Math.floor(Math.max(0, rect.left - buffer));
@@ -3973,6 +4007,87 @@
                 });
             },
 
+            checkFormationComplete() {
+                if (this.isSolidified || !this.isForming) return false;
+
+                // Count particles that are formed and visible
+                let formedCount = 0;
+                let totalCount = this.textParticles.length;
+
+                this.textParticles.forEach(p => {
+                    if (p.formed && p.alpha > p.baseAlpha * 0.8) {
+                        formedCount++;
+                    }
+                });
+
+                const formationPercentage = formedCount / totalCount;
+                return formationPercentage >= 0.95; // 95% completion threshold
+            },
+
+            solidifyText() {
+                if (this.isSolidified) return;
+                this.isSolidified = true;
+
+                const textName = document.getElementById('text-name');
+                const textRole = document.getElementById('text-role');
+
+                // Pulse animation for particles
+                gsap.to(this, {
+                    pulseScale: 1.05,
+                    duration: 0.15,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        gsap.to(this, {
+                            pulseScale: 1.0,
+                            duration: 0.3,
+                            ease: 'power2.inOut'
+                        });
+                    }
+                });
+
+                // Fade in solid text
+                gsap.to([textName, textRole], {
+                    opacity: 1,
+                    duration: 0.5,
+                    ease: 'power2.inOut'
+                });
+
+                // Smoothly fade out particles as text fades in
+                gsap.to(this.textParticles, {
+                    baseAlpha: 0,
+                    duration: 0.5,
+                    ease: 'power2.inOut',
+                    onUpdate: () => {
+                        // Smoothly reduce particle alpha
+                        this.textParticles.forEach(p => {
+                            p.alpha = p.baseAlpha;
+                        });
+                    }
+                });
+            },
+
+            reverseSolidification(onComplete) {
+                const textName = document.getElementById('text-name');
+                const textRole = document.getElementById('text-role');
+
+                // Fade out solid text (particles are already hidden)
+                gsap.to([textName, textRole], {
+                    opacity: 0,
+                    duration: 0.5,
+                    ease: 'power2.inOut',
+                    onComplete: () => {
+                        // Ensure text is completely hidden with inline style
+                        textName.style.opacity = '0';
+                        textRole.style.opacity = '0';
+
+                        // Reset for next time
+                        this.isSolidified = false;
+
+                        if (onComplete) onComplete();
+                    }
+                });
+            },
+
             createTextExplosion(text, x, y, fontSize) {
                 const tempCanvas = document.createElement('canvas');
                 const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
@@ -4032,10 +4147,38 @@
 
                 this.explosionParticles = this.explosionParticles.filter(p => p.alpha > 0);
                 this.explosionParticles.forEach(p => p.update());
+
+                // Check for formation completion
+                if (this.isForming && !this.isSolidified) {
+                    if (this.checkFormationComplete()) {
+                        if (!this.formationCheckStartTime) {
+                            this.formationCheckStartTime = now;
+                        } else if (now - this.formationCheckStartTime >= 300) {
+                            // 300ms = 0.3 seconds delay after formation complete
+                            this.solidifyText();
+                        }
+                    }
+                }
             },
 
             draw(ctx) {
-                this.particles.forEach(p => p.draw(ctx));
+                // Apply pulse scale if solidifying
+                if (this.pulseScale !== 1.0 && this.isForming) {
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+
+                    ctx.save();
+                    ctx.translate(centerX, centerY);
+                    ctx.scale(this.pulseScale, this.pulseScale);
+                    ctx.translate(-centerX, -centerY);
+
+                    this.particles.forEach(p => p.draw(ctx));
+
+                    ctx.restore();
+                } else {
+                    this.particles.forEach(p => p.draw(ctx));
+                }
+
                 this.explosionParticles.forEach(p => p.draw(ctx));
             },
 
@@ -4590,6 +4733,8 @@
                 const heroLayer = document.getElementById('hero-layer');
                 const navLayer = document.getElementById('nav-layer');
                 const ctaBtn = document.getElementById('cta-btn');
+                const textName = document.getElementById('text-name');
+                const textRole = document.getElementById('text-role');
 
                 // Reset zone rings opacity immediately to prevent flash on next nav transition
                 ApertureSystem.hideZoneRings(false);
@@ -4603,6 +4748,10 @@
                     label.style.opacity = 0;
                     label.style.transform = 'translateY(8px)';
                 });
+
+                // Reset text elements to hidden state
+                textName.style.opacity = '0';
+                textRole.style.opacity = '0';
 
                 // Reset CTA button state
                 ctaBtn.style.opacity = '0';
@@ -4788,8 +4937,16 @@
                         overwrite: 'auto'
                     });
 
-                    ParticleSystem.startDusting();
-                    StateManager.transition(AppState.NAVIGATION);
+                    // Reverse solidification first if text is solid
+                    if (ParticleSystem.isSolidified) {
+                        ParticleSystem.reverseSolidification(() => {
+                            // After text fades out, transition directly
+                            StateManager.transition(AppState.NAVIGATION);
+                        });
+                    } else {
+                        // If not solidified yet, just transition
+                        StateManager.transition(AppState.NAVIGATION);
+                    }
                 });
             }
         };
