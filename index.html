@@ -2530,7 +2530,7 @@
             <span class="zone-label" data-i18n="nav.contact">Contact</span>
         </div>
 
-        <!-- Back to Hero Button -->
+        <!-- Back to Hero Button --> 
         <button id="back-hero-btn" data-i18n="nav.backToStart">Back to Start</button>
     </div>
 
@@ -4039,7 +4039,7 @@
                     onComplete: () => {
                         gsap.to(this, {
                             pulseScale: 1.0,
-                            duration: 0.3,
+                            duration: 0.2,
                             ease: 'power2.inOut'
                         });
                     }
@@ -4086,6 +4086,56 @@
                         if (onComplete) onComplete();
                     }
                 });
+            },
+
+            reverseTypewriter(onComplete) {
+                const textName = document.getElementById('text-name');
+                const textRole = document.getElementById('text-role');
+
+                // Get full text content
+                const nameText = textName.textContent;
+                const roleText = textRole.textContent;
+
+                const deleteSpeed = 25; // ms per character (faster)
+
+                // Delete both texts simultaneously
+                let roleIndex = roleText.length;
+                let nameIndex = nameText.length;
+
+                const deleteNextChar = () => {
+                    let stillDeleting = false;
+
+                    // Delete from role if there are characters left
+                    if (roleIndex > 0) {
+                        roleIndex--;
+                        textRole.textContent = roleText.substring(0, roleIndex);
+                        stillDeleting = true;
+                    }
+
+                    // Delete from name if there are characters left
+                    if (nameIndex > 0) {
+                        nameIndex--;
+                        textName.textContent = nameText.substring(0, nameIndex);
+                        stillDeleting = true;
+                    }
+
+                    // Continue if either text still has characters
+                    if (stillDeleting) {
+                        setTimeout(deleteNextChar, deleteSpeed);
+                    } else {
+                        // All characters deleted - ensure text is completely hidden
+                        textName.style.opacity = '0';
+                        textRole.style.opacity = '0';
+
+                        // Reset for next time
+                        this.isSolidified = false;
+
+                        if (onComplete) onComplete();
+                    }
+                };
+
+                // Start deleting
+                deleteNextChar();
             },
 
             createTextExplosion(text, x, y, fontSize) {
@@ -4749,9 +4799,16 @@
                     label.style.transform = 'translateY(8px)';
                 });
 
-                // Reset text elements to hidden state
+                // Reset text elements to hidden state and restore content
                 textName.style.opacity = '0';
                 textRole.style.opacity = '0';
+                // Restore text content (in case it was cleared by reverse typewriter)
+                if (textName.hasAttribute('data-i18n')) {
+                    textName.textContent = I18nController.t(textName.getAttribute('data-i18n'));
+                }
+                if (textRole.hasAttribute('data-i18n')) {
+                    textRole.textContent = I18nController.t(textRole.getAttribute('data-i18n'));
+                }
 
                 // Reset CTA button state
                 ctaBtn.style.opacity = '0';
@@ -4934,19 +4991,20 @@
                         pointerEvents: 'none',
                         duration: 1.0,
                         ease: 'power2.out',
-                        overwrite: 'auto'
+                        overwrite: 'auto',
+                        onComplete: () => {
+                            // After button fades out, apply reverse typewriter to solid text
+                            if (ParticleSystem.isSolidified) {
+                                ParticleSystem.reverseTypewriter(() => {
+                                    // After reverse typewriter completes, transition
+                                    StateManager.transition(AppState.NAVIGATION);
+                                });
+                            } else {
+                                // If not solidified yet, just transition
+                                StateManager.transition(AppState.NAVIGATION);
+                            }
+                        }
                     });
-
-                    // Reverse solidification first if text is solid
-                    if (ParticleSystem.isSolidified) {
-                        ParticleSystem.reverseSolidification(() => {
-                            // After text fades out, transition directly
-                            StateManager.transition(AppState.NAVIGATION);
-                        });
-                    } else {
-                        // If not solidified yet, just transition
-                        StateManager.transition(AppState.NAVIGATION);
-                    }
                 });
             }
         };
