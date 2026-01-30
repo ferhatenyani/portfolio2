@@ -2501,7 +2501,7 @@
         </div>
 
         <!-- Trigger Button -->
-        <button id="cta-btn" class="group relative px-6 py-2.5 bg-transparent border border-zinc-900 hover:bg-zinc-900/10 text-zinc-900 text-xs md:text-sm font-medium tracking-wide rounded-full transition-all duration-300 ease-out flex items-center gap-2 animate-in" style="animation-delay: 2000ms; opacity: 0;">
+        <button id="cta-btn" class="group relative px-6 py-2.5 bg-transparent border border-zinc-900 hover:bg-zinc-900/10 text-zinc-900 text-xs md:text-sm font-medium tracking-wide rounded-full transition-all duration-300 ease-out flex items-center gap-2" style="opacity: 0; pointer-events: none;">
             <span class="relative z-10" data-i18n="hero.cta">Enter Portfolio</span>
             <i data-lucide="arrow-right" class="w-3.5 h-3.5 relative z-10 transition-transform duration-300 group-hover:translate-x-0.5" stroke-width="1.5"></i>
         </button>
@@ -4077,11 +4077,26 @@
                     }
                 });
 
-                // Fade in solid text
+                // Fade in solid text, then reveal CTA
                 gsap.to([textName, textRole], {
                     opacity: 1,
                     duration: 0.5,
-                    ease: 'power2.inOut'
+                    ease: 'power2.inOut',
+                    onComplete: () => {
+                        const ctaBtn = document.getElementById('cta-btn');
+                        gsap.fromTo(ctaBtn,
+                            { opacity: 0, y: 10 },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.6,
+                                ease: 'power3.out',
+                                onComplete: () => {
+                                    ctaBtn.style.pointerEvents = 'auto';
+                                }
+                            }
+                        );
+                    }
                 });
 
                 // Smoothly fade out particles as text fades in
@@ -4925,11 +4940,11 @@
                     textRole.textContent = I18nController.t(textRole.getAttribute('data-i18n'));
                 }
 
-                // Reset CTA button state
+                // Reset CTA button state (hidden and disabled until solidifyText completes)
                 ctaBtn.style.opacity = '0';
                 ctaBtn.style.filter = 'blur(0px)';
                 ctaBtn.style.transform = 'scale(1)';
-                ctaBtn.style.pointerEvents = 'auto';
+                ctaBtn.style.pointerEvents = 'none';
                 ctaBtn.classList.remove('animate-in');
 
                 // Initialize particles early so they're ready
@@ -4961,20 +4976,7 @@
                     onComplete: () => {
                         // Clear inline styles on hero layer - it's now fully visible
                         this.resetInlineStyles([heroLayer]);
-                        // Animate CTA button directly with GSAP (bypasses CSS animation-delay)
-                        gsap.fromTo(ctaBtn,
-                            { opacity: 0, y: 10 },
-                            {
-                                opacity: 1,
-                                y: 0,
-                                duration: 0.6,
-                                ease: 'power3.out',
-                                onComplete: () => {
-                                    // Clear inline styles on CTA button
-                                    this.resetInlineStyles([ctaBtn]);
-                                }
-                            }
-                        );
+                        // CTA button will be revealed by solidifyText() after animations complete
                         onComplete();
                     }
                 });
@@ -6348,6 +6350,10 @@
                 height = particleCanvas.height = apertureCanvas.height = window.innerHeight;
 
                 if (StateManager.current === AppState.HERO && !ParticleSystem.isDusting) {
+                    // Hide CTA until solidifyText completes again after re-formation
+                    const ctaBtn = document.getElementById('cta-btn');
+                    ctaBtn.style.opacity = '0';
+                    ctaBtn.style.pointerEvents = 'none';
                     ParticleSystem.initHeroState();
                     setTimeout(() => ParticleSystem.startTextFormation(), 100);
                 } else if (StateManager.current === AppState.NAVIGATION || StateManager.current === AppState.SECTION_OPEN) {
