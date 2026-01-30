@@ -4464,6 +4464,18 @@
                 gsap.killTweensOf('.zone-label');
             },
 
+            // Reset inline styles on transition elements to prevent state mismatch with CSS classes
+            resetInlineStyles(elements) {
+                const styleProps = ['opacity', 'filter', 'display', 'transform', 'pointerEvents'];
+                elements.forEach(el => {
+                    if (el) {
+                        styleProps.forEach(prop => {
+                            el.style[prop] = '';
+                        });
+                    }
+                });
+            },
+
             execute(fromState, toState, data, onComplete) {
                 const transitionKey = `${fromState}_to_${toState}`;
 
@@ -4541,11 +4553,21 @@
 
                         // Phase 2: After fade out, show nav content
                         const fadeOutComplete = () => {
+                                // Clear inline styles on introCta
+                                self.resetInlineStyles([introCta]);
+
+                                // Hide hero layer - keep display:none inline (CSS default is display:flex)
+                                // Clear other inline styles (opacity, filter) to prevent state mismatch
+                                heroLayer.style.display = 'none';
+                                heroLayer.style.opacity = '';
+                                heroLayer.style.filter = '';
+
                                 // Phase 3: Now initialize and show the nav content
                                 ParticleSystem.initNavigationState();
                                 ApertureSystem.initZoneRings();
 
                                 // Fade in nav layer with blur clearing
+                                // Note: Keep inline styles - CSS defaults are opacity:0, filter:blur(12px)
                                 gsap.to(navLayer, {
                                     opacity: 1,
                                     filter: 'blur(0px)',
@@ -4555,6 +4577,7 @@
                                 });
 
                                 // Zone labels fade in with upward motion
+                                // Note: Keep inline styles - CSS defaults are opacity:0, transform:translateY(8px)
                                 gsap.to('.zone-label', {
                                     opacity: 1,
                                     y: 0,
@@ -4606,7 +4629,10 @@
                         opacity: 1,
                         duration: 0.3,
                         delay: CONFIG.apertureDuration * 0.5,
-                        onStart: () => closeBtnProjects.classList.add('visible')
+                        onStart: () => closeBtnProjects.classList.add('visible'),
+                        onComplete: () => {
+                            closeBtnProjects.style.opacity = '';
+                        }
                     });
                 } else {
                     // Use main close button for other sections
@@ -4614,7 +4640,10 @@
                         opacity: 1,
                         duration: 0.3,
                         delay: CONFIG.apertureDuration * 0.5,
-                        onStart: () => closeBtn.classList.add('visible')
+                        onStart: () => closeBtn.classList.add('visible'),
+                        onComplete: () => {
+                            closeBtn.style.opacity = '';
+                        }
                     });
                 }
 
@@ -4771,13 +4800,19 @@
                     gsap.to(closeBtnProjects, {
                         opacity: 0,
                         duration: 0.2,
-                        onComplete: () => closeBtnProjects.classList.remove('visible')
+                        onComplete: () => {
+                            closeBtnProjects.classList.remove('visible');
+                            closeBtnProjects.style.opacity = '';
+                        }
                     });
                 } else {
                     gsap.to(closeBtn, {
                         opacity: 0,
                         duration: 0.2,
-                        onComplete: () => closeBtn.classList.remove('visible')
+                        onComplete: () => {
+                            closeBtn.classList.remove('visible');
+                            closeBtn.style.opacity = '';
+                        }
                     });
                 }
 
@@ -4803,6 +4838,7 @@
                     ApertureSystem.showZoneRings(true);
 
                     // Show zone labels with same timing as rings
+                    // Note: Keep inline styles - CSS defaults are opacity:0, transform:translateY(8px)
                     gsap.to(zoneLabels, {
                         opacity: 1,
                         y: 0,
@@ -4870,8 +4906,8 @@
                     ease: 'power2.inOut',
                     onComplete: () => {
                         navLayer.classList.remove('visible');
-                        navLayer.style.opacity = 0;
-                        navLayer.style.filter = 'blur(12px)';
+                        // Clear inline styles - let CSS class control visibility
+                        this.resetInlineStyles([navLayer]);
                     }
                 });
 
@@ -4886,10 +4922,21 @@
                         ParticleSystem.startTextFormation();
                     },
                     onComplete: () => {
+                        // Clear inline styles on hero layer - it's now fully visible
+                        this.resetInlineStyles([heroLayer]);
                         // Animate CTA button directly with GSAP (bypasses CSS animation-delay)
                         gsap.fromTo(ctaBtn,
                             { opacity: 0, y: 10 },
-                            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+                            {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.6,
+                                ease: 'power3.out',
+                                onComplete: () => {
+                                    // Clear inline styles on CTA button
+                                    this.resetInlineStyles([ctaBtn]);
+                                }
+                            }
                         );
                         onComplete();
                     }
@@ -4907,13 +4954,19 @@
                     gsap.to(closeBtnProjects, {
                         opacity: 0,
                         duration: 0.2,
-                        onComplete: () => closeBtnProjects.classList.remove('visible')
+                        onComplete: () => {
+                            closeBtnProjects.classList.remove('visible');
+                            closeBtnProjects.style.opacity = '';
+                        }
                     });
                 } else {
                     gsap.to(closeBtn, {
                         opacity: 0,
                         duration: 0.2,
-                        onComplete: () => closeBtn.classList.remove('visible')
+                        onComplete: () => {
+                            closeBtn.classList.remove('visible');
+                            closeBtn.style.opacity = '';
+                        }
                     });
                 }
 
