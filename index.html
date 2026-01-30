@@ -4420,8 +4420,9 @@
             },
 
             draw(ctx) {
-                // Draw zone rings when in navigation state (state is 0 or transitioning)
-                if (this.state < 1 && StateManager.current !== AppState.HERO) {
+                // Draw zone rings when in navigation state or while rings are still fading out
+                const hasVisibleRings = Object.keys(this.zoneRings).some(z => this.zoneRings[z].opacity > 0);
+                if (this.state < 1 && (StateManager.current !== AppState.HERO || hasVisibleRings)) {
                     this.drawZoneRings(ctx);
                 }
 
@@ -4918,18 +4919,19 @@
                 // Clear any pending hero-to-nav transition intervals
                 this.clearPendingTransitions();
 
-                // Reset zone rings opacity immediately to prevent flash on next nav transition
-                ApertureSystem.hideZoneRings(false);
+                // Fade out all zone rings simultaneously
+                Object.keys(ApertureSystem.zoneRings).forEach((zone) => {
+                    gsap.killTweensOf(ApertureSystem.zoneRings[zone]);
+                    gsap.to(ApertureSystem.zoneRings[zone], {
+                        opacity: 0,
+                        duration: 0.4,
+                        ease: 'power3.in'
+                    });
+                });
 
                 // Prepare hero layer early (hidden) so particles can initialize during nav fade
                 heroLayer.style.display = 'flex';
                 heroLayer.style.opacity = '0';
-
-                // Reset zone labels for next transition
-                document.querySelectorAll('.zone-label').forEach(label => {
-                    label.style.opacity = 0;
-                    label.style.transform = 'translateY(8px)';
-                });
 
                 // Reset text elements to hidden state and restore content
                 textName.style.opacity = '0';
@@ -4954,25 +4956,52 @@
                 // Initialize particles early so they're ready
                 ParticleSystem.initHeroState();
 
-                // Fade out nav layer with blur
+                const backBtn = document.getElementById('back-hero-btn');
+
+                // Stagger fade-out zone labels (exact reverse of heroToNavigation fade-in)
+                gsap.to('.zone-label', {
+                    opacity: 0,
+                    y: 8,
+                    duration: 0.4,
+                    stagger: 0.12,
+                    ease: 'power3.in'
+                });
+
+                // Fade out back button (matched to label timing)
+                gsap.to(backBtn, {
+                    opacity: 0,
+                    y: 8,
+                    duration: 0.4,
+                    ease: 'power3.in'
+                });
+
+                // Fade out nav layer with blur (exact reverse of heroToNavigation fade-in)
                 gsap.to(navLayer, {
                     opacity: 0,
                     filter: 'blur(12px)',
-                    duration: 0.6,
-                    ease: 'power2.inOut',
+                    duration: 0.8,
+                    delay: 0.1,
+                    ease: 'power2.in',
                     onComplete: () => {
                         navLayer.classList.remove('visible');
+                        // Reset zone labels now that nav is hidden (ready for next transition)
+                        document.querySelectorAll('.zone-label').forEach(label => {
+                            label.style.opacity = 0;
+                            label.style.transform = 'translateY(8px)';
+                        });
                         // Clear inline styles - let CSS class control visibility
                         this.resetInlineStyles([navLayer]);
+                        backBtn.style.opacity = '';
+                        backBtn.style.transform = '';
                     }
                 });
 
                 // Start fading in hero layer with slight overlap (starts before nav fully fades)
                 gsap.to(heroLayer, {
                     opacity: 1,
-                    duration: 0.8,
-                    delay: 0.3,
-                    ease: 'power2.out',
+                    duration: 1.0,
+                    delay: 0.35,
+                    ease: 'power2.inOut',
                     onStart: () => {
                         // Start text formation as hero fades in
                         ParticleSystem.startTextFormation();
