@@ -4437,8 +4437,33 @@
                 }
             },
 
+            // Kill all active GSAP tweens on transition elements to prevent animation conflicts
+            killActiveTransitionTweens() {
+                const navLayer = document.getElementById('nav-layer');
+                const heroLayer = document.getElementById('hero-layer');
+                const introCta = document.getElementById('intro-cta-overlay');
+                const closeBtn = document.getElementById('close-btn');
+                const closeBtnProjects = document.getElementById('close-btn-projects');
+                const zoneLabels = document.querySelectorAll('.zone-label');
+                const ctaBtn = document.getElementById('cta-btn');
+
+                // Kill tweens on all commonly animated transition elements
+                gsap.killTweensOf(navLayer);
+                gsap.killTweensOf(heroLayer);
+                gsap.killTweensOf(introCta);
+                gsap.killTweensOf(closeBtn);
+                gsap.killTweensOf(closeBtnProjects);
+                gsap.killTweensOf(zoneLabels);
+                gsap.killTweensOf(ctaBtn);
+                gsap.killTweensOf('.zone-label');
+            },
+
             execute(fromState, toState, data, onComplete) {
                 const transitionKey = `${fromState}_to_${toState}`;
+
+                // Kill any ongoing animations on transition elements before starting new transition
+                this.killActiveTransitionTweens();
+                this.clearPendingTransitions();
 
                 const transitions = {
                     'hero_to_navigation': this.heroToNavigation.bind(this),
