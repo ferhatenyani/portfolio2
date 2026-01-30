@@ -2530,7 +2530,7 @@
             <span class="zone-label" data-i18n="nav.contact">Contact</span>
         </div>
 
-        <!-- Back to Hero Button -->
+        <!-- Back to Hero Button --> 
         <button id="back-hero-btn" data-i18n="nav.backToStart">Back to Start</button>
     </div>
 
@@ -3250,6 +3250,16 @@
         // Initialize Lucide icons
         lucide.createIcons();
 
+        // Issue #7 fix: Helper to only reinitialize Lucide icons when needed
+        function refreshLucideIcons(container) {
+            // Check if there are any unrendered icons (i elements with data-lucide attribute)
+            const scope = container || document;
+            const pendingIcons = scope.querySelectorAll('i[data-lucide]');
+            if (pendingIcons.length > 0 && typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
         // ============================================
         // INTERNATIONALIZATION (i18n) CONTROLLER
         // ============================================
@@ -3502,7 +3512,7 @@
         // ============================================
         const CONFIG = {
             // Hero text sampling
-            textSampleGap: 1,
+            textSampleGap: 3,
             particleSize: 1.0,
             mouseRadius: 60,
 
@@ -3548,6 +3558,8 @@
             previous: null,
             activeSection: null,
             isTransitioning: false,
+            _transitionTimeoutId: null,
+            _transitionTimeoutMs: 10000, // Max transition time before force-unlock
 
             transition(newState, data = {}) {
                 if (this.isTransitioning && !data.force) return;
@@ -3557,7 +3569,27 @@
                 this.previous = this.current;
                 this.current = newState;
 
+                // Clear any existing timeout from a previous transition
+                if (this._transitionTimeoutId) {
+                    clearTimeout(this._transitionTimeoutId);
+                    this._transitionTimeoutId = null;
+                }
+
+                // Set a timeout fallback to unlock if callback chain fails
+                this._transitionTimeoutId = setTimeout(() => {
+                    if (this.isTransitioning) {
+                        console.warn('StateManager: Transition timeout reached, force-unlocking isTransitioning');
+                        this.isTransitioning = false;
+                    }
+                    this._transitionTimeoutId = null;
+                }, this._transitionTimeoutMs);
+
                 TransitionController.execute(this.previous, newState, data, () => {
+                    // Clear timeout since transition completed normally
+                    if (this._transitionTimeoutId) {
+                        clearTimeout(this._transitionTimeoutId);
+                        this._transitionTimeoutId = null;
+                    }
                     this.isTransitioning = false;
                 });
             },
@@ -3686,15 +3718,16 @@
                 this.wanderSpeed = 0.1 + Math.random() * 0.15;
             }
 
-            update(hoveredZone) {
+            update(hoveredZone, now) {
                 switch (this.mode) {
                     case 'wander':
                         this.updateWander();
                         break;
                     case 'form':
-                        this.updateFormation();
+                        this.updateFormation(now);
                         break;
                     case 'dust':
+                        if (this.alpha <= 0) break;
                         this.updateDust();
                         break;
                     case 'concentrate':
@@ -3719,7 +3752,7 @@
                 }
             }
 
-            updateFormation() {
+            updateFormation(now) {
                 const dx = mouse.x - this.x;
                 const dy = mouse.y - this.y;
                 const distance = Math.hypot(dx, dy);
@@ -3753,10 +3786,10 @@
 
                 // Handle opacity animation
                 if (this.fadeStartTime === null) {
-                    this.fadeStartTime = performance.now();
+                    this.fadeStartTime = now;
                 }
 
-                const elapsed = (performance.now() - this.fadeStartTime) / 1000; // Convert to seconds
+                const elapsed = (now - this.fadeStartTime) / 1000; // Convert to seconds
 
                 if (elapsed >= this.fadeDelay) {
                     // Calculate fade progress (0 to 1)
@@ -3869,6 +3902,9 @@
             explosionParticles: [],
             isForming: false,
             isDusting: false,
+            isSolidified: false,
+            formationCheckStartTime: null,
+            pulseScale: 1.0,
 
             init() {
                 this.particles = [];
@@ -3877,6 +3913,9 @@
                 this.explosionParticles = [];
                 this.isForming = false;
                 this.isDusting = false;
+                this.isSolidified = false;
+                this.formationCheckStartTime = null;
+                this.pulseScale = 1.0;
             },
 
             initHeroState() {
@@ -3893,13 +3932,41 @@
                     const rect = el.getBoundingClientRect();
                     const style = window.getComputedStyle(el);
 
+                    // Clear canvas before sampling
+                    textSamplingCtx.clearRect(0, 0, width, height);
+
+                    // Apply all text rendering properties to match DOM exactly
                     textSamplingCtx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
                     textSamplingCtx.fillStyle = 'white';
                     textSamplingCtx.textBaseline = 'top';
-                    textSamplingCtx.textAlign = 'center';
 
+                    // Apply letter spacing manually by drawing each character with spacing
+                    const letterSpacing = parseFloat(style.letterSpacing) || 0;
+                    const text = el.innerText;
                     const centerX = rect.left + rect.width / 2;
-                    textSamplingCtx.fillText(el.innerText, centerX, rect.top);
+
+                    if (letterSpacing && letterSpacing !== 0) {
+                        // Use LEFT alignment for manual character positioning
+                        textSamplingCtx.textAlign = 'left';
+
+                        // Calculate total width with letter spacing
+                        let totalWidth = 0;
+                        for (let i = 0; i < text.length; i++) {
+                            totalWidth += textSamplingCtx.measureText(text[i]).width;
+                            if (i < text.length - 1) totalWidth += letterSpacing;
+                        }
+
+                        // Draw each character with proper spacing (currentX is left edge)
+                        let currentX = centerX - totalWidth / 2;
+                        for (let i = 0; i < text.length; i++) {
+                            textSamplingCtx.fillText(text[i], currentX, rect.top);
+                            currentX += textSamplingCtx.measureText(text[i]).width + letterSpacing;
+                        }
+                    } else {
+                        // Use CENTER alignment for single fillText call
+                        textSamplingCtx.textAlign = 'center';
+                        textSamplingCtx.fillText(text, centerX, rect.top);
+                    }
 
                     const buffer = 20;
                     const scanLeft = Math.floor(Math.max(0, rect.left - buffer));
@@ -3972,6 +4039,118 @@
                 });
             },
 
+            checkFormationComplete() {
+                if (this.isSolidified || !this.isForming) return false;
+
+                // Count particles that are formed and visible
+                let formedCount = 0;
+                let totalCount = this.textParticles.length;
+
+                this.textParticles.forEach(p => {
+                    if (p.formed && p.alpha > p.baseAlpha * 0.8) {
+                        formedCount++;
+                    }
+                });
+
+                const formationPercentage = formedCount / totalCount;
+                return formationPercentage >= 0.75; // 75% completion threshold
+            },
+
+            solidifyText() {
+                if (this.isSolidified) return;
+                this.isSolidified = true;
+
+                const textName = document.getElementById('text-name');
+                const textRole = document.getElementById('text-role');
+
+                // Pulse animation for particles
+                gsap.to(this, {
+                    pulseScale: 1.05,
+                    duration: 0.15,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        gsap.to(this, {
+                            pulseScale: 1.0,
+                            duration: 0.2,
+                            ease: 'power2.inOut'
+                        });
+                    }
+                });
+
+                // Fade in solid text
+                gsap.to([textName, textRole], {
+                    opacity: 1,
+                    duration: 0.5,
+                    ease: 'power2.inOut'
+                });
+
+                // Smoothly fade out particles as text fades in
+                gsap.to(this.textParticles, {
+                    baseAlpha: 0,
+                    duration: 0.5,
+                    ease: 'power2.inOut',
+                    onUpdate: () => {
+                        // Smoothly reduce particle alpha
+                        this.textParticles.forEach(p => {
+                            p.alpha = p.baseAlpha;
+                        });
+                    }
+                });
+            },
+
+            reverseSolidification(onComplete) {
+                const textName = document.getElementById('text-name');
+                const textRole = document.getElementById('text-role');
+
+                // Fade out solid text (particles are already hidden)
+                gsap.to([textName, textRole], {
+                    opacity: 0,
+                    duration: 0.5,
+                    ease: 'power2.inOut',
+                    onComplete: () => {
+                        // Ensure text is completely hidden with inline style
+                        textName.style.opacity = '0';
+                        textRole.style.opacity = '0';
+                        textName.style.filter = 'blur(0px)';
+                        textRole.style.filter = 'blur(0px)';
+
+                        // Reset for next time
+                        this.isSolidified = false;
+
+                        if (onComplete) onComplete();
+                    }
+                });
+            },
+
+            // Simple fadeout animation for text elements
+            curtainWipeText(onComplete) {
+                const textName = document.getElementById('text-name');
+                const textRole = document.getElementById('text-role');
+
+                // Fade out with blur effect
+                gsap.to([textName, textRole], {
+                    opacity: 0,
+                    filter: 'blur(4px)',
+                    duration: 0.6,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        // Reset filter for next time
+                        textName.style.filter = 'blur(0px)';
+                        textRole.style.filter = 'blur(0px)';
+
+                        // Reset for next time
+                        this.isSolidified = false;
+
+                        if (onComplete) onComplete();
+                    }
+                });
+            },
+
+            // Legacy function name for backward compatibility
+            reverseTypewriter(onComplete) {
+                this.curtainWipeText(onComplete);
+            },
+
             createTextExplosion(text, x, y, fontSize) {
                 const tempCanvas = document.createElement('canvas');
                 const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
@@ -4024,22 +4203,54 @@
                 }
             },
 
-            update(hoveredZone) {
+            update(hoveredZone, now) {
                 this.particles.forEach(p => {
-                    p.update(hoveredZone);
+                    p.update(hoveredZone, now);
                 });
 
                 this.explosionParticles = this.explosionParticles.filter(p => p.alpha > 0);
                 this.explosionParticles.forEach(p => p.update());
+
+                // Check for formation completion
+                if (this.isForming && !this.isSolidified) {
+                    if (this.checkFormationComplete()) {
+                        if (!this.formationCheckStartTime) {
+                            this.formationCheckStartTime = now;
+                        } else if (now - this.formationCheckStartTime >= 300) {
+                            // 300ms = 0.3 seconds delay after formation complete
+                            this.solidifyText();
+                        }
+                    }
+                }
             },
 
             draw(ctx) {
-                this.particles.forEach(p => p.draw(ctx));
+                // Apply pulse scale if solidifying
+                if (this.pulseScale !== 1.0 && this.isForming) {
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+
+                    ctx.save();
+                    ctx.translate(centerX, centerY);
+                    ctx.scale(this.pulseScale, this.pulseScale);
+                    ctx.translate(-centerX, -centerY);
+
+                    this.particles.forEach(p => p.draw(ctx));
+
+                    ctx.restore();
+                } else {
+                    this.particles.forEach(p => p.draw(ctx));
+                }
+
                 this.explosionParticles.forEach(p => p.draw(ctx));
             },
 
             getActiveParticleCount() {
-                return this.particles.filter(p => p.alpha > 0).length;
+                let count = 0;
+                for (let i = 0; i < this.particles.length; i++) {
+                    if (this.particles[i].alpha > 0) count++;
+                }
+                return count;
             }
         };
 
@@ -4073,6 +4284,8 @@
                 const zones = Object.keys(this.zoneRings);
 
                 zones.forEach((zone, index) => {
+                    // Kill any existing GSAP tweens on this zone ring to prevent animation overlap
+                    gsap.killTweensOf(this.zoneRings[zone]);
                     this.zoneRings[zone].particles = [];
                     this.zoneRings[zone].opacity = 0; // Reset opacity
                     for (let i = 0; i < particlesPerRing; i++) {
@@ -4098,6 +4311,8 @@
                 const zones = Object.keys(this.zoneRings);
 
                 zones.forEach((zone, index) => {
+                    // Kill any existing GSAP tweens on this zone ring to prevent animation overlap
+                    gsap.killTweensOf(this.zoneRings[zone]);
                     if (animate) {
                         gsap.to(this.zoneRings[zone], {
                             opacity: 0,
@@ -4115,6 +4330,8 @@
                 const zones = Object.keys(this.zoneRings);
 
                 zones.forEach((zone, index) => {
+                    // Kill any existing GSAP tweens on this zone ring to prevent animation overlap
+                    gsap.killTweensOf(this.zoneRings[zone]);
                     if (animate) {
                         gsap.to(this.zoneRings[zone], {
                             opacity: 1,
@@ -4240,8 +4457,68 @@
         // TRANSITION CONTROLLER
         // ============================================
         const TransitionController = {
+            _heroToNavCheckDustInterval: null,
+
+            clearPendingTransitions() {
+                if (this._heroToNavCheckDustInterval) {
+                    clearInterval(this._heroToNavCheckDustInterval);
+                    this._heroToNavCheckDustInterval = null;
+                }
+                // Clear typewriter timeouts to prevent memory leaks and visual glitches
+                if (this._typewriterTimeoutId) {
+                    clearTimeout(this._typewriterTimeoutId);
+                    this._typewriterTimeoutId = null;
+                }
+                if (this._typewriterHoldTimeoutId) {
+                    clearTimeout(this._typewriterHoldTimeoutId);
+                    this._typewriterHoldTimeoutId = null;
+                }
+            },
+
+            // Kill all active GSAP tweens on transition elements to prevent animation conflicts
+            killActiveTransitionTweens() {
+                const navLayer = document.getElementById('nav-layer');
+                const heroLayer = document.getElementById('hero-layer');
+                const introCta = document.getElementById('intro-cta-overlay');
+                const closeBtn = document.getElementById('close-btn');
+                const closeBtnProjects = document.getElementById('close-btn-projects');
+                const zoneLabels = document.querySelectorAll('.zone-label');
+                const ctaBtn = document.getElementById('cta-btn');
+
+                // Kill tweens on all commonly animated transition elements
+                gsap.killTweensOf(navLayer);
+                gsap.killTweensOf(heroLayer);
+                gsap.killTweensOf(introCta);
+                gsap.killTweensOf(closeBtn);
+                gsap.killTweensOf(closeBtnProjects);
+                gsap.killTweensOf(zoneLabels);
+                gsap.killTweensOf(ctaBtn);
+                gsap.killTweensOf('.zone-label');
+
+                // Kill GSAP animations on ParticleSystem before particle arrays are replaced
+                gsap.killTweensOf(ParticleSystem);
+                ParticleSystem.textParticles.forEach(p => gsap.killTweensOf(p));
+                ParticleSystem.zoneParticles.forEach(p => gsap.killTweensOf(p));
+            },
+
+            // Reset inline styles on transition elements to prevent state mismatch with CSS classes
+            resetInlineStyles(elements) {
+                const styleProps = ['opacity', 'filter', 'display', 'transform', 'pointerEvents'];
+                elements.forEach(el => {
+                    if (el) {
+                        styleProps.forEach(prop => {
+                            el.style[prop] = '';
+                        });
+                    }
+                });
+            },
+
             execute(fromState, toState, data, onComplete) {
                 const transitionKey = `${fromState}_to_${toState}`;
+
+                // Kill any ongoing animations on transition elements before starting new transition
+                this.killActiveTransitionTweens();
+                this.clearPendingTransitions();
 
                 const transitions = {
                     'hero_to_navigation': this.heroToNavigation.bind(this),
@@ -4264,10 +4541,17 @@
                 const navLayer = document.getElementById('nav-layer');
                 const introCta = document.getElementById('intro-cta-overlay');
 
+                // Issue #5 fix: Reset formationCheckStartTime when leaving hero
+                ParticleSystem.formationCheckStartTime = null;
+
+                // Clear any existing interval from a previous interrupted transition
+                this.clearPendingTransitions();
+
                 // Wait for dust animation to nearly complete before showing navigation
-                const checkDust = setInterval(() => {
+                this._heroToNavCheckDustInterval = setInterval(() => {
                     if (ParticleSystem.getActiveParticleCount() < ParticleSystem.textParticles.length * 0.1) { // When 90% of particles have scattered
-                        clearInterval(checkDust);
+                        clearInterval(this._heroToNavCheckDustInterval);
+                        this._heroToNavCheckDustInterval = null;
 
                         navLayer.classList.add('visible');
 
@@ -4282,14 +4566,17 @@
                         let charIndex = 0;
                         const typeSpeed = 45; // ms per character
 
+                        const self = this;
                         const typeNextChar = () => {
                             if (charIndex < fullText.length) {
                                 introCta.textContent += fullText.charAt(charIndex);
                                 charIndex++;
-                                setTimeout(typeNextChar, typeSpeed);
+                                self._typewriterTimeoutId = setTimeout(typeNextChar, typeSpeed);
                             } else {
                                 // Typing complete - hold briefly then fade out
-                                setTimeout(() => {
+                                self._typewriterTimeoutId = null;
+                                self._typewriterHoldTimeoutId = setTimeout(() => {
+                                    self._typewriterHoldTimeoutId = null;
                                     introCta.classList.remove('typing');
                                     gsap.to(introCta, {
                                         opacity: 0,
@@ -4302,15 +4589,25 @@
                         };
 
                         // Start typing after a brief delay
-                        setTimeout(typeNextChar, 200);
+                        this._typewriterTimeoutId = setTimeout(typeNextChar, 200);
 
                         // Phase 2: After fade out, show nav content
                         const fadeOutComplete = () => {
+                                // Clear inline styles on introCta
+                                self.resetInlineStyles([introCta]);
+
+                                // Hide hero layer - keep display:none inline (CSS default is display:flex)
+                                // Clear other inline styles (opacity, filter) to prevent state mismatch
+                                heroLayer.style.display = 'none';
+                                heroLayer.style.opacity = '';
+                                heroLayer.style.filter = '';
+
                                 // Phase 3: Now initialize and show the nav content
                                 ParticleSystem.initNavigationState();
                                 ApertureSystem.initZoneRings();
 
                                 // Fade in nav layer with blur clearing
+                                // Note: Keep inline styles - CSS defaults are opacity:0, filter:blur(12px)
                                 gsap.to(navLayer, {
                                     opacity: 1,
                                     filter: 'blur(0px)',
@@ -4320,6 +4617,7 @@
                                 });
 
                                 // Zone labels fade in with upward motion
+                                // Note: Keep inline styles - CSS defaults are opacity:0, transform:translateY(8px)
                                 gsap.to('.zone-label', {
                                     opacity: 1,
                                     y: 0,
@@ -4371,7 +4669,10 @@
                         opacity: 1,
                         duration: 0.3,
                         delay: CONFIG.apertureDuration * 0.5,
-                        onStart: () => closeBtnProjects.classList.add('visible')
+                        onStart: () => closeBtnProjects.classList.add('visible'),
+                        onComplete: () => {
+                            closeBtnProjects.style.opacity = '';
+                        }
                     });
                 } else {
                     // Use main close button for other sections
@@ -4379,7 +4680,10 @@
                         opacity: 1,
                         duration: 0.3,
                         delay: CONFIG.apertureDuration * 0.5,
-                        onStart: () => closeBtn.classList.add('visible')
+                        onStart: () => closeBtn.classList.add('visible'),
+                        onComplete: () => {
+                            closeBtn.style.opacity = '';
+                        }
                     });
                 }
 
@@ -4536,19 +4840,29 @@
                     gsap.to(closeBtnProjects, {
                         opacity: 0,
                         duration: 0.2,
-                        onComplete: () => closeBtnProjects.classList.remove('visible')
+                        onComplete: () => {
+                            closeBtnProjects.classList.remove('visible');
+                            closeBtnProjects.style.opacity = '';
+                        }
                     });
                 } else {
                     gsap.to(closeBtn, {
                         opacity: 0,
                         duration: 0.2,
-                        onComplete: () => closeBtn.classList.remove('visible')
+                        onComplete: () => {
+                            closeBtn.classList.remove('visible');
+                            closeBtn.style.opacity = '';
+                        }
                     });
                 }
 
-                // Reset contact controller if leaving contact section
+                // Reset controllers if leaving their sections
                 if (sectionName === 'contact') {
                     ContactController.reset();
+                }
+                // Issue #6 fix: Reset skills section active state
+                if (sectionName === 'skills') {
+                    SkillsController.reset();
                 }
 
                 ApertureSystem.animateClose(CONFIG.apertureDuration, () => {
@@ -4568,6 +4882,7 @@
                     ApertureSystem.showZoneRings(true);
 
                     // Show zone labels with same timing as rings
+                    // Note: Keep inline styles - CSS defaults are opacity:0, transform:translateY(8px)
                     gsap.to(zoneLabels, {
                         opacity: 1,
                         y: 0,
@@ -4585,6 +4900,11 @@
                 const heroLayer = document.getElementById('hero-layer');
                 const navLayer = document.getElementById('nav-layer');
                 const ctaBtn = document.getElementById('cta-btn');
+                const textName = document.getElementById('text-name');
+                const textRole = document.getElementById('text-role');
+
+                // Clear any pending hero-to-nav transition intervals
+                this.clearPendingTransitions();
 
                 // Reset zone rings opacity immediately to prevent flash on next nav transition
                 ApertureSystem.hideZoneRings(false);
@@ -4599,8 +4919,22 @@
                     label.style.transform = 'translateY(8px)';
                 });
 
+                // Reset text elements to hidden state and restore content
+                textName.style.opacity = '0';
+                textName.style.filter = 'blur(0px)';
+                textRole.style.opacity = '0';
+                textRole.style.filter = 'blur(0px)';
+                // Restore text content (in case it was cleared by reverse typewriter)
+                if (textName.hasAttribute('data-i18n')) {
+                    textName.textContent = I18nController.t(textName.getAttribute('data-i18n'));
+                }
+                if (textRole.hasAttribute('data-i18n')) {
+                    textRole.textContent = I18nController.t(textRole.getAttribute('data-i18n'));
+                }
+
                 // Reset CTA button state
                 ctaBtn.style.opacity = '0';
+                ctaBtn.style.filter = 'blur(0px)';
                 ctaBtn.style.transform = 'scale(1)';
                 ctaBtn.style.pointerEvents = 'auto';
                 ctaBtn.classList.remove('animate-in');
@@ -4616,8 +4950,8 @@
                     ease: 'power2.inOut',
                     onComplete: () => {
                         navLayer.classList.remove('visible');
-                        navLayer.style.opacity = 0;
-                        navLayer.style.filter = 'blur(12px)';
+                        // Clear inline styles - let CSS class control visibility
+                        this.resetInlineStyles([navLayer]);
                     }
                 });
 
@@ -4632,10 +4966,21 @@
                         ParticleSystem.startTextFormation();
                     },
                     onComplete: () => {
+                        // Clear inline styles on hero layer - it's now fully visible
+                        this.resetInlineStyles([heroLayer]);
                         // Animate CTA button directly with GSAP (bypasses CSS animation-delay)
                         gsap.fromTo(ctaBtn,
                             { opacity: 0, y: 10 },
-                            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+                            {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.6,
+                                ease: 'power3.out',
+                                onComplete: () => {
+                                    // Clear inline styles on CTA button
+                                    this.resetInlineStyles([ctaBtn]);
+                                }
+                            }
                         );
                         onComplete();
                     }
@@ -4653,13 +4998,19 @@
                     gsap.to(closeBtnProjects, {
                         opacity: 0,
                         duration: 0.2,
-                        onComplete: () => closeBtnProjects.classList.remove('visible')
+                        onComplete: () => {
+                            closeBtnProjects.classList.remove('visible');
+                            closeBtnProjects.style.opacity = '';
+                        }
                     });
                 } else {
                     gsap.to(closeBtn, {
                         opacity: 0,
                         duration: 0.2,
-                        onComplete: () => closeBtn.classList.remove('visible')
+                        onComplete: () => {
+                            closeBtn.classList.remove('visible');
+                            closeBtn.style.opacity = '';
+                        }
                     });
                 }
 
@@ -4676,8 +5027,18 @@
         // ============================================
         const NavigationController = {
             hoveredZone: null,
+            _initialized: false,
+            _abortController: null,
 
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                // Create AbortController for cleanup
+                this._abortController = new AbortController();
+                const signal = this._abortController.signal;
+
                 const zones = document.querySelectorAll('.zone');
                 const closeBtn = document.getElementById('close-btn');
                 const closeBtnProjects = document.getElementById('close-btn-projects');
@@ -4686,31 +5047,31 @@
                 zones.forEach(zone => {
                     const sectionName = zone.dataset.section;
 
-                    zone.addEventListener('mouseenter', () => this.onZoneEnter(sectionName));
-                    zone.addEventListener('mouseleave', () => this.onZoneLeave(sectionName));
-                    zone.addEventListener('click', () => this.onZoneClick(sectionName));
+                    zone.addEventListener('mouseenter', () => this.onZoneEnter(sectionName), { signal });
+                    zone.addEventListener('mouseleave', () => this.onZoneLeave(sectionName), { signal });
+                    zone.addEventListener('click', () => this.onZoneClick(sectionName), { signal });
 
-                    zone.addEventListener('touchstart', () => this.onZoneEnter(sectionName), { passive: true });
+                    zone.addEventListener('touchstart', () => this.onZoneEnter(sectionName), { passive: true, signal });
                     zone.addEventListener('touchend', (e) => {
                         e.preventDefault();
                         this.onZoneClick(sectionName);
-                    });
+                    }, { signal });
                 });
 
-                closeBtn.addEventListener('click', () => this.closeSection());
+                closeBtn.addEventListener('click', () => this.closeSection(), { signal });
                 closeBtn.addEventListener('touchend', (e) => {
                     e.preventDefault();
                     this.closeSection();
-                });
+                }, { signal });
 
                 // Projects section close button
-                closeBtnProjects.addEventListener('click', () => this.closeSection());
+                closeBtnProjects.addEventListener('click', () => this.closeSection(), { signal });
                 closeBtnProjects.addEventListener('touchend', (e) => {
                     e.preventDefault();
                     this.closeSection();
-                });
+                }, { signal });
 
-                backHeroBtn.addEventListener('click', () => this.backToHero());
+                backHeroBtn.addEventListener('click', () => this.backToHero(), { signal });
 
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
@@ -4718,7 +5079,15 @@
                             this.closeSection();
                         }
                     }
-                });
+                }, { signal });
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                this._initialized = false;
             },
 
             onZoneEnter(sectionName) {
@@ -4766,26 +5135,52 @@
         // HERO CONTROLLER
         // ============================================
         const HeroController = {
+            _initialized: false,
+            _abortController: null,
+
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                this._abortController = new AbortController();
+                const signal = this._abortController.signal;
+
                 const ctaBtn = document.getElementById('cta-btn');
 
                 ctaBtn.addEventListener('click', () => {
                     // Remove the animate-in class to prevent interference with fade-out
                     ctaBtn.classList.remove('animate-in');
 
-                    // Add a slower, more subtle fade out animation to the CTA button
-                    gsap.to(ctaBtn, {
-                        opacity: 0,
-                        scale: 0.95,
-                        pointerEvents: 'none',
-                        duration: 1.0,
-                        ease: 'power2.out',
-                        overwrite: 'auto'
-                    });
+                    // Get text elements
+                    const textName = document.getElementById('text-name');
+                    const textRole = document.getElementById('text-role');
 
-                    ParticleSystem.startDusting();
-                    StateManager.transition(AppState.NAVIGATION);
-                });
+                    // Fade out all three elements simultaneously with blur
+                    gsap.to([ctaBtn, textName, textRole], {
+                        opacity: 0,
+                        filter: 'blur(4px)',
+                        pointerEvents: 'none',
+                        duration: 0.75,
+                        ease: 'power2.out',
+                        overwrite: 'auto',
+                        onComplete: () => {
+                            // Reset solidified state
+                            ParticleSystem.isSolidified = false;
+
+                            // Transition to navigation
+                            StateManager.transition(AppState.NAVIGATION);
+                        }
+                    });
+                }, { signal });
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                this._initialized = false;
             }
         };
 
@@ -4796,6 +5191,13 @@
             // State
             currentStep: 'email', // 'email', 'message', 'thanks'
             email: '',
+            _initialized: false,
+            _abortController: null,
+
+            // visualViewport state (Issue #3 fix)
+            _viewportInitialHeight: null,
+            _keyboardOpen: false,
+            _resizeTimeout: null,
 
             // DOM Elements
             emailInput: null,
@@ -4827,6 +5229,11 @@
             },
 
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                this._abortController = new AbortController();
                 // Get DOM elements
                 this.emailInput = document.getElementById('contact-email-input');
                 this.messageInput = document.getElementById('contact-message-input');
@@ -4846,6 +5253,8 @@
             },
 
             bindEvents() {
+                const signal = this._abortController.signal;
+
                 // Email input events
                 this.emailInput.addEventListener('input', (e) => {
                     this.updatePreview(e.target.value);
@@ -4855,7 +5264,7 @@
                     this.emailInput.classList.remove('invalid');
                     this.emailHint.classList.remove('error');
                     this.emailHint.textContent = I18nController.t('contact.emailHint');
-                });
+                }, { signal });
 
                 this.emailInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
@@ -4870,7 +5279,7 @@
                             NavigationController.closeSection();
                         }
                     }
-                });
+                }, { signal });
 
                 // Message input events
                 this.messageInput.addEventListener('input', (e) => {
@@ -4878,7 +5287,7 @@
                     this.adjustMessageFontSize();
                     this.autoResizeTextarea();
                     this.toggleSendButton();
-                });
+                }, { signal });
 
                 this.messageInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
@@ -4892,53 +5301,53 @@
                             NavigationController.closeSection();
                         }
                     }
-                });
+                }, { signal });
 
                 // Edit email button
                 this.emailEditBtn.addEventListener('click', () => {
                     this.goToEmailStep();
-                });
+                }, { signal });
 
                 // Send button
                 this.sendBtn.addEventListener('click', () => {
                     this.submitMessage();
-                });
+                }, { signal });
 
                 // Next button (email step)
                 this.nextBtn.addEventListener('click', () => {
                     this.validateAndProceed();
-                });
+                }, { signal });
 
                 // Reset button (in thank you view)
                 this.resetBtn.addEventListener('click', () => {
                     this.reset();
                     this.focusInput();
-                });
+                }, { signal });
 
                 // On touch devices: blur input when keyboard is dismissed
                 // This handles the case where user taps outside or dismisses keyboard
                 if (this.isTouchDevice()) {
                     if (window.visualViewport) {
-                        let initialHeight = window.visualViewport.height;
-                        let keyboardOpen = false;
-                        let resizeTimeout = null;
+                        // Issue #3 fix: Use instance properties instead of closure variables
+                        this._viewportInitialHeight = window.visualViewport.height;
+                        this._keyboardOpen = false;
 
                         window.visualViewport.addEventListener('resize', () => {
                             const currentHeight = window.visualViewport.height;
-                            const heightDiff = currentHeight - initialHeight;
+                            const heightDiff = currentHeight - this._viewportInitialHeight;
 
                             // Clear any pending timeout
-                            if (resizeTimeout) clearTimeout(resizeTimeout);
+                            if (this._resizeTimeout) clearTimeout(this._resizeTimeout);
 
                             // Debounce to wait for resize to stabilize
-                            resizeTimeout = setTimeout(() => {
+                            this._resizeTimeout = setTimeout(() => {
                                 // Keyboard opened (viewport shrunk significantly)
                                 if (heightDiff < -100) {
-                                    keyboardOpen = true;
+                                    this._keyboardOpen = true;
                                 }
                                 // Keyboard closed (viewport back to near original)
-                                else if (keyboardOpen && heightDiff > -50) {
-                                    keyboardOpen = false;
+                                else if (this._keyboardOpen && heightDiff > -50) {
+                                    this._keyboardOpen = false;
                                     // Blur the active input
                                     if (document.activeElement === this.emailInput ||
                                         document.activeElement === this.messageInput) {
@@ -4946,9 +5355,21 @@
                                     }
                                 }
                             }, 100);
-                        });
+                        }, { signal });
                     }
                 }
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                if (this._resizeTimeout) {
+                    clearTimeout(this._resizeTimeout);
+                    this._resizeTimeout = null;
+                }
+                this._initialized = false;
             },
 
             validateEmail(email) {
@@ -4999,8 +5420,8 @@
                         this.stepMessage.style.display = 'flex';
                         this.currentStep = 'message';
 
-                        // Reinitialize Lucide icons for the edit button
-                        lucide.createIcons();
+                        // Issue #7 fix: Only reinitialize if needed
+                        refreshLucideIcons(this.stepMessage);
 
                         gsap.fromTo(this.stepMessage,
                             { opacity: 0, y: 20 },
@@ -5169,8 +5590,8 @@
                             this.stepThanks.style.display = 'flex';
                             this.currentStep = 'thanks';
 
-                            // Reinitialize Lucide icons for the check icon
-                            lucide.createIcons();
+                            // Issue #7 fix: Only reinitialize if needed
+                            refreshLucideIcons(this.stepThanks);
 
                             gsap.fromTo(this.stepThanks,
                                 { opacity: 0, y: 20 },
@@ -5291,6 +5712,16 @@
                 this.stepEmail.style.opacity = 1;
                 this.stepMessage.style.display = 'none';
                 this.stepThanks.style.display = 'none';
+
+                // Issue #3 fix: Reset visualViewport state
+                if (this._resizeTimeout) {
+                    clearTimeout(this._resizeTimeout);
+                    this._resizeTimeout = null;
+                }
+                this._keyboardOpen = false;
+                if (window.visualViewport) {
+                    this._viewportInitialHeight = window.visualViewport.height;
+                }
             }
         };
 
@@ -5298,7 +5729,17 @@
         // SKILLS CONTROLLER
         // ============================================
         const SkillsController = {
+            _initialized: false,
+            _abortController: null,
+
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                this._abortController = new AbortController();
+                const signal = this._abortController.signal;
+
                 const categories = document.querySelectorAll('.skill-category');
 
                 categories.forEach(category => {
@@ -5311,12 +5752,12 @@
                             });
                             category.classList.toggle('active');
                         }
-                    });
+                    }, { signal });
 
                     // Handle touch events
                     category.addEventListener('touchstart', () => {
                         category.classList.add('active');
-                    }, { passive: true });
+                    }, { passive: true, signal });
 
                     category.addEventListener('touchend', () => {
                         // Keep active state on touch devices until another is tapped
@@ -5325,7 +5766,7 @@
                                 category.classList.remove('active');
                             }, 500);
                         }
-                    }, { passive: true });
+                    }, { passive: true, signal });
                 });
 
                 // Click outside to deactivate on mobile
@@ -5333,7 +5774,21 @@
                     if (!e.target.closest('.skill-category')) {
                         categories.forEach(c => c.classList.remove('active'));
                     }
-                });
+                }, { signal });
+            },
+
+            // Issue #6 fix: Reset active states when leaving section
+            reset() {
+                const categories = document.querySelectorAll('.skill-category');
+                categories.forEach(c => c.classList.remove('active'));
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                this._initialized = false;
             }
         };
 
@@ -5350,8 +5805,18 @@
             nextBtn: null,
             isAnimating: false,
             animationTimeout: null,
+            _initialized: false,
+            _abortController: null,
+            _lucideInitialized: false,
 
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                this._abortController = new AbortController();
+                const signal = this._abortController.signal;
+
                 this.track = document.getElementById('projects-track');
                 this.slides = document.querySelectorAll('.project-slide');
                 this.tabs = document.querySelectorAll('.project-tab');
@@ -5363,30 +5828,31 @@
                     tab.addEventListener('click', () => {
                         const index = parseInt(tab.dataset.project);
                         this.goToProject(index);
-                    });
+                    }, { signal });
                 });
 
                 // Arrow click handlers
-                this.prevBtn.addEventListener('click', () => this.prev());
-                this.nextBtn.addEventListener('click', () => this.next());
+                this.prevBtn.addEventListener('click', () => this.prev(), { signal });
+                this.nextBtn.addEventListener('click', () => this.next(), { signal });
 
                 // Keyboard navigation
                 document.addEventListener('keydown', (e) => {
                     if (StateManager.activeSection !== 'projects') return;
                     if (e.key === 'ArrowLeft') this.prev();
                     if (e.key === 'ArrowRight') this.next();
-                });
+                }, { signal });
 
                 // Gallery toggle for Project 2
-                this.initGalleryToggle();
+                this.initGalleryToggle(signal);
 
-                // Reinitialize Lucide icons for dynamically added content
-                if (typeof lucide !== 'undefined') {
+                // Issue #7 fix: Only initialize Lucide icons once
+                if (typeof lucide !== 'undefined' && !this._lucideInitialized) {
                     lucide.createIcons();
+                    this._lucideInitialized = true;
                 }
             },
 
-            initGalleryToggle() {
+            initGalleryToggle(signal) {
                 const toggleBtns = document.querySelectorAll('.gallery-toggle-btn');
 
                 // Project 2 case studies
@@ -5450,14 +5916,14 @@
                                 });
                             }
                         }
-                    });
+                    }, { signal });
                 });
 
                 // Initialize case study navigation
-                this.initCaseStudyNavigation();
+                this.initCaseStudyNavigation(signal);
             },
 
-            initCaseStudyNavigation() {
+            initCaseStudyNavigation(signal) {
                 // Handle navigation arrows
                 document.querySelectorAll('.case-study-nav').forEach(navBtn => {
                     navBtn.addEventListener('click', () => {
@@ -5486,7 +5952,7 @@
                         }
 
                         this.updateCaseStudyDots(scrollId, newIndex);
-                    });
+                    }, { signal });
                 });
 
                 // Handle progress dots
@@ -5508,11 +5974,11 @@
                             }
 
                             this.updateCaseStudyDots(scrollId, index);
-                        });
+                        }, { signal });
                     });
                 });
 
-                // Handle scroll updates for progress dots
+                // Issue #4 fix: Handle scroll updates for progress dots with signal
                 document.querySelectorAll('.case-study-scroll').forEach(scrollContainer => {
                     let scrollTimeout;
                     scrollContainer.addEventListener('scroll', () => {
@@ -5524,7 +5990,7 @@
                             const currentIndex = Math.round(currentScroll / panelSize);
                             this.updateCaseStudyDots(scrollContainer.id, currentIndex);
                         }, 50);
-                    });
+                    }, { signal });
                 });
             },
 
@@ -5585,17 +6051,32 @@
                 // Update arrow states
                 this.updateArrows();
 
-                // Reinitialize Lucide icons in case they didn't render
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
+                // Issue #7 fix: Only reinitialize Lucide icons if needed
+                refreshLucideIcons(this.slides[index]);
 
-                // Reset animation lock after fade transition completes (matches 0.6s CSS transition)
-                // Using stored timeout reference so we can clear it if needed
-                this.animationTimeout = setTimeout(() => {
+                // Reset animation lock when CSS transition actually ends
+                // Use transitionend event instead of fixed timeout to stay in sync with CSS
+                const activeSlide = this.slides[index];
+
+                const onTransitionEnd = (e) => {
+                    // Only respond to opacity transitions on the slide itself
+                    if (e.propertyName !== 'opacity' || e.target !== activeSlide) return;
+
+                    activeSlide.removeEventListener('transitionend', onTransitionEnd);
+                    clearTimeout(this.animationTimeout);
                     this.isAnimating = false;
                     this.animationTimeout = null;
-                }, 600);
+                };
+
+                activeSlide.addEventListener('transitionend', onTransitionEnd);
+
+                // Fallback timeout in case transitionend doesn't fire (e.g., display:none, no transition)
+                // Set slightly longer than expected transition to avoid race conditions
+                this.animationTimeout = setTimeout(() => {
+                    activeSlide.removeEventListener('transitionend', onTransitionEnd);
+                    this.isAnimating = false;
+                    this.animationTimeout = null;
+                }, 800);
             },
 
             prev() {
@@ -5671,9 +6152,14 @@
                 const project3AdminView = document.getElementById('project3-admin-view');
 
                 if (project3UserView && project3AdminView) {
+                    // Issue #8 fix: Kill any running GSAP animations before resetting
+                    gsap.killTweensOf(project3UserView);
+                    gsap.killTweensOf(project3AdminView);
+
                     project3UserView.style.display = 'block';
                     project3UserView.style.opacity = '1';
                     project3AdminView.style.display = 'none';
+                    project3AdminView.style.opacity = '';
                 }
 
                 // Reset all toggle buttons to user view active state
@@ -5681,6 +6167,18 @@
                 toggleBtns.forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.view === 'user');
                 });
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                if (this.animationTimeout) {
+                    clearTimeout(this.animationTimeout);
+                    this.animationTimeout = null;
+                }
+                this._initialized = false;
             },
 
             // Animate content in when section opens
@@ -5752,16 +6250,57 @@
         // ============================================
         // MAIN ANIMATION LOOP
         // ============================================
-        function animate() {
-            requestAnimationFrame(animate);
+        // Issue #2 fix: Add visibility tracking and state-aware throttling
+        let animationFrameId = null;
+        let isDocumentVisible = true;
+        let lastAnimationTime = 0;
+        const MIN_FRAME_TIME = 16; // ~60fps cap
+
+        // Handle visibility changes to pause/resume animation
+        document.addEventListener('visibilitychange', () => {
+            isDocumentVisible = !document.hidden;
+            if (isDocumentVisible && !animationFrameId) {
+                lastAnimationTime = performance.now();
+                animationFrameId = requestAnimationFrame(animate);
+            }
+        });
+
+        function animate(timestamp) {
+            // Issue #2 fix: Stop loop when document is hidden
+            if (!isDocumentVisible) {
+                animationFrameId = null;
+                return;
+            }
+
+            animationFrameId = requestAnimationFrame(animate);
+
+            // Issue #2 fix: Throttle frame rate when in inactive sections
+            const deltaTime = timestamp - lastAnimationTime;
+            const currentState = StateManager.current;
+            const isInSection = currentState === AppState.SECTION_OPEN;
+            const hasExplosionParticles = ParticleSystem.explosionParticles.length > 0;
+
+            // Skip frame if in section with no active animations (throttle to ~15fps)
+            // Keep full speed during aperture animations
+            if (isInSection && !hasExplosionParticles && !ApertureSystem.isAnimating && deltaTime < 66) {
+                return;
+            }
+
+            // Normal frame rate throttling
+            if (deltaTime < MIN_FRAME_TIME) {
+                return;
+            }
+
+            lastAnimationTime = timestamp;
 
             particleCtx.clearRect(0, 0, width, height);
             apertureCtx.clearRect(0, 0, width, height);
 
             const hoveredZone = NavigationController.hoveredZone;
+            const now = performance.now();
 
             if (ApertureSystem.state < 1) {
-                ParticleSystem.update(hoveredZone);
+                ParticleSystem.update(hoveredZone, now);
                 ParticleSystem.draw(particleCtx);
             }
 
@@ -5797,7 +6336,8 @@
             ProjectsController.init();
 
             ParticleSystem.initHeroState();
-            animate();
+            lastAnimationTime = performance.now();
+            animationFrameId = requestAnimationFrame(animate);
 
             document.fonts.ready.then(() => {
                 ParticleSystem.initHeroState();
