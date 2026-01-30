@@ -4789,6 +4789,9 @@
                         if (sectionName === 'contact') {
                             ContactController.reset();
                         }
+                        if (sectionName === 'skills') {
+                            SkillsController.reset();
+                        }
 
                         section.classList.remove('active');
                         zones.forEach(z => z.style.pointerEvents = 'auto');
@@ -4820,24 +4823,26 @@
                     });
                 };
 
-                // Skills section has different structure - no .section-content
+                // Fade out the section content as a single unit,
+                // then chain the aperture close so content is fully gone
+                // before particles become visible
                 if (sectionName === 'skills') {
-                    const skillCategories = section.querySelectorAll('.skill-category');
-
-                    gsap.to([...skillCategories].reverse(), {
+                    gsap.to(section.querySelector('.skills-content'), {
                         opacity: 0,
                         y: -20,
-                        duration: 0.3,
-                        stagger: 0.05,
-                        ease: 'power2.in'
+                        duration: 0.15,
+                        ease: 'power2.in',
+                        onComplete: closeAperture
                     });
                 } else if (sectionName === 'projects') {
-                    // Projects section has custom carousel layout
-                    ProjectsController.animateOut();
+                    gsap.to(section.querySelector('.section-content'), {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.15,
+                        ease: 'power2.in',
+                        onComplete: closeAperture
+                    });
                 } else if (sectionName === 'contact') {
-                    // Fade out the currently visible step as a single unit,
-                    // then chain the aperture close so content is fully gone
-                    // before particles become visible
                     const visibleStep = ContactController.currentStep === 'email'
                         ? ContactController.stepEmail
                         : ContactController.currentStep === 'message'
@@ -4852,31 +4857,13 @@
                         onComplete: closeAperture
                     });
                 } else {
-                    const content = section.querySelector('.section-content');
-                    const h2 = content.querySelector('h2');
-                    const p = content.querySelector('p');
-
-                    // If about section, animate all paragraphs and info grid out
-                    if (sectionName === 'about') {
-                        const allParagraphs = content.querySelectorAll('p');
-                        const infoGrid = content.querySelector('.about-info-grid');
-
-                        gsap.to([...allParagraphs, infoGrid, h2].reverse(), {
-                            opacity: 0,
-                            y: -20,
-                            duration: 0.3,
-                            stagger: 0.05,
-                            ease: 'power2.in'
-                        });
-                    } else {
-                        gsap.to([p, h2], {
-                            opacity: 0,
-                            y: -20,
-                            duration: 0.3,
-                            stagger: 0.1,
-                            ease: 'power2.in'
-                        });
-                    }
+                    gsap.to(section.querySelector('.section-content'), {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.15,
+                        ease: 'power2.in',
+                        onComplete: closeAperture
+                    });
                 }
 
                 // Hide appropriate close button based on section
@@ -4900,16 +4887,6 @@
                     });
                 }
 
-                // Issue #6 fix: Reset skills section active state
-                if (sectionName === 'skills') {
-                    SkillsController.reset();
-                }
-
-                // For non-contact sections, start aperture close immediately
-                // (contact chains it after its content fade completes)
-                if (sectionName !== 'contact') {
-                    closeAperture();
-                }
             },
 
             navigationToHero(data, onComplete) {
