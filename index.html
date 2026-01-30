@@ -3250,6 +3250,16 @@
         // Initialize Lucide icons
         lucide.createIcons();
 
+        // Issue #7 fix: Helper to only reinitialize Lucide icons when needed
+        function refreshLucideIcons(container) {
+            // Check if there are any unrendered icons (i elements with data-lucide attribute)
+            const scope = container || document;
+            const pendingIcons = scope.querySelectorAll('i[data-lucide]');
+            if (pendingIcons.length > 0 && typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
         // ============================================
         // INTERNATIONALIZATION (i18n) CONTROLLER
         // ============================================
@@ -4531,6 +4541,9 @@
                 const navLayer = document.getElementById('nav-layer');
                 const introCta = document.getElementById('intro-cta-overlay');
 
+                // Issue #5 fix: Reset formationCheckStartTime when leaving hero
+                ParticleSystem.formationCheckStartTime = null;
+
                 // Clear any existing interval from a previous interrupted transition
                 this.clearPendingTransitions();
 
@@ -4843,9 +4856,13 @@
                     });
                 }
 
-                // Reset contact controller if leaving contact section
+                // Reset controllers if leaving their sections
                 if (sectionName === 'contact') {
                     ContactController.reset();
+                }
+                // Issue #6 fix: Reset skills section active state
+                if (sectionName === 'skills') {
+                    SkillsController.reset();
                 }
 
                 ApertureSystem.animateClose(CONFIG.apertureDuration, () => {
@@ -5010,8 +5027,18 @@
         // ============================================
         const NavigationController = {
             hoveredZone: null,
+            _initialized: false,
+            _abortController: null,
 
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                // Create AbortController for cleanup
+                this._abortController = new AbortController();
+                const signal = this._abortController.signal;
+
                 const zones = document.querySelectorAll('.zone');
                 const closeBtn = document.getElementById('close-btn');
                 const closeBtnProjects = document.getElementById('close-btn-projects');
@@ -5020,31 +5047,31 @@
                 zones.forEach(zone => {
                     const sectionName = zone.dataset.section;
 
-                    zone.addEventListener('mouseenter', () => this.onZoneEnter(sectionName));
-                    zone.addEventListener('mouseleave', () => this.onZoneLeave(sectionName));
-                    zone.addEventListener('click', () => this.onZoneClick(sectionName));
+                    zone.addEventListener('mouseenter', () => this.onZoneEnter(sectionName), { signal });
+                    zone.addEventListener('mouseleave', () => this.onZoneLeave(sectionName), { signal });
+                    zone.addEventListener('click', () => this.onZoneClick(sectionName), { signal });
 
-                    zone.addEventListener('touchstart', () => this.onZoneEnter(sectionName), { passive: true });
+                    zone.addEventListener('touchstart', () => this.onZoneEnter(sectionName), { passive: true, signal });
                     zone.addEventListener('touchend', (e) => {
                         e.preventDefault();
                         this.onZoneClick(sectionName);
-                    });
+                    }, { signal });
                 });
 
-                closeBtn.addEventListener('click', () => this.closeSection());
+                closeBtn.addEventListener('click', () => this.closeSection(), { signal });
                 closeBtn.addEventListener('touchend', (e) => {
                     e.preventDefault();
                     this.closeSection();
-                });
+                }, { signal });
 
                 // Projects section close button
-                closeBtnProjects.addEventListener('click', () => this.closeSection());
+                closeBtnProjects.addEventListener('click', () => this.closeSection(), { signal });
                 closeBtnProjects.addEventListener('touchend', (e) => {
                     e.preventDefault();
                     this.closeSection();
-                });
+                }, { signal });
 
-                backHeroBtn.addEventListener('click', () => this.backToHero());
+                backHeroBtn.addEventListener('click', () => this.backToHero(), { signal });
 
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
@@ -5052,7 +5079,15 @@
                             this.closeSection();
                         }
                     }
-                });
+                }, { signal });
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                this._initialized = false;
             },
 
             onZoneEnter(sectionName) {
@@ -5100,7 +5135,17 @@
         // HERO CONTROLLER
         // ============================================
         const HeroController = {
+            _initialized: false,
+            _abortController: null,
+
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                this._abortController = new AbortController();
+                const signal = this._abortController.signal;
+
                 const ctaBtn = document.getElementById('cta-btn');
 
                 ctaBtn.addEventListener('click', () => {
@@ -5127,7 +5172,15 @@
                             StateManager.transition(AppState.NAVIGATION);
                         }
                     });
-                });
+                }, { signal });
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                this._initialized = false;
             }
         };
 
@@ -5138,6 +5191,13 @@
             // State
             currentStep: 'email', // 'email', 'message', 'thanks'
             email: '',
+            _initialized: false,
+            _abortController: null,
+
+            // visualViewport state (Issue #3 fix)
+            _viewportInitialHeight: null,
+            _keyboardOpen: false,
+            _resizeTimeout: null,
 
             // DOM Elements
             emailInput: null,
@@ -5169,6 +5229,11 @@
             },
 
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                this._abortController = new AbortController();
                 // Get DOM elements
                 this.emailInput = document.getElementById('contact-email-input');
                 this.messageInput = document.getElementById('contact-message-input');
@@ -5188,6 +5253,8 @@
             },
 
             bindEvents() {
+                const signal = this._abortController.signal;
+
                 // Email input events
                 this.emailInput.addEventListener('input', (e) => {
                     this.updatePreview(e.target.value);
@@ -5197,7 +5264,7 @@
                     this.emailInput.classList.remove('invalid');
                     this.emailHint.classList.remove('error');
                     this.emailHint.textContent = I18nController.t('contact.emailHint');
-                });
+                }, { signal });
 
                 this.emailInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
@@ -5212,7 +5279,7 @@
                             NavigationController.closeSection();
                         }
                     }
-                });
+                }, { signal });
 
                 // Message input events
                 this.messageInput.addEventListener('input', (e) => {
@@ -5220,7 +5287,7 @@
                     this.adjustMessageFontSize();
                     this.autoResizeTextarea();
                     this.toggleSendButton();
-                });
+                }, { signal });
 
                 this.messageInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
@@ -5234,53 +5301,53 @@
                             NavigationController.closeSection();
                         }
                     }
-                });
+                }, { signal });
 
                 // Edit email button
                 this.emailEditBtn.addEventListener('click', () => {
                     this.goToEmailStep();
-                });
+                }, { signal });
 
                 // Send button
                 this.sendBtn.addEventListener('click', () => {
                     this.submitMessage();
-                });
+                }, { signal });
 
                 // Next button (email step)
                 this.nextBtn.addEventListener('click', () => {
                     this.validateAndProceed();
-                });
+                }, { signal });
 
                 // Reset button (in thank you view)
                 this.resetBtn.addEventListener('click', () => {
                     this.reset();
                     this.focusInput();
-                });
+                }, { signal });
 
                 // On touch devices: blur input when keyboard is dismissed
                 // This handles the case where user taps outside or dismisses keyboard
                 if (this.isTouchDevice()) {
                     if (window.visualViewport) {
-                        let initialHeight = window.visualViewport.height;
-                        let keyboardOpen = false;
-                        let resizeTimeout = null;
+                        // Issue #3 fix: Use instance properties instead of closure variables
+                        this._viewportInitialHeight = window.visualViewport.height;
+                        this._keyboardOpen = false;
 
                         window.visualViewport.addEventListener('resize', () => {
                             const currentHeight = window.visualViewport.height;
-                            const heightDiff = currentHeight - initialHeight;
+                            const heightDiff = currentHeight - this._viewportInitialHeight;
 
                             // Clear any pending timeout
-                            if (resizeTimeout) clearTimeout(resizeTimeout);
+                            if (this._resizeTimeout) clearTimeout(this._resizeTimeout);
 
                             // Debounce to wait for resize to stabilize
-                            resizeTimeout = setTimeout(() => {
+                            this._resizeTimeout = setTimeout(() => {
                                 // Keyboard opened (viewport shrunk significantly)
                                 if (heightDiff < -100) {
-                                    keyboardOpen = true;
+                                    this._keyboardOpen = true;
                                 }
                                 // Keyboard closed (viewport back to near original)
-                                else if (keyboardOpen && heightDiff > -50) {
-                                    keyboardOpen = false;
+                                else if (this._keyboardOpen && heightDiff > -50) {
+                                    this._keyboardOpen = false;
                                     // Blur the active input
                                     if (document.activeElement === this.emailInput ||
                                         document.activeElement === this.messageInput) {
@@ -5288,9 +5355,21 @@
                                     }
                                 }
                             }, 100);
-                        });
+                        }, { signal });
                     }
                 }
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                if (this._resizeTimeout) {
+                    clearTimeout(this._resizeTimeout);
+                    this._resizeTimeout = null;
+                }
+                this._initialized = false;
             },
 
             validateEmail(email) {
@@ -5341,8 +5420,8 @@
                         this.stepMessage.style.display = 'flex';
                         this.currentStep = 'message';
 
-                        // Reinitialize Lucide icons for the edit button
-                        lucide.createIcons();
+                        // Issue #7 fix: Only reinitialize if needed
+                        refreshLucideIcons(this.stepMessage);
 
                         gsap.fromTo(this.stepMessage,
                             { opacity: 0, y: 20 },
@@ -5511,8 +5590,8 @@
                             this.stepThanks.style.display = 'flex';
                             this.currentStep = 'thanks';
 
-                            // Reinitialize Lucide icons for the check icon
-                            lucide.createIcons();
+                            // Issue #7 fix: Only reinitialize if needed
+                            refreshLucideIcons(this.stepThanks);
 
                             gsap.fromTo(this.stepThanks,
                                 { opacity: 0, y: 20 },
@@ -5633,6 +5712,16 @@
                 this.stepEmail.style.opacity = 1;
                 this.stepMessage.style.display = 'none';
                 this.stepThanks.style.display = 'none';
+
+                // Issue #3 fix: Reset visualViewport state
+                if (this._resizeTimeout) {
+                    clearTimeout(this._resizeTimeout);
+                    this._resizeTimeout = null;
+                }
+                this._keyboardOpen = false;
+                if (window.visualViewport) {
+                    this._viewportInitialHeight = window.visualViewport.height;
+                }
             }
         };
 
@@ -5640,7 +5729,17 @@
         // SKILLS CONTROLLER
         // ============================================
         const SkillsController = {
+            _initialized: false,
+            _abortController: null,
+
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                this._abortController = new AbortController();
+                const signal = this._abortController.signal;
+
                 const categories = document.querySelectorAll('.skill-category');
 
                 categories.forEach(category => {
@@ -5653,12 +5752,12 @@
                             });
                             category.classList.toggle('active');
                         }
-                    });
+                    }, { signal });
 
                     // Handle touch events
                     category.addEventListener('touchstart', () => {
                         category.classList.add('active');
-                    }, { passive: true });
+                    }, { passive: true, signal });
 
                     category.addEventListener('touchend', () => {
                         // Keep active state on touch devices until another is tapped
@@ -5667,7 +5766,7 @@
                                 category.classList.remove('active');
                             }, 500);
                         }
-                    }, { passive: true });
+                    }, { passive: true, signal });
                 });
 
                 // Click outside to deactivate on mobile
@@ -5675,7 +5774,21 @@
                     if (!e.target.closest('.skill-category')) {
                         categories.forEach(c => c.classList.remove('active'));
                     }
-                });
+                }, { signal });
+            },
+
+            // Issue #6 fix: Reset active states when leaving section
+            reset() {
+                const categories = document.querySelectorAll('.skill-category');
+                categories.forEach(c => c.classList.remove('active'));
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                this._initialized = false;
             }
         };
 
@@ -5692,8 +5805,18 @@
             nextBtn: null,
             isAnimating: false,
             animationTimeout: null,
+            _initialized: false,
+            _abortController: null,
+            _lucideInitialized: false,
 
             init() {
+                // Prevent duplicate initialization
+                if (this._initialized) return;
+                this._initialized = true;
+
+                this._abortController = new AbortController();
+                const signal = this._abortController.signal;
+
                 this.track = document.getElementById('projects-track');
                 this.slides = document.querySelectorAll('.project-slide');
                 this.tabs = document.querySelectorAll('.project-tab');
@@ -5705,30 +5828,31 @@
                     tab.addEventListener('click', () => {
                         const index = parseInt(tab.dataset.project);
                         this.goToProject(index);
-                    });
+                    }, { signal });
                 });
 
                 // Arrow click handlers
-                this.prevBtn.addEventListener('click', () => this.prev());
-                this.nextBtn.addEventListener('click', () => this.next());
+                this.prevBtn.addEventListener('click', () => this.prev(), { signal });
+                this.nextBtn.addEventListener('click', () => this.next(), { signal });
 
                 // Keyboard navigation
                 document.addEventListener('keydown', (e) => {
                     if (StateManager.activeSection !== 'projects') return;
                     if (e.key === 'ArrowLeft') this.prev();
                     if (e.key === 'ArrowRight') this.next();
-                });
+                }, { signal });
 
                 // Gallery toggle for Project 2
-                this.initGalleryToggle();
+                this.initGalleryToggle(signal);
 
-                // Reinitialize Lucide icons for dynamically added content
-                if (typeof lucide !== 'undefined') {
+                // Issue #7 fix: Only initialize Lucide icons once
+                if (typeof lucide !== 'undefined' && !this._lucideInitialized) {
                     lucide.createIcons();
+                    this._lucideInitialized = true;
                 }
             },
 
-            initGalleryToggle() {
+            initGalleryToggle(signal) {
                 const toggleBtns = document.querySelectorAll('.gallery-toggle-btn');
 
                 // Project 2 case studies
@@ -5792,14 +5916,14 @@
                                 });
                             }
                         }
-                    });
+                    }, { signal });
                 });
 
                 // Initialize case study navigation
-                this.initCaseStudyNavigation();
+                this.initCaseStudyNavigation(signal);
             },
 
-            initCaseStudyNavigation() {
+            initCaseStudyNavigation(signal) {
                 // Handle navigation arrows
                 document.querySelectorAll('.case-study-nav').forEach(navBtn => {
                     navBtn.addEventListener('click', () => {
@@ -5828,7 +5952,7 @@
                         }
 
                         this.updateCaseStudyDots(scrollId, newIndex);
-                    });
+                    }, { signal });
                 });
 
                 // Handle progress dots
@@ -5850,11 +5974,11 @@
                             }
 
                             this.updateCaseStudyDots(scrollId, index);
-                        });
+                        }, { signal });
                     });
                 });
 
-                // Handle scroll updates for progress dots
+                // Issue #4 fix: Handle scroll updates for progress dots with signal
                 document.querySelectorAll('.case-study-scroll').forEach(scrollContainer => {
                     let scrollTimeout;
                     scrollContainer.addEventListener('scroll', () => {
@@ -5866,7 +5990,7 @@
                             const currentIndex = Math.round(currentScroll / panelSize);
                             this.updateCaseStudyDots(scrollContainer.id, currentIndex);
                         }, 50);
-                    });
+                    }, { signal });
                 });
             },
 
@@ -5927,10 +6051,8 @@
                 // Update arrow states
                 this.updateArrows();
 
-                // Reinitialize Lucide icons in case they didn't render
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
+                // Issue #7 fix: Only reinitialize Lucide icons if needed
+                refreshLucideIcons(this.slides[index]);
 
                 // Reset animation lock when CSS transition actually ends
                 // Use transitionend event instead of fixed timeout to stay in sync with CSS
@@ -6030,9 +6152,14 @@
                 const project3AdminView = document.getElementById('project3-admin-view');
 
                 if (project3UserView && project3AdminView) {
+                    // Issue #8 fix: Kill any running GSAP animations before resetting
+                    gsap.killTweensOf(project3UserView);
+                    gsap.killTweensOf(project3AdminView);
+
                     project3UserView.style.display = 'block';
                     project3UserView.style.opacity = '1';
                     project3AdminView.style.display = 'none';
+                    project3AdminView.style.opacity = '';
                 }
 
                 // Reset all toggle buttons to user view active state
@@ -6040,6 +6167,18 @@
                 toggleBtns.forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.view === 'user');
                 });
+            },
+
+            destroy() {
+                if (this._abortController) {
+                    this._abortController.abort();
+                    this._abortController = null;
+                }
+                if (this.animationTimeout) {
+                    clearTimeout(this.animationTimeout);
+                    this.animationTimeout = null;
+                }
+                this._initialized = false;
             },
 
             // Animate content in when section opens
@@ -6111,8 +6250,48 @@
         // ============================================
         // MAIN ANIMATION LOOP
         // ============================================
-        function animate() {
-            requestAnimationFrame(animate);
+        // Issue #2 fix: Add visibility tracking and state-aware throttling
+        let animationFrameId = null;
+        let isDocumentVisible = true;
+        let lastAnimationTime = 0;
+        const MIN_FRAME_TIME = 16; // ~60fps cap
+
+        // Handle visibility changes to pause/resume animation
+        document.addEventListener('visibilitychange', () => {
+            isDocumentVisible = !document.hidden;
+            if (isDocumentVisible && !animationFrameId) {
+                lastAnimationTime = performance.now();
+                animationFrameId = requestAnimationFrame(animate);
+            }
+        });
+
+        function animate(timestamp) {
+            // Issue #2 fix: Stop loop when document is hidden
+            if (!isDocumentVisible) {
+                animationFrameId = null;
+                return;
+            }
+
+            animationFrameId = requestAnimationFrame(animate);
+
+            // Issue #2 fix: Throttle frame rate when in inactive sections
+            const deltaTime = timestamp - lastAnimationTime;
+            const currentState = StateManager.current;
+            const isInSection = currentState === AppState.SECTION_OPEN;
+            const hasExplosionParticles = ParticleSystem.explosionParticles.length > 0;
+
+            // Skip frame if in section with no active animations (throttle to ~15fps)
+            // Keep full speed during aperture animations
+            if (isInSection && !hasExplosionParticles && !ApertureSystem.isAnimating && deltaTime < 66) {
+                return;
+            }
+
+            // Normal frame rate throttling
+            if (deltaTime < MIN_FRAME_TIME) {
+                return;
+            }
+
+            lastAnimationTime = timestamp;
 
             particleCtx.clearRect(0, 0, width, height);
             apertureCtx.clearRect(0, 0, width, height);
@@ -6157,7 +6336,8 @@
             ProjectsController.init();
 
             ParticleSystem.initHeroState();
-            animate();
+            lastAnimationTime = performance.now();
+            animationFrameId = requestAnimationFrame(animate);
 
             document.fonts.ready.then(() => {
                 ParticleSystem.initHeroState();
