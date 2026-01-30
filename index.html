@@ -4856,16 +4856,18 @@
                     });
                 }
 
-                // Reset controllers if leaving their sections
-                if (sectionName === 'contact') {
-                    ContactController.reset();
-                }
                 // Issue #6 fix: Reset skills section active state
                 if (sectionName === 'skills') {
                     SkillsController.reset();
                 }
 
                 ApertureSystem.animateClose(CONFIG.apertureDuration, () => {
+                    // Reset contact controller after aperture is fully closed
+                    // so the step doesn't visibly revert before the close animation finishes
+                    if (sectionName === 'contact') {
+                        ContactController.reset();
+                    }
+
                     section.classList.remove('active');
                     zones.forEach(z => z.style.pointerEvents = 'auto');
                     backBtn.style.display = 'block';
