@@ -1,5 +1,6 @@
 sections text labels fonts and weight: 
 sections ring sizes: 
-remove three dots nav on mobile for study case: 
 text should become even smaller and span more horizontally in contact: 
-button should be uncklickable until the pulse animation is finished in hero
+better fade out animation when going back to hero: 
+add horizontal scroll between the section in projects for mobile: 
+make the skills section better: 
