@@ -5932,12 +5932,29 @@
                     lucide.createIcons();
                 }
 
-                // Reset animation lock after fade transition completes (matches 0.6s CSS transition)
-                // Using stored timeout reference so we can clear it if needed
-                this.animationTimeout = setTimeout(() => {
+                // Reset animation lock when CSS transition actually ends
+                // Use transitionend event instead of fixed timeout to stay in sync with CSS
+                const activeSlide = this.slides[index];
+
+                const onTransitionEnd = (e) => {
+                    // Only respond to opacity transitions on the slide itself
+                    if (e.propertyName !== 'opacity' || e.target !== activeSlide) return;
+
+                    activeSlide.removeEventListener('transitionend', onTransitionEnd);
+                    clearTimeout(this.animationTimeout);
                     this.isAnimating = false;
                     this.animationTimeout = null;
-                }, 600);
+                };
+
+                activeSlide.addEventListener('transitionend', onTransitionEnd);
+
+                // Fallback timeout in case transitionend doesn't fire (e.g., display:none, no transition)
+                // Set slightly longer than expected transition to avoid race conditions
+                this.animationTimeout = setTimeout(() => {
+                    activeSlide.removeEventListener('transitionend', onTransitionEnd);
+                    this.isAnimating = false;
+                    this.animationTimeout = null;
+                }, 800);
             },
 
             prev() {
