@@ -4426,6 +4426,15 @@
                     clearInterval(this._heroToNavCheckDustInterval);
                     this._heroToNavCheckDustInterval = null;
                 }
+                // Clear typewriter timeouts to prevent memory leaks and visual glitches
+                if (this._typewriterTimeoutId) {
+                    clearTimeout(this._typewriterTimeoutId);
+                    this._typewriterTimeoutId = null;
+                }
+                if (this._typewriterHoldTimeoutId) {
+                    clearTimeout(this._typewriterHoldTimeoutId);
+                    this._typewriterHoldTimeoutId = null;
+                }
             },
 
             execute(fromState, toState, data, onComplete) {
@@ -4474,14 +4483,17 @@
                         let charIndex = 0;
                         const typeSpeed = 45; // ms per character
 
+                        const self = this;
                         const typeNextChar = () => {
                             if (charIndex < fullText.length) {
                                 introCta.textContent += fullText.charAt(charIndex);
                                 charIndex++;
-                                setTimeout(typeNextChar, typeSpeed);
+                                self._typewriterTimeoutId = setTimeout(typeNextChar, typeSpeed);
                             } else {
                                 // Typing complete - hold briefly then fade out
-                                setTimeout(() => {
+                                self._typewriterTimeoutId = null;
+                                self._typewriterHoldTimeoutId = setTimeout(() => {
+                                    self._typewriterHoldTimeoutId = null;
                                     introCta.classList.remove('typing');
                                     gsap.to(introCta, {
                                         opacity: 0,
@@ -4494,7 +4506,7 @@
                         };
 
                         // Start typing after a brief delay
-                        setTimeout(typeNextChar, 200);
+                        this._typewriterTimeoutId = setTimeout(typeNextChar, 200);
 
                         // Phase 2: After fade out, show nav content
                         const fadeOutComplete = () => {
