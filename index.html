@@ -4419,6 +4419,15 @@
         // TRANSITION CONTROLLER
         // ============================================
         const TransitionController = {
+            _heroToNavCheckDustInterval: null,
+
+            clearPendingTransitions() {
+                if (this._heroToNavCheckDustInterval) {
+                    clearInterval(this._heroToNavCheckDustInterval);
+                    this._heroToNavCheckDustInterval = null;
+                }
+            },
+
             execute(fromState, toState, data, onComplete) {
                 const transitionKey = `${fromState}_to_${toState}`;
 
@@ -4443,10 +4452,14 @@
                 const navLayer = document.getElementById('nav-layer');
                 const introCta = document.getElementById('intro-cta-overlay');
 
+                // Clear any existing interval from a previous interrupted transition
+                this.clearPendingTransitions();
+
                 // Wait for dust animation to nearly complete before showing navigation
-                const checkDust = setInterval(() => {
+                this._heroToNavCheckDustInterval = setInterval(() => {
                     if (ParticleSystem.getActiveParticleCount() < ParticleSystem.textParticles.length * 0.1) { // When 90% of particles have scattered
-                        clearInterval(checkDust);
+                        clearInterval(this._heroToNavCheckDustInterval);
+                        this._heroToNavCheckDustInterval = null;
 
                         navLayer.classList.add('visible');
 
@@ -4766,6 +4779,9 @@
                 const ctaBtn = document.getElementById('cta-btn');
                 const textName = document.getElementById('text-name');
                 const textRole = document.getElementById('text-role');
+
+                // Clear any pending hero-to-nav transition intervals
+                this.clearPendingTransitions();
 
                 // Reset zone rings opacity immediately to prevent flash on next nav transition
                 ApertureSystem.hideZoneRings(false);
