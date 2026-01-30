@@ -322,7 +322,8 @@
            (Two-step: Email → Message flow)
         ================================ */
         #section-contact .section-content {
-            max-width: 900px;
+            width: 100%;
+            max-width: min(80vw, 1200px);
             position: relative;
             display: flex;
             flex-direction: column;
@@ -512,7 +513,6 @@
         /* Message Textarea Wrapper */
         .contact-message-wrapper {
             width: 100%;
-            max-width: 700px;
             position: relative;
         }
 
@@ -5216,8 +5216,18 @@
             // Font scaling config for message
             fontConfig: {
                 maxFont: 3.5,    // rem - starting font size
-                minFont: 1,     // rem - minimum font size
-                charsToMin: 200 // characters at which we hit min font
+                minFont: 1.4,   // rem - minimum font size (stays readable)
+                charsToMin: 300  // characters at which we hit min font
+            },
+
+            // Canvas for measuring text width (reused)
+            _measureCanvas: null,
+            _maxTextareaHeight: 0,
+
+            getTargetWordCount() {
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                return Math.min(800, Math.max(80, Math.floor((vw * vh) / 4000)));
             },
 
             // Font scaling config for email (smaller reduction)
@@ -5284,6 +5294,7 @@
                 this.messageInput.addEventListener('input', (e) => {
                     this.updatePreview(e.target.value);
                     this.adjustMessageFontSize();
+                    this.updateMaxHeight();
                     this.autoResizeTextarea();
                     this.toggleSendButton();
                 }, { signal });
@@ -5294,11 +5305,20 @@
                             this.messageInput.value = '';
                             this.updatePreview('');
                             this.adjustMessageFontSize();
+                            this.updateMaxHeight();
                             this.autoResizeTextarea();
                             this.toggleSendButton();
                         } else {
                             NavigationController.closeSection();
                         }
+                    }
+                }, { signal });
+
+                // Recalculate max-height on window resize
+                window.addEventListener('resize', () => {
+                    if (this.currentStep === 'message') {
+                        this.updateMaxHeight();
+                        this.autoResizeTextarea();
                     }
                 }, { signal });
 
@@ -5430,6 +5450,7 @@
                                 duration: 0.4,
                                 ease: 'power2.out',
                                 onComplete: () => {
+                                    this.updateMaxHeight();
                                     this.messageInput.focus();
                                 }
                             }
@@ -5483,7 +5504,7 @@
                 const fontSize = maxFont - (ratio * (maxFont - minFont));
 
                 // Apply responsive font size using clamp
-                const minResponsive = fontSize * 0.4;  // 40% for mobile
+                const minResponsive = fontSize * 0.6;  // 60% for mobile (stays readable)
                 const maxResponsive = fontSize;
                 const vwValue = fontSize * 1.5;
 
@@ -5508,11 +5529,39 @@
                 this.emailInput.style.fontSize = `clamp(${minResponsive}rem, ${vwValue}vw, ${maxResponsive}rem)`;
             },
 
+            updateMaxHeight() {
+                const computed = window.getComputedStyle(this.messageInput);
+                const fontSize = parseFloat(computed.fontSize);
+                const lineHeight = parseFloat(computed.lineHeight) || fontSize * 1.2;
+                const containerWidth = this.messageInput.clientWidth;
+                const targetWords = this.getTargetWordCount();
+                const totalChars = targetWords * 6; // avg 5 chars + space per word
+
+                if (!this._measureCanvas) this._measureCanvas = document.createElement('canvas');
+                const ctx = this._measureCanvas.getContext('2d');
+                ctx.font = `600 ${fontSize}px Inter, sans-serif`;
+                const avgCharWidth = ctx.measureText('abcdefghijklmnopqrstuvwxyz ').width / 27;
+
+                const charsPerLine = Math.max(1, Math.floor(containerWidth / avgCharWidth));
+                const linesNeeded = Math.ceil(totalChars / charsPerLine);
+                const calculated = linesNeeded * lineHeight;
+
+                // Safety cap: never exceed 55% of viewport height
+                this._maxTextareaHeight = Math.min(calculated, window.innerHeight * 0.55);
+                this.messageInput.style.maxHeight = this._maxTextareaHeight + 'px';
+            },
+
             autoResizeTextarea() {
-                // Reset height to auto to get the correct scrollHeight
                 this.messageInput.style.height = 'auto';
-                // Set height to scrollHeight to fit content
-                this.messageInput.style.height = this.messageInput.scrollHeight + 'px';
+                const scrollHeight = this.messageInput.scrollHeight;
+
+                if (this._maxTextareaHeight && scrollHeight > this._maxTextareaHeight) {
+                    this.messageInput.style.height = this._maxTextareaHeight + 'px';
+                    this.messageInput.style.overflowY = 'auto';
+                } else {
+                    this.messageInput.style.height = scrollHeight + 'px';
+                    this.messageInput.style.overflowY = 'hidden';
+                }
             },
 
             toggleSendButton() {
