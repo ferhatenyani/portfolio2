@@ -3548,6 +3548,8 @@
             previous: null,
             activeSection: null,
             isTransitioning: false,
+            _transitionTimeoutId: null,
+            _transitionTimeoutMs: 10000, // Max transition time before force-unlock
 
             transition(newState, data = {}) {
                 if (this.isTransitioning && !data.force) return;
@@ -3557,7 +3559,27 @@
                 this.previous = this.current;
                 this.current = newState;
 
+                // Clear any existing timeout from a previous transition
+                if (this._transitionTimeoutId) {
+                    clearTimeout(this._transitionTimeoutId);
+                    this._transitionTimeoutId = null;
+                }
+
+                // Set a timeout fallback to unlock if callback chain fails
+                this._transitionTimeoutId = setTimeout(() => {
+                    if (this.isTransitioning) {
+                        console.warn('StateManager: Transition timeout reached, force-unlocking isTransitioning');
+                        this.isTransitioning = false;
+                    }
+                    this._transitionTimeoutId = null;
+                }, this._transitionTimeoutMs);
+
                 TransitionController.execute(this.previous, newState, data, () => {
+                    // Clear timeout since transition completed normally
+                    if (this._transitionTimeoutId) {
+                        clearTimeout(this._transitionTimeoutId);
+                        this._transitionTimeoutId = null;
+                    }
                     this.isTransitioning = false;
                 });
             },
