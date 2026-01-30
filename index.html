@@ -4783,6 +4783,43 @@
                 const zoneLabels = document.querySelectorAll('.zone-label');
                 const backBtn = document.getElementById('back-hero-btn');
 
+                // Shared aperture close + cleanup
+                const closeAperture = () => {
+                    ApertureSystem.animateClose(CONFIG.apertureDuration, () => {
+                        if (sectionName === 'contact') {
+                            ContactController.reset();
+                        }
+
+                        section.classList.remove('active');
+                        zones.forEach(z => z.style.pointerEvents = 'auto');
+                        backBtn.style.display = 'block';
+                        StateManager.clearActiveSection();
+
+                        // Reinitialize zone rings (don't animate yet - we'll animate with showZoneRings)
+                        ApertureSystem.initZoneRings(false);
+                        // Reset ring opacities to 0 for the fade-in animation
+                        Object.keys(ApertureSystem.zoneRings).forEach(zone => {
+                            ApertureSystem.zoneRings[zone].opacity = 0;
+                        });
+
+                        // Show zone rings and labels together with matching timing (like initial page load)
+                        ApertureSystem.showZoneRings(true);
+
+                        // Show zone labels with same timing as rings
+                        // Note: Keep inline styles - CSS defaults are opacity:0, transform:translateY(8px)
+                        gsap.to(zoneLabels, {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.7,
+                            stagger: 0.12,
+                            delay: 0.1, // Match the ring animation timing
+                            ease: 'power3.out'
+                        });
+
+                        onComplete();
+                    });
+                };
+
                 // Skills section has different structure - no .section-content
                 if (sectionName === 'skills') {
                     const skillCategories = section.querySelectorAll('.skill-category');
@@ -4797,6 +4834,23 @@
                 } else if (sectionName === 'projects') {
                     // Projects section has custom carousel layout
                     ProjectsController.animateOut();
+                } else if (sectionName === 'contact') {
+                    // Fade out the currently visible step as a single unit,
+                    // then chain the aperture close so content is fully gone
+                    // before particles become visible
+                    const visibleStep = ContactController.currentStep === 'email'
+                        ? ContactController.stepEmail
+                        : ContactController.currentStep === 'message'
+                            ? ContactController.stepMessage
+                            : ContactController.stepThanks;
+
+                    gsap.to(visibleStep, {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.15,
+                        ease: 'power2.in',
+                        onComplete: closeAperture
+                    });
                 } else {
                     const content = section.querySelector('.section-content');
                     const h2 = content.querySelector('h2');
@@ -4812,16 +4866,6 @@
                             y: -20,
                             duration: 0.3,
                             stagger: 0.05,
-                            ease: 'power2.in'
-                        });
-                    } else if (sectionName === 'contact') {
-                        // Include contact-specific elements (input, hint, buttons) in the fade-out
-                        const contactElements = content.querySelectorAll('.contact-input, .contact-hint, .contact-email-badge, .contact-message-input, .contact-send-btn, .contact-thank-you-icon, .contact-reset-btn, .contact-next-btn');
-                        gsap.to([p, h2, ...contactElements], {
-                            opacity: 0,
-                            y: -20,
-                            duration: 0.3,
-                            stagger: 0.1,
                             ease: 'power2.in'
                         });
                     } else {
@@ -4861,41 +4905,11 @@
                     SkillsController.reset();
                 }
 
-                ApertureSystem.animateClose(CONFIG.apertureDuration, () => {
-                    // Reset contact controller after aperture is fully closed
-                    // so the step doesn't visibly revert before the close animation finishes
-                    if (sectionName === 'contact') {
-                        ContactController.reset();
-                    }
-
-                    section.classList.remove('active');
-                    zones.forEach(z => z.style.pointerEvents = 'auto');
-                    backBtn.style.display = 'block';
-                    StateManager.clearActiveSection();
-
-                    // Reinitialize zone rings (don't animate yet - we'll animate with showZoneRings)
-                    ApertureSystem.initZoneRings(false);
-                    // Reset ring opacities to 0 for the fade-in animation
-                    Object.keys(ApertureSystem.zoneRings).forEach(zone => {
-                        ApertureSystem.zoneRings[zone].opacity = 0;
-                    });
-
-                    // Show zone rings and labels together with matching timing (like initial page load)
-                    ApertureSystem.showZoneRings(true);
-
-                    // Show zone labels with same timing as rings
-                    // Note: Keep inline styles - CSS defaults are opacity:0, transform:translateY(8px)
-                    gsap.to(zoneLabels, {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.7,
-                        stagger: 0.12,
-                        delay: 0.1, // Match the ring animation timing
-                        ease: 'power3.out'
-                    });
-
-                    onComplete();
-                });
+                // For non-contact sections, start aperture close immediately
+                // (contact chains it after its content fade completes)
+                if (sectionName !== 'contact') {
+                    closeAperture();
+                }
             },
 
             navigationToHero(data, onComplete) {
