@@ -4462,6 +4462,11 @@
                 gsap.killTweensOf(zoneLabels);
                 gsap.killTweensOf(ctaBtn);
                 gsap.killTweensOf('.zone-label');
+
+                // Kill GSAP animations on ParticleSystem before particle arrays are replaced
+                gsap.killTweensOf(ParticleSystem);
+                ParticleSystem.textParticles.forEach(p => gsap.killTweensOf(p));
+                ParticleSystem.zoneParticles.forEach(p => gsap.killTweensOf(p));
             },
 
             // Reset inline styles on transition elements to prevent state mismatch with CSS classes
