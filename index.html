@@ -4663,6 +4663,13 @@
 
                 section.classList.add('active');
 
+                // Reset leftover inline styles from previous exit animations on content containers
+                const contentEl = section.querySelector('.section-content') || section.querySelector('.skills-content');
+                if (contentEl) {
+                    contentEl.style.opacity = '';
+                    contentEl.style.transform = '';
+                }
+
                 zones.forEach(z => z.style.pointerEvents = 'none');
 
                 // Hide zone labels and rings when opening a section
