@@ -3275,6 +3275,7 @@
                 this.sounds.typing = new Audio('sound/typing.wav');
                 this.sounds.whoosh = new Audio('sound/whoosh.mp3');
                 this.sounds.reverse = new Audio('sound/reverseW.mp3');
+                this.sounds.backToStart = new Audio('sound/backToStart.mp3');
 
                 // Preload by triggering load() on each
                 Object.values(this.sounds).forEach(audio => {
@@ -5199,6 +5200,7 @@
             },
 
             backToHero() {
+                SoundManager.play('backToStart');
                 if (StateManager.activeSection) {
                     StateManager.transition(AppState.HERO, { fromSection: true });
                 } else {
