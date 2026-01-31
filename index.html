@@ -4612,7 +4612,11 @@
                         };
 
                         // Start typing after a brief delay
-                        this._typewriterTimeoutId = setTimeout(typeNextChar, 200);
+                        this._typewriterTimeoutId = setTimeout(() => {
+                            const typingSound = new Audio('sound/typing.wav');
+                            typingSound.play();
+                            typeNextChar();
+                        }, 200);
 
                         // Phase 2: After fade out, show nav content
                         const fadeOutComplete = () => {
@@ -5152,6 +5156,8 @@
 
             onZoneClick(sectionName) {
                 if (StateManager.isTransitioning) return;
+                const whooshSound = new Audio('sound/whoosh.mp3');
+                whooshSound.play();
                 this.hoveredZone = null;
                 ApertureSystem.clearHoveredZone(sectionName);
                 StateManager.transition(AppState.SECTION_OPEN, { sectionName });
@@ -5159,6 +5165,8 @@
 
             closeSection() {
                 if (!StateManager.activeSection) return;
+                const reverseSound = new Audio('sound/reverseW.mp3');
+                reverseSound.play();
                 StateManager.transition(AppState.NAVIGATION);
             },
 
