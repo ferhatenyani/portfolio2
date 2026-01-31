@@ -4307,6 +4307,7 @@
                     gsap.killTweensOf(this.zoneRings[zone]);
                     this.zoneRings[zone].particles = [];
                     this.zoneRings[zone].opacity = 0; // Reset opacity
+                    this.zoneRings[zone].scale = 1; // Reset scale (prevents stale hover scale)
                     for (let i = 0; i < particlesPerRing; i++) {
                         const angle = (i / particlesPerRing) * Math.PI * 2;
                         this.zoneRings[zone].particles.push(new ApertureParticle(angle));
@@ -4373,6 +4374,7 @@
                 // Animate scale up for hovered zone using custom hoverScale
                 if (zoneName) {
                     const ring = this.zoneRings[zoneName];
+                    gsap.killTweensOf(ring, 'scale');
                     gsap.to(ring, {
                         scale: ring.hoverScale,
                         duration: 0.4,
@@ -4384,6 +4386,7 @@
             clearHoveredZone(zoneName) {
                 // Animate scale back down
                 if (zoneName && this.zoneRings[zoneName]) {
+                    gsap.killTweensOf(this.zoneRings[zoneName], 'scale');
                     gsap.to(this.zoneRings[zoneName], {
                         scale: 1,
                         duration: 0.3,
@@ -5149,6 +5152,8 @@
 
             onZoneClick(sectionName) {
                 if (StateManager.isTransitioning) return;
+                this.hoveredZone = null;
+                ApertureSystem.clearHoveredZone(sectionName);
                 StateManager.transition(AppState.SECTION_OPEN, { sectionName });
             },
 
