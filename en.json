@@ -27,14 +27,14 @@
       "viewDemo": "View Live Demo"
     },
     "project2": {
-      "title": "ReviseGPT",
+      "title": "AcademAI",
       "description": "An intelligent platform empowering medical students and professors with AI-driven diagnostics, adaptive quizzes, and automated course corrections — paired with a powerful admin dashboard for content oversight.",
       "userApp": "User App",
       "adminApp": "Admin App",
       "caseStudy": {
         "badge": "Case Study",
         "intro": {
-          "title": "ReviseGPT",
+          "title": "AcademAI",
           "description": "An AI-powered medical education platform designed to support students through intelligent diagnostics, adaptive learning, and course correction."
         },
         "adminIntro": {
