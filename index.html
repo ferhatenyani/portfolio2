@@ -2586,7 +2586,7 @@
                                 <span class="project-tag">TypeScript</span>
                                 <span class="project-tag">Framer Motion</span>
                             </div>
-                            <a href="#" class="project-link" target="_blank" rel="noopener">
+                            <a href="https://reporthub-rust.vercel.app/" class="project-link" target="_blank" rel="noopener">
                                 <span data-i18n="projects.project1.viewDemo">View Live Demo</span>
                                 <i data-lucide="arrow-right" stroke-width="1.5"></i>
                             </a>
@@ -5680,16 +5680,17 @@
             },
 
             updatePreview(text) {
-                if (text.length > 0) {
-                    this.preview.textContent = text;
-                    this.preview.classList.add('visible');
-                    // Lighter opacity to not disturb the user
-                    const opacity = Math.min(text.length * 0.008, 0.05);
-                    this.preview.style.opacity = opacity;
-                } else {
-                    this.preview.classList.remove('visible');
-                    this.preview.style.opacity = 0;
-                }
+                // Disabled: typing preview effect removed
+                // if (text.length > 0) {
+                //     this.preview.textContent = text;
+                //     this.preview.classList.add('visible');
+                //     // Lighter opacity to not disturb the user
+                //     const opacity = Math.min(text.length * 0.008, 0.05);
+                //     this.preview.style.opacity = opacity;
+                // } else {
+                //     this.preview.classList.remove('visible');
+                //     this.preview.style.opacity = 0;
+                // }
             },
 
             async submitMessage() {
