@@ -3265,6 +3265,39 @@
         }
 
         // ============================================
+        // SOUND MANAGER - Preload audio for instant playback
+        // ============================================
+        const SoundManager = {
+            sounds: {},
+
+            init() {
+                // Preload all audio files
+                this.sounds.typing = new Audio('sound/typing.wav');
+                this.sounds.whoosh = new Audio('sound/whoosh.mp3');
+                this.sounds.reverse = new Audio('sound/reverseW.mp3');
+
+                // Preload by triggering load() on each
+                Object.values(this.sounds).forEach(audio => {
+                    audio.preload = 'auto';
+                    audio.load();
+                });
+            },
+
+            play(soundName) {
+                const sound = this.sounds[soundName];
+                if (sound) {
+                    sound.currentTime = 0; // Reset to start for replay
+                    sound.play().catch(err => {
+                        console.warn(`Failed to play ${soundName}:`, err);
+                    });
+                }
+            }
+        };
+
+        // Initialize sound preloading immediately
+        SoundManager.init();
+
+        // ============================================
         // INTERNATIONALIZATION (i18n) CONTROLLER
         // ============================================
         const I18nController = {
@@ -4611,12 +4644,9 @@
                             }
                         };
 
-                        // Start typing after a brief delay
-                        this._typewriterTimeoutId = setTimeout(() => {
-                            const typingSound = new Audio('sound/typing.wav');
-                            typingSound.play();
-                            typeNextChar();
-                        }, 200);
+                        // Start typing and sound immediately
+                        SoundManager.play('typing');
+                        this._typewriterTimeoutId = setTimeout(typeNextChar, typeSpeed);
 
                         // Phase 2: After fade out, show nav content
                         const fadeOutComplete = () => {
@@ -5156,8 +5186,7 @@
 
             onZoneClick(sectionName) {
                 if (StateManager.isTransitioning) return;
-                const whooshSound = new Audio('sound/whoosh.mp3');
-                whooshSound.play();
+                SoundManager.play('whoosh');
                 this.hoveredZone = null;
                 ApertureSystem.clearHoveredZone(sectionName);
                 StateManager.transition(AppState.SECTION_OPEN, { sectionName });
@@ -5165,8 +5194,7 @@
 
             closeSection() {
                 if (!StateManager.activeSection) return;
-                const reverseSound = new Audio('sound/reverseW.mp3');
-                reverseSound.play();
+                SoundManager.play('reverse');
                 StateManager.transition(AppState.NAVIGATION);
             },
 
