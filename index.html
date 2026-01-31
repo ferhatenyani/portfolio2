@@ -273,6 +273,12 @@
             border-color: #3f3f46;
         }
 
+        #back-hero-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         /* ================================
            SECTION CONTAINERS
         ================================ */
@@ -4597,6 +4603,10 @@
                 const heroLayer = document.getElementById('hero-layer');
                 const navLayer = document.getElementById('nav-layer');
                 const introCta = document.getElementById('intro-cta-overlay');
+                const backBtn = document.getElementById('back-hero-btn');
+
+                // Disable back button during animation
+                backBtn.disabled = true;
 
                 // Issue #5 fix: Reset formationCheckStartTime when leaving hero
                 ParticleSystem.formationCheckStartTime = null;
@@ -4671,7 +4681,11 @@
                                     filter: 'blur(0px)',
                                     duration: 0.8,
                                     ease: 'power2.out',
-                                    onComplete: onComplete
+                                    onComplete: () => {
+                                        // Enable back button after animation completes
+                                        backBtn.disabled = false;
+                                        onComplete();
+                                    }
                                 });
 
                                 // Zone labels fade in with upward motion
@@ -5144,7 +5158,11 @@
                     this.closeSection();
                 }, { signal });
 
-                backHeroBtn.addEventListener('click', () => this.backToHero(), { signal });
+                backHeroBtn.addEventListener('click', () => {
+                    if (!backHeroBtn.disabled) {
+                        this.backToHero();
+                    }
+                }, { signal });
 
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
