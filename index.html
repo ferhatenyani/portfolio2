@@ -5919,6 +5919,9 @@
                     if (e.key === 'ArrowRight') this.next();
                 }, { signal });
 
+                // Gesture navigation (trackpad + touch swipe)
+                this.initGestureNavigation(signal);
+
                 // Gallery toggle for Project 2
                 this.initGalleryToggle(signal);
 
@@ -5927,6 +5930,125 @@
                     lucide.createIcons();
                     this._lucideInitialized = true;
                 }
+            },
+
+            initGestureNavigation(signal) {
+                const carousel = document.querySelector('.projects-carousel');
+                if (!carousel) return;
+
+                // --- Helpers ---
+                // Check if an event target is inside a case-study-scroll container
+                const getCaseStudyScroll = (target) => target.closest('.case-study-scroll');
+
+                // Determine if a case-study-scroll is at its horizontal boundary
+                const isAtBoundary = (scrollEl, direction) => {
+                    // direction: -1 = swiping right (want prev), +1 = swiping left (want next)
+                    const tolerance = 2; // px rounding tolerance
+                    if (direction < 0) {
+                        // At the very start?
+                        return scrollEl.scrollLeft <= tolerance;
+                    }
+                    // At the very end?
+                    return scrollEl.scrollLeft + scrollEl.clientWidth >= scrollEl.scrollWidth - tolerance;
+                };
+
+                // --- Wheel (trackpad two-finger scroll) ---
+                let wheelAccum = 0;
+                let wheelTimer = null;
+                const WHEEL_THRESHOLD = 50;
+
+                carousel.addEventListener('wheel', (e) => {
+                    if (StateManager.activeSection !== 'projects') return;
+                    if (this.isAnimating) return;
+
+                    // Only react to primarily-horizontal gestures
+                    if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
+
+                    const direction = e.deltaX > 0 ? 1 : -1; // +1 = next, -1 = prev
+
+                    // If inside a case-study-scroll, only intercept at boundaries
+                    const caseScroll = getCaseStudyScroll(e.target);
+                    if (caseScroll) {
+                        if (!isAtBoundary(caseScroll, direction)) return;
+                        // At boundary — prevent the case study from rubber-banding
+                        e.preventDefault();
+                    } else {
+                        e.preventDefault();
+                    }
+
+                    // Accumulate delta and trigger when threshold exceeded
+                    wheelAccum += e.deltaX;
+                    clearTimeout(wheelTimer);
+                    wheelTimer = setTimeout(() => { wheelAccum = 0; }, 200);
+
+                    if (Math.abs(wheelAccum) >= WHEEL_THRESHOLD) {
+                        if (wheelAccum > 0) this.next();
+                        else this.prev();
+                        wheelAccum = 0;
+                    }
+                }, { signal, passive: false });
+
+                // --- Touch swipe ---
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchDeltaX = 0;
+                let isSwiping = false;
+                let touchCaseScroll = null;
+                const SWIPE_THRESHOLD = 50;
+
+                carousel.addEventListener('touchstart', (e) => {
+                    if (StateManager.activeSection !== 'projects') return;
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                    touchDeltaX = 0;
+                    isSwiping = false;
+                    touchCaseScroll = getCaseStudyScroll(e.target);
+                }, { signal, passive: true });
+
+                carousel.addEventListener('touchmove', (e) => {
+                    if (StateManager.activeSection !== 'projects') return;
+                    const dx = e.touches[0].clientX - touchStartX;
+                    const dy = e.touches[0].clientY - touchStartY;
+
+                    // Lock into horizontal swipe only if horizontal displacement dominates
+                    if (!isSwiping) {
+                        if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+                            isSwiping = true;
+                        } else if (Math.abs(dy) > 10) {
+                            // Vertical gesture — bail out entirely
+                            isSwiping = false;
+                            touchCaseScroll = null;
+                            return;
+                        }
+                    }
+
+                    if (isSwiping) {
+                        touchDeltaX = dx;
+                    }
+                }, { signal, passive: true });
+
+                carousel.addEventListener('touchend', () => {
+                    if (!isSwiping || this.isAnimating) return;
+
+                    const direction = touchDeltaX < 0 ? 1 : -1; // swipe-left = next
+
+                    // If inside case-study-scroll, only navigate at boundaries
+                    if (touchCaseScroll) {
+                        if (!isAtBoundary(touchCaseScroll, direction)) {
+                            isSwiping = false;
+                            touchCaseScroll = null;
+                            return;
+                        }
+                    }
+
+                    if (Math.abs(touchDeltaX) >= SWIPE_THRESHOLD) {
+                        if (direction > 0) this.next();
+                        else this.prev();
+                    }
+
+                    isSwiping = false;
+                    touchCaseScroll = null;
+                }, { signal, passive: true });
             },
 
             initGalleryToggle(signal) {
