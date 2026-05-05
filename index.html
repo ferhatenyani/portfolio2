@@ -9,18 +9,62 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Libraries -->
+    <!-- Libraries (Tailwind CDN replaced by inline static CSS below; EmailJS lazy-loaded on first contact submit) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://unpkg.com/lucide@0.469.0"></script>
 
     <style>
-        /* Import secondary font for creative pairing - Space Mono for technical/code aesthetic */
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+        /* ================================
+           TAILWIND STATIC SUBSET
+           Replaces cdn.tailwindcss.com runtime (~120KB) with the
+           ~30 utility classes actually used in this document.
+        ================================ */
+        .relative{position:relative}
+        .flex{display:flex}
+        .flex-col{flex-direction:column}
+        .items-center{align-items:center}
+        .justify-center{justify-content:center}
+        .gap-2{gap:.5rem}
+        .w-full{width:100%}
+        .w-3{width:.75rem}.h-3{height:.75rem}
+        .w-3\.5{width:.875rem}.h-3\.5{height:.875rem}
+        .w-4{width:1rem}.h-4{height:1rem}
+        .w-12{width:3rem}.h-12{height:3rem}
+        .mb-6{margin-bottom:1.5rem}
+        .mb-12{margin-bottom:3rem}
+        .px-6{padding-left:1.5rem;padding-right:1.5rem}
+        .py-2\.5{padding-top:.625rem;padding-bottom:.625rem}
+        .bg-transparent{background-color:transparent}
+        .border{border-width:1px;border-style:solid}
+        .border-zinc-900{border-color:#18181b}
+        .text-zinc-900{color:#18181b}
+        .text-xs{font-size:.75rem;line-height:1rem}
+        .text-xl{font-size:1.25rem;line-height:1.75rem}
+        .text-5xl{font-size:3rem;line-height:1}
+        .font-medium{font-weight:500}
+        .font-semibold{font-weight:600}
+        .tracking-tight{letter-spacing:-.025em}
+        .tracking-tighter{letter-spacing:-.05em}
+        .tracking-wide{letter-spacing:.025em}
+        .leading-tight{line-height:1.25}
+        .uppercase{text-transform:uppercase}
+        .rounded-full{border-radius:9999px}
+        .transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}
+        .transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}
+        .duration-300{transition-duration:.3s}
+        .ease-out{transition-timing-function:cubic-bezier(0,0,.2,1)}
+        .z-10{z-index:10}
+        .hover\:bg-zinc-900\/10:hover{background-color:rgba(24,24,27,.1)}
+        .group:hover .group-hover\:translate-x-0\.5{transform:translateX(.125rem)}
+        @media (min-width:768px){
+            .md\:text-sm{font-size:.875rem;line-height:1.25rem}
+            .md\:text-2xl{font-size:1.5rem;line-height:2rem}
+            .md\:text-7xl{font-size:4.5rem;line-height:1}
+        }
 
         * {
             margin: 0;
@@ -2645,7 +2689,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
-                                                        <img src="/medicalChatBot/app-user/chat-dark-mode.png" alt="AI Chat Interface" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/chat-dark-mode.png" alt="AI Chat Interface" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2662,10 +2706,10 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
-                                                        <img src="/medicalChatBot/app-user/main page - quiz.png" alt="Quiz Interface" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/main page - quiz.png" alt="Quiz Interface" loading="lazy" decoding="async">
                                                     </div>
                                                     <div class="case-study-mockup mockup-secondary">
-                                                        <img src="/medicalChatBot/app-user/main page - quiz-1.png" alt="Quiz Question View" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/main page - quiz-1.png" alt="Quiz Question View" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2682,13 +2726,13 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
-                                                        <img src="/medicalChatBot/app-user/main page - correction.png" alt="Course Correction Upload" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/main page - correction.png" alt="Course Correction Upload" loading="lazy" decoding="async">
                                                     </div>
                                                     <div class="case-study-mockup mockup-secondary">
-                                                        <img src="/medicalChatBot/app-user/main page - correction-1.png" alt="Correction Processing" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/main page - correction-1.png" alt="Correction Processing" loading="lazy" decoding="async">
                                                     </div>
                                                     <div class="case-study-mockup mockup-tertiary">
-                                                        <img src="/medicalChatBot/app-user/main page - correction-2.png" alt="Correction Results" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/main page - correction-2.png" alt="Correction Results" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2705,13 +2749,13 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
-                                                        <img src="/medicalChatBot/app-user/profilePage1.png" alt="Student Profile Overview" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/profilePage1.png" alt="Student Profile Overview" loading="lazy" decoding="async">
                                                     </div>
                                                     <div class="case-study-mockup mockup-secondary">
-                                                        <img src="/medicalChatBot/app-user/profilePage2.png" alt="Profile Settings" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/profilePage2.png" alt="Profile Settings" loading="lazy" decoding="async">
                                                     </div>
                                                     <div class="case-study-mockup mockup-tertiary">
-                                                        <img src="/medicalChatBot/app-user/access plan.png" alt="Access Plans" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/access plan.png" alt="Access Plans" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2728,10 +2772,10 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
-                                                        <img src="/medicalChatBot/app-user/chat-light-mode.png" alt="Light Mode Interface" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/chat-light-mode.png" alt="Light Mode Interface" loading="lazy" decoding="async">
                                                     </div>
                                                     <div class="case-study-mockup mockup-secondary">
-                                                        <img src="/medicalChatBot/app-user/chat-dark-mode.png" alt="Dark Mode Interface" loading="lazy">
+                                                        <img src="/medicalChatBot/app-user/chat-dark-mode.png" alt="Dark Mode Interface" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2781,7 +2825,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/dashboardLightMode.png" alt="Admin Dashboard Light Mode" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/dashboardLightMode.png" alt="Admin Dashboard Light Mode" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2796,7 +2840,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/dashboardDarkMode.png" alt="Admin Dashboard Dark Mode" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/dashboardDarkMode.png" alt="Admin Dashboard Dark Mode" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2813,7 +2857,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/usersPage.png" alt="Users Management Page" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/usersPage.png" alt="Users Management Page" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2828,7 +2872,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/usersDetailsModal.png" alt="User Details Modal" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/usersDetailsModal.png" alt="User Details Modal" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2843,7 +2887,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/editUserModal.png" alt="Edit User Modal" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/editUserModal.png" alt="Edit User Modal" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2860,7 +2904,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/quizAnalyticsPage.png" alt="Quiz Analytics Overview" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/quizAnalyticsPage.png" alt="Quiz Analytics Overview" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2875,7 +2919,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/quizAnalyticsPage2.png" alt="Quiz Analytics Detail" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/quizAnalyticsPage2.png" alt="Quiz Analytics Detail" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2892,7 +2936,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/correctionsPage.png" alt="Corrections Management" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/correctionsPage.png" alt="Corrections Management" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2907,7 +2951,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/correctionDetailsModal.png" alt="Correction Details" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/correctionDetailsModal.png" alt="Correction Details" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2922,7 +2966,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/reviewCorrectionModal.png" alt="Review Correction Modal" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/reviewCorrectionModal.png" alt="Review Correction Modal" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2939,7 +2983,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/payementsManegementPage.png" alt="Payments Management" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/payementsManegementPage.png" alt="Payments Management" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2954,7 +2998,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/transactionDetailsModal.png" alt="Transaction Details" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/transactionDetailsModal.png" alt="Transaction Details" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2971,7 +3015,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/settingsPage.png" alt="Settings Configuration" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/settingsPage.png" alt="Settings Configuration" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -2986,7 +3030,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/settingsPage2.png" alt="Settings Advanced" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/settingsPage2.png" alt="Settings Advanced" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -3001,7 +3045,7 @@
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
-                                                        <img src="/medicalChatBot/app-admin/changePasswordModal.png" alt="Change Password" loading="lazy">
+                                                        <img src="/medicalChatBot/app-admin/changePasswordModal.png" alt="Change Password" loading="lazy" decoding="async">
                                                     </div>
                                                 </div>
                                             </div>
@@ -3143,9 +3187,9 @@
                     <h3 class="skill-title" data-i18n="skills.frontendStack.title">Frontend Stack</h3>
                     <div class="skill-separator"></div>
                     <ul class="skill-list" data-i18n-list="skills.frontendStack.items">
-                        <li>React + TypeScript</li>
-                        <li>Tailwind CSS</li>
+                        <li>Next.js, React + TypeScript</li>
                         <li>React Native</li>
+                        <li>Tailwind CSS</li>
                     </ul>
                 </div>
                 <div class="skill-category" tabindex="0">
@@ -3176,7 +3220,7 @@
                     <ul class="skill-list" data-i18n-list="skills.engineeringTools.items">
                         <li>Git version control workflows</li>
                         <li>Vercel . Netlify . Cloudflare Pages</li>
-                        <li>Docker . Docker Compose</li>
+                        <li>Docker</li>
                     </ul>
                 </div>
             </div>
@@ -3282,9 +3326,8 @@
                 // Load saved language preference
                 const savedLang = localStorage.getItem('portfolio-lang') || 'en';
 
-                // Load translations
-                await this.loadTranslations('en');
-                await this.loadTranslations('fr');
+                // Only fetch the active language up front; the other is fetched on first toggle.
+                await this.loadTranslations(savedLang);
 
                 this.isLoaded = true;
 
@@ -3311,9 +3354,13 @@
                 if (!langToggle) return;
 
                 langToggle.querySelectorAll('button').forEach(btn => {
-                    btn.addEventListener('click', () => {
+                    btn.addEventListener('click', async () => {
                         const lang = btn.dataset.lang;
                         if (lang !== this.currentLang) {
+                            // Lazy-fetch the target language pack on first switch
+                            if (!this.translations[lang]) {
+                                await this.loadTranslations(lang);
+                            }
                             this.setLanguage(lang, true);
                         }
                     });
@@ -5641,6 +5688,28 @@
                 }
             },
 
+            // Lazy-loads the EmailJS browser SDK on first send. Cached after that.
+            ensureEmailJS() {
+                if (this._emailjsPromise) return this._emailjsPromise;
+                this._emailjsPromise = new Promise((resolve, reject) => {
+                    if (window.emailjs) {
+                        emailjs.init('6xclFYMoBC1fgWG1M');
+                        resolve();
+                        return;
+                    }
+                    const s = document.createElement('script');
+                    s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+                    s.async = true;
+                    s.onload = () => {
+                        emailjs.init('6xclFYMoBC1fgWG1M');
+                        resolve();
+                    };
+                    s.onerror = () => reject(new Error('EmailJS failed to load'));
+                    document.head.appendChild(s);
+                });
+                return this._emailjsPromise;
+            },
+
             updatePreview(text) {
                 // Disabled: typing preview effect removed
                 // if (text.length > 0) {
@@ -5674,6 +5743,9 @@
                 const fontSize = parseInt(window.getComputedStyle(this.messageInput).fontSize);
 
                 try {
+                    // Lazy-load EmailJS on first send
+                    await this.ensureEmailJS();
+
                     // Send email via EmailJS
                     await emailjs.send(
                         'service_5q45bua',
@@ -6556,8 +6628,7 @@
             // Initialize i18n first
             await I18nController.init();
 
-            // Initialize EmailJS
-            emailjs.init('6xclFYMoBC1fgWG1M');
+            // EmailJS is now lazy-loaded on first contact submit (see ContactController.ensureEmailJS).
 
             HeroController.init();
             NavigationController.init();
