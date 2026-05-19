@@ -112,7 +112,7 @@
   "about": {
     "title": "About",
     "intro": "UI/UX designer & frontend developer crafting web experiences with soul, speed, and precision.",
-    "paragraph1": "I design in Figma, build with React + TypeScript, style with Tailwind, and bring interfaces to life using Framer Motion — delivering production-ready products that perform flawlessly.",
+    "paragraph1": "I design in Figma, build with Next.js + TypeScript, style with Tailwind, and bring interfaces to life using Framer Motion — delivering production-ready products that perform flawlessly.",
     "paragraph2": "Final-year Computer Science student actively freelancing and shipping personal projects reaching thousands of users.",
     "location": {
       "label": "Location",
@@ -141,7 +141,7 @@
     "frontendStack": {
       "title": "Frontend Stack",
       "items": [
-        "React + TypeScript",
+        "Next.js + TypeScript",
         "Tailwind CSS",
         "React Native"
       ]
