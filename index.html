@@ -1010,15 +1010,59 @@
             flex-direction: column;
         }
 
-        /* Projects Header with Tabs */
+        /* Projects Header with Scrollable Tab Bar */
         .projects-header {
+            position: relative;
+            padding: clamp(20px, 4vh, 40px) 0;
+            width: 100%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .projects-tabs-scroll {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: clamp(20px, 4vh, 40px) clamp(20px, 4vw, 60px);
-            gap: clamp(8px, 2vw, 24px);
-            position: relative;
+            gap: clamp(4px, 1.5vw, 20px);
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 0 clamp(40px, 8vw, 80px);
+            /* Centers when content fits; scrolls when it overflows */
+            justify-content: safe center;
         }
+
+        .projects-tabs-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Side fade masks */
+        .projects-header::before,
+        .projects-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: clamp(30px, 6vw, 60px);
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .projects-header::before {
+            left: 0;
+            background: linear-gradient(to right, #fafafa 0%, rgba(250, 250, 250, 0.85) 55%, rgba(250, 250, 250, 0) 100%);
+        }
+
+        .projects-header::after {
+            right: 0;
+            background: linear-gradient(to left, #fafafa 0%, rgba(250, 250, 250, 0.85) 55%, rgba(250, 250, 250, 0) 100%);
+        }
+
+        .projects-header.fade-left::before { opacity: 1; }
+        .projects-header.fade-right::after { opacity: 1; }
 
         /* Close button positioning for projects section */
         #section-projects .close-btn-projects {
@@ -1081,6 +1125,9 @@
             cursor: pointer;
             position: relative;
             transition: color 0.3s ease;
+            flex: 0 0 auto;
+            white-space: nowrap;
+            scroll-snap-align: center;
         }
 
         .project-tab::after {
@@ -2118,12 +2165,6 @@
             text-transform: uppercase;
         }
 
-        /* Project 3 Gallery - reusing Project 2 pattern */
-        #project3-user-view,
-        #project3-admin-view {
-            width: 100%;
-        }
-
         /* Tablet Adjustments for Projects */
         @media (max-width: 900px) {
             .project-slide {
@@ -2148,7 +2189,12 @@
             }
 
             .projects-header {
-                padding: 16px 20px;
+                padding: 16px 0;
+            }
+
+            .projects-tabs-scroll {
+                padding: 0 clamp(24px, 8vw, 40px);
+                gap: 2px;
             }
 
             #section-projects .close-btn-projects {
@@ -2690,11 +2736,18 @@
         <!-- Close button for projects section -->
         <button class="close-btn-projects" id="close-btn-projects" aria-label="Close section"></button>
         <div class="section-content">
-            <!-- Projects Header with Tabs -->
-            <div class="projects-header">
-                <button class="project-tab active" data-project="0" data-i18n="projects.tabs.project1">Project 1</button>
-                <button class="project-tab" data-project="1" data-i18n="projects.tabs.project2">Project 2</button>
-                <button class="project-tab" data-project="2" data-i18n="projects.tabs.project3">Project 3</button>
+            <!-- Projects Header with Scrollable Tab Bar -->
+            <div class="projects-header" id="projects-header">
+                <div class="projects-tabs-scroll" id="projects-tabs-scroll">
+                    <button class="project-tab active" data-project="0" data-i18n="projects.tabs.project1">GlobalEmploi</button>
+                    <button class="project-tab" data-project="1" data-i18n="projects.tabs.project2">Orkestra</button>
+                    <button class="project-tab" data-project="2" data-i18n="projects.tabs.project3">Docpilote</button>
+                    <button class="project-tab" data-project="3" data-i18n="projects.tabs.project4">Headless E-commerce</button>
+                    <button class="project-tab" data-project="4" data-i18n="projects.tabs.project5">Esprit Livre</button>
+                    <button class="project-tab" data-project="5" data-i18n="projects.tabs.project6">Hotel Booking</button>
+                    <button class="project-tab" data-project="6" data-i18n="projects.tabs.project7">Doctoque</button>
+                    <button class="project-tab" data-project="7" data-i18n="projects.tabs.project8">AcademAI</button>
+                </div>
             </div>
 
             <!-- Projects Carousel -->
@@ -2709,31 +2762,157 @@
 
                 <!-- Projects Track -->
                 <div class="projects-track" id="projects-track">
-                    <!-- Project 1: Power BI Dashboard -->
+                    <!-- Project 1: GlobalEmploi -->
                     <div class="project-slide" data-index="0">
                         <div class="project-content">
-                            <h2 class="project-title" data-i18n="projects.project1.title">ReportHub</h2>
+                            <h2 class="project-title" data-i18n="projects.project1.title">GlobalEmploi</h2>
                             <p class="project-description" data-i18n="projects.project1.description">
-                                A modern SaaS application featuring embedded Power BI dashboards, designed with a clear separation between User and Admin experiences. The focus is on data clarity, role-based access, and smooth interactions, delivering complex analytics through a clean, intuitive interface.
+                                A remote-job aggregator built for Algerian candidates — pulling live listings from a curated pipeline of international sources into a single, fast, filterable frontend. Led the interface end-to-end with occasional backend contributions to the aggregation layer.
                             </p>
                             <div class="project-tags">
-                                <span class="project-tag">React</span>
-                                <span class="project-tag">Tailwind CSS</span>
+                                <span class="project-tag">Next.js</span>
                                 <span class="project-tag">TypeScript</span>
-                                <span class="project-tag">Framer Motion</span>
+                                <span class="project-tag">Tailwind CSS</span>
+                                <span class="project-tag">Aggregation Pipeline</span>
                             </div>
-                            <a href="https://reporthub-rust.vercel.app/" class="project-link" target="_blank" rel="noopener">
+                            <a href="https://job-market-web-green.vercel.app/" class="project-link" target="_blank" rel="noopener">
                                 <span data-i18n="projects.project1.viewDemo">View Live Demo</span>
                                 <i data-lucide="arrow-right" stroke-width="1.5"></i>
                             </a>
                         </div>
                     </div>
 
-                    <!-- Project 2: AcademAI (Medical AI) -->
+                    <!-- Project 2: Orkestra -->
                     <div class="project-slide" data-index="1">
                         <div class="project-content">
-                            <h2 class="project-title" data-i18n="projects.project2.title">AcademAI</h2>
+                            <h2 class="project-title" data-i18n="projects.project2.title">Orkestra</h2>
                             <p class="project-description" data-i18n="projects.project2.description">
+                                A BFSI analytics cockpit built for Malyz Consulting (Geneva) to serve Swiss SMEs. Led the entire front-end, wired to Helvebroker SA and Odoo backends, with a Mistral AI agent for on-demand financial reasoning.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Next.js</span>
+                                <span class="project-tag">TypeScript</span>
+                                <span class="project-tag">Tailwind CSS</span>
+                                <span class="project-tag">Mistral AI</span>
+                                <span class="project-tag">Odoo</span>
+                            </div>
+                            <a href="https://orkestra-cockpit.vercel.app/" class="project-link" target="_blank" rel="noopener">
+                                <span data-i18n="projects.project2.viewDemo">View Live Demo</span>
+                                <i data-lucide="arrow-right" stroke-width="1.5"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Project 3: Docpilote -->
+                    <div class="project-slide" data-index="2">
+                        <div class="project-content">
+                            <h2 class="project-title" data-i18n="projects.project3.title">Docpilote</h2>
+                            <p class="project-description" data-i18n="projects.project3.description">
+                                Medical-practice management SaaS for Algerian clinics — patients, appointments, prescriptions and billing in DA. Full Arabic / French RTL interface, offline support for spotty networks, and workflows shaped around real clinical routines.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Next.js</span>
+                                <span class="project-tag">TypeScript</span>
+                                <span class="project-tag">i18n · RTL</span>
+                                <span class="project-tag">Offline-first</span>
+                            </div>
+                            <a href="https://docpilote.netlify.app/" class="project-link" target="_blank" rel="noopener">
+                                <span data-i18n="projects.project3.viewDemo">View Live Demo</span>
+                                <i data-lucide="arrow-right" stroke-width="1.5"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Project 4: Headless E-commerce Platform -->
+                    <div class="project-slide" data-index="3">
+                        <div class="project-content">
+                            <h2 class="project-title" data-i18n="projects.project4.title">Headless E-commerce Platform</h2>
+                            <p class="project-description" data-i18n="projects.project4.description">
+                                Built entirely solo for the Algerian market. A Dockerized WordPress + WooCommerce backend exposes a custom 125-route REST API (RBAC, audit trail, cash-on-delivery, Yalidine + ZR Express shipping adapters, Chargily payments, CMS, analytics) — consumed by two decoupled Next.js 16 / React 19 / TypeScript frontends. Bilingual FR / AR with full RTL, mobile-first, ships a staff admin panel and a customer storefront.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Next.js 16</span>
+                                <span class="project-tag">React 19</span>
+                                <span class="project-tag">TypeScript</span>
+                                <span class="project-tag">WordPress · WooCommerce</span>
+                                <span class="project-tag">REST API · RBAC</span>
+                                <span class="project-tag">Docker</span>
+                                <span class="project-tag">i18n · RTL</span>
+                            </div>
+                            <div class="project-tag" style="border-color:#18181b;color:#18181b;margin-top:4px;display:inline-block;">
+                                <span data-i18n="projects.project4.soloBadge">Solo build — front &amp; back</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 5: Esprit Livre -->
+                    <div class="project-slide" data-index="4">
+                        <div class="project-content">
+                            <h2 class="project-title" data-i18n="projects.project5.title">Esprit Livre</h2>
+                            <p class="project-description" data-i18n="projects.project5.description">
+                                A full-featured book e-commerce platform with a dedicated User app for browsing and purchasing, and a powerful Admin app giving the store owner complete control over products, orders, and content. The project emphasizes usability, motion-driven feedback, and scalable UI architecture.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">React</span>
+                                <span class="project-tag">Tailwind CSS</span>
+                                <span class="project-tag">TanStack Query</span>
+                                <span class="project-tag">Framer Motion</span>
+                                <span class="project-tag">Spring Boot</span>
+                            </div>
+                            <a href="https://espritlivre.com/" class="project-link" target="_blank" rel="noopener">
+                                <span data-i18n="projects.project5.viewDemo">View Live Demo</span>
+                                <i data-lucide="arrow-right" stroke-width="1.5"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Project 6: Hotel Booking Platform -->
+                    <div class="project-slide" data-index="5">
+                        <div class="project-content">
+                            <h2 class="project-title" data-i18n="projects.project6.title">Hotel Booking Platform</h2>
+                            <p class="project-description" data-i18n="projects.project6.description">
+                                A full Next.js hotel website with room booking, restaurant, events, and an integrated AI concierge. Ships with a lightweight admin dashboard at /admin for content and inventory.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Next.js</span>
+                                <span class="project-tag">TypeScript</span>
+                                <span class="project-tag">Tailwind CSS</span>
+                                <span class="project-tag">AI Concierge</span>
+                                <span class="project-tag">Admin Dashboard</span>
+                            </div>
+                            <a href="https://hotels-ten-topaz.vercel.app/" class="project-link" target="_blank" rel="noopener">
+                                <span data-i18n="projects.project6.viewDemo">View Live Demo</span>
+                                <i data-lucide="arrow-right" stroke-width="1.5"></i>
+                            </a>
+                            <p style="margin-top: 12px; font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #a1a1aa;" data-i18n="projects.project6.adminHint">Admin dashboard at /admin</p>
+                        </div>
+                    </div>
+
+                    <!-- Project 7: Doctoque -->
+                    <div class="project-slide" data-index="6">
+                        <div class="project-content">
+                            <h2 class="project-title" data-i18n="projects.project7.title">Doctoque</h2>
+                            <p class="project-description" data-i18n="projects.project7.description">
+                                Contributed to Doctoque â€” a production SaaS platform for law firms on a Next.js + Odoo stack. Refined UI/UX flows, cleaned the codebase, and shipped measurable web-performance improvements.
+                            </p>
+                            <div class="project-tags">
+                                <span class="project-tag">Next.js</span>
+                                <span class="project-tag">TypeScript</span>
+                                <span class="project-tag">Odoo</span>
+                                <span class="project-tag">Performance</span>
+                            </div>
+                            <a href="https://doctoque.com/" class="project-link" target="_blank" rel="noopener">
+                                <span data-i18n="projects.project7.viewDemo">View Live Site</span>
+                                <i data-lucide="arrow-right" stroke-width="1.5"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Project 8: AcademAI (Medical AI) -->
+                    <div class="project-slide" data-index="7">
+                        <div class="project-content">
+                            <h2 class="project-title" data-i18n="projects.project8.title">AcademAI</h2>
+                            <p class="project-description" data-i18n="projects.project8.description">
                                 An intelligent platform empowering medical students and professors with AI-driven diagnostics, adaptive quizzes, and automated course corrections — paired with a powerful admin dashboard for content oversight.
                             </p>
                             <div class="project-tags">
@@ -2744,13 +2923,13 @@
                             <!-- Case Study with Toggle -->
                             <div class="project-gallery">
                                 <div class="gallery-toggle">
-                                    <button class="gallery-toggle-btn active" data-view="user" data-project="2">
+                                    <button class="gallery-toggle-btn active" data-view="user" data-project="academai">
                                         <i data-lucide="smartphone" stroke-width="1.5"></i>
-                                        <span data-i18n="projects.project2.userApp">User App</span>
+                                        <span data-i18n="projects.project8.userApp">User App</span>
                                     </button>
-                                    <button class="gallery-toggle-btn" data-view="admin" data-project="2">
+                                    <button class="gallery-toggle-btn" data-view="admin" data-project="academai">
                                         <i data-lucide="layout-dashboard" stroke-width="1.5"></i>
-                                        <span data-i18n="projects.project2.adminApp">Admin App</span>
+                                        <span data-i18n="projects.project8.adminApp">Admin App</span>
                                     </button>
                                 </div>
 
@@ -2763,10 +2942,10 @@
                                             <div class="case-study-intro">
                                                 <div class="case-study-badge">
                                                     <span class="pulse-dot"></span>
-                                                    <span data-i18n="projects.project2.caseStudy.badge">Case Study</span>
+                                                    <span data-i18n="projects.project8.caseStudy.badge">Case Study</span>
                                                 </div>
-                                                <h3 data-i18n="projects.project2.caseStudy.intro.title">AcademAI</h3>
-                                                <p data-i18n="projects.project2.caseStudy.intro.description">An AI-powered medical education platform designed to support students through intelligent diagnostics, adaptive learning, and course correction.</p>
+                                                <h3 data-i18n="projects.project8.caseStudy.intro.title">AcademAI</h3>
+                                                <p data-i18n="projects.project8.caseStudy.intro.description">An AI-powered medical education platform designed to support students through intelligent diagnostics, adaptive learning, and course correction.</p>
                                             </div>
 
                                             <!-- Feature 01: AI Diagnostic Chat -->
@@ -2774,10 +2953,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.feature01.label">Feature 01</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.feature01.label">Feature 01</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature01.title">AI Diagnostic Chat</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature01.description">Natural language processing enables students to ask medical questions and receive instant, accurate diagnostic guidance with cited medical sources.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.feature01.title">AI Diagnostic Chat</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.feature01.description">Natural language processing enables students to ask medical questions and receive instant, accurate diagnostic guidance with cited medical sources.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2791,10 +2970,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.feature02.label">Feature 02</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.feature02.label">Feature 02</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature02.title">Adaptive Quiz System</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature02.description">AI-generated quizzes adapt to student performance and learning patterns. Questions reinforce weak areas and build comprehensive medical knowledge.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.feature02.title">Adaptive Quiz System</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.feature02.description">AI-generated quizzes adapt to student performance and learning patterns. Questions reinforce weak areas and build comprehensive medical knowledge.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2811,10 +2990,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.feature03.label">Feature 03</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.feature03.label">Feature 03</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature03.title">PDF Course Correction</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature03.description">Upload medical textbooks or study materials to receive AI-powered corrections and annotations. The system identifies outdated information and provides current medical guidelines.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.feature03.title">PDF Course Correction</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.feature03.description">Upload medical textbooks or study materials to receive AI-powered corrections and annotations. The system identifies outdated information and provides current medical guidelines.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2834,10 +3013,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.feature04.label">Feature 04</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.feature04.label">Feature 04</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature04.title">Profile & Access</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature04.description">Personalized student profiles with subscription management and premium features tailored for medical education.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.feature04.title">Profile & Access</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.feature04.description">Personalized student profiles with subscription management and premium features tailored for medical education.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2857,10 +3036,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.feature05.label">Design System</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.feature05.label">Design System</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.feature05.title">Light & Dark Mode</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.feature05.description">A carefully designed theme system optimized for extended study sessions. Dark mode reduces eye strain during night studying, while light mode ensures clarity in clinical settings.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.feature05.title">Light & Dark Mode</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.feature05.description">A carefully designed theme system optimized for extended study sessions. Dark mode reduces eye strain during night studying, while light mode ensures clarity in clinical settings.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-primary">
@@ -2899,10 +3078,10 @@
                                             <div class="case-study-intro">
                                                 <div class="case-study-badge">
                                                     <span class="pulse-dot"></span>
-                                                    <span data-i18n="projects.project2.caseStudy.badge">Case Study</span>
+                                                    <span data-i18n="projects.project8.caseStudy.badge">Case Study</span>
                                                 </div>
-                                                <h3 data-i18n="projects.project2.caseStudy.adminIntro.title">Admin Dashboard</h3>
-                                                <p data-i18n="projects.project2.caseStudy.adminIntro.description">Comprehensive admin platform for managing medical education content, monitoring student progress, and overseeing course corrections.</p>
+                                                <h3 data-i18n="projects.project8.caseStudy.adminIntro.title">Admin Dashboard</h3>
+                                                <p data-i18n="projects.project8.caseStudy.adminIntro.description">Comprehensive admin platform for managing medical education content, monitoring student progress, and overseeing course corrections.</p>
                                             </div>
 
                                             <!-- Feature 01: Admin Dashboard -->
@@ -2910,10 +3089,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature01.label">Feature 01</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.adminFeature01.label">Feature 01</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature01.title">Admin Dashboard</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature01.description">Centralized command center with real-time analytics, student activity monitoring, and platform health metrics.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.adminFeature01.title">Admin Dashboard</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.adminFeature01.description">Centralized command center with real-time analytics, student activity monitoring, and platform health metrics.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -2942,10 +3121,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature02.label">Feature 02</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.adminFeature02.label">Feature 02</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature02.title">User Management</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature02.description">Complete oversight of student and educator accounts. View detailed user profiles, edit permissions, and monitor individual learning progress.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.adminFeature02.title">User Management</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.adminFeature02.description">Complete oversight of student and educator accounts. View detailed user profiles, edit permissions, and monitor individual learning progress.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -2989,10 +3168,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature03.label">Feature 03</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.adminFeature03.label">Feature 03</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature03.title">Quiz Analytics</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature03.description">Deep insights into student performance and quiz effectiveness. Track completion rates, difficulty patterns, and learning outcomes.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.adminFeature03.title">Quiz Analytics</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.adminFeature03.description">Deep insights into student performance and quiz effectiveness. Track completion rates, difficulty patterns, and learning outcomes.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -3021,10 +3200,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature04.label">Feature 04</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.adminFeature04.label">Feature 04</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature04.title">Course Correction Review</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature04.description">Review, approve, and manage AI-generated course corrections. Examine detailed correction reports and validate suggested updates.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.adminFeature04.title">Course Correction Review</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.adminFeature04.description">Review, approve, and manage AI-generated course corrections. Examine detailed correction reports and validate suggested updates.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -3068,10 +3247,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature05.label">Feature 05</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.adminFeature05.label">Feature 05</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature05.title">Payment Management</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature05.description">Monitor subscription revenue, track transactions, and manage payment operations with detailed financial reporting.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.adminFeature05.title">Payment Management</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.adminFeature05.description">Monitor subscription revenue, track transactions, and manage payment operations with detailed financial reporting.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -3100,10 +3279,10 @@
                                                 <div class="case-study-panel-header">
                                                     <div class="case-study-panel-label">
                                                         <span class="dot"></span>
-                                                        <span data-i18n="projects.project2.caseStudy.features.adminFeature06.label">Feature 06</span>
+                                                        <span data-i18n="projects.project8.caseStudy.features.adminFeature06.label">Feature 06</span>
                                                     </div>
-                                                    <h4 class="case-study-panel-title" data-i18n="projects.project2.caseStudy.features.adminFeature06.title">Settings & Security</h4>
-                                                    <p class="case-study-panel-desc" data-i18n="projects.project2.caseStudy.features.adminFeature06.description">Platform configuration and security controls. Manage system settings, configure AI parameters, and maintain security.</p>
+                                                    <h4 class="case-study-panel-title" data-i18n="projects.project8.caseStudy.features.adminFeature06.title">Settings & Security</h4>
+                                                    <p class="case-study-panel-desc" data-i18n="projects.project8.caseStudy.features.adminFeature06.description">Platform configuration and security controls. Manage system settings, configure AI parameters, and maintain security.</p>
                                                 </div>
                                                 <div class="case-study-mockups">
                                                     <div class="case-study-mockup mockup-desktop">
@@ -3176,59 +3355,6 @@
                         </div>
                     </div>
 
-                    <!-- Project 3: Bookstore -->
-                    <div class="project-slide" data-index="2">
-                        <div class="project-content">
-                            <h2 class="project-title" data-i18n="projects.project3.title">Esprit Livre</h2>
-                            <p class="project-description" data-i18n="projects.project3.description">
-                                A full-featured book e-commerce platform with a dedicated User app for browsing and purchasing, and a powerful Admin app giving the store owner complete control over products, orders, and content. The project emphasizes usability, motion-driven feedback, and scalable UI architecture.
-                            </p>
-                            <div class="project-tags">
-                                <span class="project-tag">React</span>
-                                <span class="project-tag">Tailwind CSS</span>
-                                <span class="project-tag">TanStack Query</span>
-                                <span class="project-tag">Framer Motion</span>
-                                <span class="project-tag">Spring Boot</span>
-                            </div>
-
-                            <!-- User/Admin Toggle for Project 3 -->
-                            <div class="project-gallery">
-                                <div class="gallery-toggle">
-                                    <button class="gallery-toggle-btn active" data-view="user" data-project="3">
-                                        <i data-lucide="shopping-bag" stroke-width="1.5"></i>
-                                        <span data-i18n="projects.project3.userApp">User App</span>
-                                    </button>
-                                    <button class="gallery-toggle-btn" data-view="admin" data-project="3">
-                                        <i data-lucide="layout-dashboard" stroke-width="1.5"></i>
-                                        <span data-i18n="projects.project3.adminApp">Admin App</span>
-                                    </button>
-                                </div>
-
-                                <!-- User App View - Live Demo Button -->
-                                <div id="project3-user-view" style="margin-top: 1.5rem;">
-                                    <a href="https://espritlivre.com/" class="project-link" target="_blank" rel="noopener">
-                                        <span data-i18n="projects.project3.viewDemo">View Live Demo</span>
-                                        <i data-lucide="arrow-right" stroke-width="1.5"></i>
-                                    </a>
-                                </div>
-
-                                <!-- Admin App View - Video Preview (hidden by default) -->
-                                <div id="project3-admin-view" style="display: none;">
-                                    <div class="project-video-container">
-                                        <div class="video-placeholder">
-                                            <i data-lucide="play-circle" stroke-width="1"></i>
-                                            <span data-i18n="projects.project3.videoPlaceholder">Demo Video Coming Soon</span>
-                                        </div>
-                                        <!-- Replace placeholder with actual video when ready:
-                                        <video controls poster="/path/to/poster.jpg">
-                                            <source src="/path/to/demo-video.mp4" type="video/mp4">
-                                        </video>
-                                        -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -6072,10 +6198,12 @@
         // ============================================
         const ProjectsController = {
             currentIndex: 0,
-            totalProjects: 3,
+            totalProjects: 8,
             track: null,
             slides: null,
             tabs: null,
+            tabsScroll: null,
+            tabsHeader: null,
             prevBtn: null,
             nextBtn: null,
             isAnimating: false,
@@ -6095,6 +6223,8 @@
                 this.track = document.getElementById('projects-track');
                 this.slides = document.querySelectorAll('.project-slide');
                 this.tabs = document.querySelectorAll('.project-tab');
+                this.tabsScroll = document.getElementById('projects-tabs-scroll');
+                this.tabsHeader = document.getElementById('projects-header');
                 this.prevBtn = document.getElementById('project-prev');
                 this.nextBtn = document.getElementById('project-next');
 
@@ -6109,6 +6239,16 @@
                 // Arrow click handlers
                 this.prevBtn.addEventListener('click', () => this.prev(), { signal });
                 this.nextBtn.addEventListener('click', () => this.next(), { signal });
+
+                // Tab bar: update side fades on scroll + resize
+                if (this.tabsScroll) {
+                    const updateFades = () => this.updateTabFades();
+                    this.tabsScroll.addEventListener('scroll', updateFades, { signal, passive: true });
+                    window.addEventListener('resize', updateFades, { signal });
+                    // Initial paint + a slightly deferred one after layout/i18n text swap
+                    updateFades();
+                    setTimeout(updateFades, 100);
+                }
 
                 // Keyboard navigation
                 document.addEventListener('keydown', (e) => {
@@ -6252,65 +6392,34 @@
             initGalleryToggle(signal) {
                 const toggleBtns = document.querySelectorAll('.gallery-toggle-btn');
 
-                // Project 2 case studies
+                // AcademAI case studies (user vs admin)
                 const userCaseStudy = document.getElementById('case-study-user');
                 const adminCaseStudy = document.getElementById('case-study-admin');
-
-                // Project 3 views
-                const project3UserView = document.getElementById('project3-user-view');
-                const project3AdminView = document.getElementById('project3-admin-view');
 
                 toggleBtns.forEach(btn => {
                     btn.addEventListener('click', () => {
                         const view = btn.dataset.view;
-                        const projectNum = btn.dataset.project;
+                        const projectKey = btn.dataset.project;
 
                         // Get sibling toggle buttons (within same gallery-toggle container)
                         const siblingBtns = btn.parentElement.querySelectorAll('.gallery-toggle-btn');
                         siblingBtns.forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
 
-                        // Handle Project 2 case study toggle
-                        if (projectNum === '2') {
+                        // AcademAI case study toggle
+                        if (projectKey === 'academai') {
                             if (view === 'user') {
                                 adminCaseStudy.classList.remove('active');
                                 userCaseStudy.classList.add('active');
-                                // Reset scroll position
                                 const userScroll = document.getElementById('user-scroll');
                                 if (userScroll) userScroll.scrollLeft = 0;
                                 this.updateCaseStudyDots('user-scroll', 0);
                             } else {
                                 userCaseStudy.classList.remove('active');
                                 adminCaseStudy.classList.add('active');
-                                // Reset scroll position
                                 const adminScroll = document.getElementById('admin-scroll');
                                 if (adminScroll) adminScroll.scrollLeft = 0;
                                 this.updateCaseStudyDots('admin-scroll', 0);
-                            }
-                        }
-
-                        // Handle Project 3 toggle
-                        if (projectNum === '3') {
-                            if (view === 'user') {
-                                gsap.to(project3AdminView, {
-                                    opacity: 0,
-                                    duration: 0.2,
-                                    onComplete: () => {
-                                        project3AdminView.style.display = 'none';
-                                        project3UserView.style.display = 'block';
-                                        gsap.fromTo(project3UserView, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-                                    }
-                                });
-                            } else {
-                                gsap.to(project3UserView, {
-                                    opacity: 0,
-                                    duration: 0.2,
-                                    onComplete: () => {
-                                        project3UserView.style.display = 'none';
-                                        project3AdminView.style.display = 'block';
-                                        gsap.fromTo(project3AdminView, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-                                    }
-                                });
                             }
                         }
                     }, { signal });
@@ -6318,6 +6427,28 @@
 
                 // Initialize case study navigation
                 this.initCaseStudyNavigation(signal);
+            },
+
+            updateTabFades() {
+                if (!this.tabsScroll || !this.tabsHeader) return;
+                const el = this.tabsScroll;
+                const tol = 2;
+                const canScroll = el.scrollWidth - el.clientWidth > tol;
+                const atStart = el.scrollLeft <= tol;
+                const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - tol;
+                this.tabsHeader.classList.toggle('fade-left', canScroll && !atStart);
+                this.tabsHeader.classList.toggle('fade-right', canScroll && !atEnd);
+            },
+
+            scrollActiveTabIntoView() {
+                if (!this.tabsScroll) return;
+                const activeTab = this.tabs[this.currentIndex];
+                if (!activeTab) return;
+                const el = this.tabsScroll;
+                const tabLeft = activeTab.offsetLeft;
+                const tabCenter = tabLeft + activeTab.offsetWidth / 2;
+                const target = tabCenter - el.clientWidth / 2;
+                el.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
             },
 
             initCaseStudyNavigation(signal) {
@@ -6445,6 +6576,9 @@
                     tab.classList.toggle('active', i === index);
                 });
 
+                // Keep the active tab visible in the scrollable tab bar
+                this.scrollActiveTabIntoView();
+
                 // Update arrow states
                 this.updateArrows();
 
@@ -6544,26 +6678,15 @@
                     this.updateCaseStudyDots('admin-scroll', 0);
                 }
 
-                // Reset Project 3 toggle to user view
-                const project3UserView = document.getElementById('project3-user-view');
-                const project3AdminView = document.getElementById('project3-admin-view');
-
-                if (project3UserView && project3AdminView) {
-                    // Issue #8 fix: Kill any running GSAP animations before resetting
-                    gsap.killTweensOf(project3UserView);
-                    gsap.killTweensOf(project3AdminView);
-
-                    project3UserView.style.display = 'block';
-                    project3UserView.style.opacity = '1';
-                    project3AdminView.style.display = 'none';
-                    project3AdminView.style.opacity = '';
-                }
-
                 // Reset all toggle buttons to user view active state
                 const toggleBtns = document.querySelectorAll('.gallery-toggle-btn');
                 toggleBtns.forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.view === 'user');
                 });
+
+                // Reset tab bar scroll to start + fade state
+                if (this.tabsScroll) this.tabsScroll.scrollLeft = 0;
+                this.updateTabFades();
             },
 
             destroy() {

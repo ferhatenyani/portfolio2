@@ -17,16 +17,52 @@
   },
   "projects": {
     "tabs": {
-      "project1": "Project 1",
-      "project2": "Project 2",
-      "project3": "Project 3"
+      "project1": "GlobalEmploi",
+      "project2": "Orkestra",
+      "project3": "Docpilote",
+      "project4": "Headless E-commerce",
+      "project5": "Esprit Livre",
+      "project6": "Hotel Booking",
+      "project7": "Doctoque",
+      "project8": "AcademAI"
     },
     "project1": {
-      "title": "ReportHub",
-      "description": "A modern SaaS application featuring embedded Power BI dashboards, designed with a clear separation between User and Admin experiences. The focus is on data clarity, role-based access, and smooth interactions, delivering complex analytics through a clean, intuitive interface.",
+      "title": "GlobalEmploi",
+      "description": "A remote-job aggregator built for Algerian candidates — pulling live listings from a curated pipeline of international sources into a single, fast, filterable frontend. Led the interface end-to-end with occasional backend contributions to the aggregation layer.",
       "viewDemo": "View Live Demo"
     },
     "project2": {
+      "title": "Orkestra",
+      "description": "A BFSI analytics cockpit built for Malyz Consulting (Geneva) to serve Swiss SMEs. Led the entire front-end, wired to Helvebroker SA and Odoo backends, with a Mistral AI agent for on-demand financial reasoning.",
+      "viewDemo": "View Live Demo"
+    },
+    "project3": {
+      "title": "Docpilote",
+      "description": "Medical-practice management SaaS for Algerian clinics — patients, appointments, prescriptions and billing in DA. Full Arabic / French RTL interface, offline support for spotty networks, and workflows shaped around real clinical routines.",
+      "viewDemo": "View Live Demo"
+    },
+    "project4": {
+      "title": "Headless E-commerce Platform",
+      "description": "Built entirely solo for the Algerian market. A Dockerized WordPress + WooCommerce backend exposes a custom 125-route REST API (RBAC, audit trail, cash-on-delivery, Yalidine + ZR Express shipping adapters, Chargily payments, CMS, analytics) — consumed by two decoupled Next.js 16 / React 19 / TypeScript frontends. Bilingual FR / AR with full RTL, mobile-first, ships a staff admin panel and a customer storefront.",
+      "soloBadge": "Solo build — front & back"
+    },
+    "project5": {
+      "title": "Esprit Livre",
+      "description": "A full-featured book e-commerce platform with a dedicated User app for browsing and purchasing, and a powerful Admin app giving the store owner complete control over products, orders, and content. The project emphasizes usability, motion-driven feedback, and scalable UI architecture.",
+      "viewDemo": "View Live Demo"
+    },
+    "project6": {
+      "title": "Hotel Booking Platform",
+      "description": "A full Next.js hotel website with room booking, restaurant, events, and an integrated AI concierge. Ships with a lightweight admin dashboard at /admin for content and inventory.",
+      "viewDemo": "View Live Demo",
+      "adminHint": "Admin dashboard at /admin"
+    },
+    "project7": {
+      "title": "Doctoque",
+      "description": "Contributed to Doctoque — a production SaaS platform for law firms on a Next.js + Odoo stack. Refined UI/UX flows, cleaned the codebase, and shipped measurable web-performance improvements.",
+      "viewDemo": "View Live Site"
+    },
+    "project8": {
       "title": "AcademAI",
       "description": "An intelligent platform empowering medical students and professors with AI-driven diagnostics, adaptive quizzes, and automated course corrections — paired with a powerful admin dashboard for content oversight.",
       "userApp": "User App",
@@ -99,14 +135,6 @@
           }
         }
       }
-    },
-    "project3": {
-      "title": "Esprit Livre",
-      "description": "A full-featured book e-commerce platform with a dedicated User app for browsing and purchasing, and a powerful Admin app giving the store owner complete control over products, orders, and content. The project emphasizes usability, motion-driven feedback, and scalable UI architecture.",
-      "userApp": "User App",
-      "adminApp": "Admin App",
-      "viewDemo": "View Live Demo",
-      "videoPlaceholder": "Demo Video Coming Soon"
     }
   },
   "about": {

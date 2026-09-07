@@ -17,16 +17,52 @@
   },
   "projects": {
     "tabs": {
-      "project1": "Projet 1",
-      "project2": "Projet 2",
-      "project3": "Projet 3"
+      "project1": "GlobalEmploi",
+      "project2": "Orkestra",
+      "project3": "Docpilote",
+      "project4": "E-commerce Headless",
+      "project5": "Esprit Livre",
+      "project6": "Hotel Booking",
+      "project7": "Doctoque",
+      "project8": "AcademAI"
     },
     "project1": {
-      "title": "ReportHub",
-      "description": "Une application SaaS moderne intégrant des tableaux de bord Power BI, conçue avec une séparation claire entre les expériences Utilisateur et Admin. L'accent est mis sur la clarté des données, l'accès basé sur les rôles et des interactions fluides, offrant des analyses complexes via une interface épurée et intuitive.",
+      "title": "GlobalEmploi",
+      "description": "Agrégateur d'emplois à distance conçu pour les candidats algériens — récupère en temps réel des offres issues d'un pipeline soigné de sources internationales, réunies dans un frontend rapide et filtrable. J'ai piloté l'interface de bout en bout, avec quelques contributions backend sur la couche d'agrégation.",
       "viewDemo": "Voir la Démo"
     },
     "project2": {
+      "title": "Orkestra",
+      "description": "Cockpit d'analyse BFSI conçu pour Malyz Consulting (Genève) au service des PME suisses. J'ai dirigé l'intégralité du front-end, connecté aux backends Helvebroker SA et Odoo, avec un agent IA Mistral pour du raisonnement financier à la demande.",
+      "viewDemo": "Voir la Démo"
+    },
+    "project3": {
+      "title": "Docpilote",
+      "description": "SaaS de gestion de cabinet médical pour cliniques algériennes — patients, rendez-vous, ordonnances et facturation en DA. Interface bilingue arabe / français avec support RTL complet, mode hors-ligne pour les réseaux instables, et workflows calqués sur les routines cliniques réelles.",
+      "viewDemo": "Voir la Démo"
+    },
+    "project4": {
+      "title": "Plateforme E-commerce Headless",
+      "description": "Construite entièrement seul pour le marché algérien. Un backend Dockerisé WordPress + WooCommerce expose une API REST personnalisée de 125 routes (RBAC, journal d'audit, paiement à la livraison, adaptateurs Yalidine + ZR Express, paiements Chargily, CMS, analytics) — consommée par deux frontends Next.js 16 / React 19 / TypeScript découplés. Bilingue FR / AR avec RTL complet, mobile-first, avec un panneau admin staff et une boutique client.",
+      "soloBadge": "Projet solo — front & back"
+    },
+    "project5": {
+      "title": "Esprit Livre",
+      "description": "Une plateforme e-commerce de livres complète avec une application Utilisateur dédiée pour la navigation et l'achat, et une puissante application Admin donnant au propriétaire de la boutique un contrôle total sur les produits, commandes et contenus. Le projet met l'accent sur l'utilisabilité, les retours pilotés par le mouvement et une architecture UI évolutive.",
+      "viewDemo": "Voir la Démo"
+    },
+    "project6": {
+      "title": "Plateforme de Réservation Hôtelière",
+      "description": "Un site hôtelier Next.js complet avec réservation de chambres, restaurant, événements et un concierge IA intégré. Livré avec un tableau de bord admin léger sur /admin pour la gestion du contenu et de l'inventaire.",
+      "viewDemo": "Voir la Démo",
+      "adminHint": "Tableau de bord admin sur /admin"
+    },
+    "project7": {
+      "title": "Doctoque",
+      "description": "Contribution à Doctoque — plateforme SaaS en production pour cabinets d'avocats sur stack Next.js + Odoo. Affinage des flux UI/UX, nettoyage du code et améliorations mesurables des performances web.",
+      "viewDemo": "Voir le Site"
+    },
+    "project8": {
       "title": "AcademAI",
       "description": "Une plateforme intelligente qui accompagne les étudiants en médecine et les professeurs avec des diagnostics pilotés par l'IA, des quiz adaptatifs et des corrections de cours automatisées — associée à un puissant tableau de bord admin pour la supervision du contenu.",
       "userApp": "App Utilisateur",
@@ -99,14 +135,6 @@
           }
         }
       }
-    },
-    "project3": {
-      "title": "Esprit Livre",
-      "description": "Une plateforme e-commerce de livres complète avec une application Utilisateur dédiée pour la navigation et l'achat, et une puissante application Admin donnant au propriétaire de la boutique un contrôle total sur les produits, commandes et contenus. Le projet met l'accent sur l'utilisabilité, les retours pilotés par le mouvement et une architecture UI évolutive.",
-      "userApp": "App Utilisateur",
-      "adminApp": "App Admin",
-      "viewDemo": "Voir la Démo",
-      "videoPlaceholder": "Vidéo démo bientôt disponible"
     }
   },
   "about": {
